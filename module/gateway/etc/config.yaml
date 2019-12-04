@@ -1,0 +1,8 @@
+redis:
+  redisurl: localhost:6379
+  redispassword:
+  redisdb: 4
+  redismaxidleconnections: 3
+  redisidletimeoutseconds: 240
+userurl: http://localhost:9081
+

@@ -1,0 +1,141 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "Pc2ORQp+VY3Un/dkh4QwLC7R6lE=",
+			"path": "github.com/BurntSushi/toml",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "2UmMbNHc8FBr98mJFN1k8ISOIHk=",
+			"path": "github.com/garyburd/redigo/internal",
+			"revision": "569eae59ada904ea8db7a225c2b47165af08735a",
+			"revisionTime": "2018-04-04T16:07:26Z"
+		},
+		{
+			"checksumSHA1": "3kM5bMyfqvdCfgQdOb01CR1aA74=",
+			"path": "github.com/garyburd/redigo/redis",
+			"revision": "569eae59ada904ea8db7a225c2b47165af08735a",
+			"revisionTime": "2018-04-04T16:07:26Z"
+		},
+		{
+			"checksumSHA1": "qlEzrgKgIkh7y0ePm9BNo1cNdXo=",
+			"path": "github.com/gin-contrib/sse",
+			"revision": "43f0f29dbd2b3f0feeebff91fd9cda22db296938",
+			"revisionTime": "2019-09-05T05:13:34Z"
+		},
+		{
+			"checksumSHA1": "NamzkzoWIDIjzMWjd+0KqOCA6nw=",
+			"path": "github.com/gin-gonic/gin",
+			"revision": "db9174ae0c2587fe1c755def0f88cb9aba9e9641",
+			"revisionTime": "2019-11-01T02:47:40Z"
+		},
+		{
+			"checksumSHA1": "W3jpGcnMGZFhEjO+D79fIhK+4EQ=",
+			"path": "github.com/gin-gonic/gin/binding",
+			"revision": "db9174ae0c2587fe1c755def0f88cb9aba9e9641",
+			"revisionTime": "2019-11-01T02:47:40Z"
+		},
+		{
+			"checksumSHA1": "rST0S8cuVbM57VmJhWXhKNUkKTc=",
+			"path": "github.com/gin-gonic/gin/internal/json",
+			"revision": "db9174ae0c2587fe1c755def0f88cb9aba9e9641",
+			"revisionTime": "2019-11-01T02:47:40Z"
+		},
+		{
+			"checksumSHA1": "lbL3cOGzkGouMKZ+lAYnXgOa/DE=",
+			"path": "github.com/gin-gonic/gin/render",
+			"revision": "db9174ae0c2587fe1c755def0f88cb9aba9e9641",
+			"revisionTime": "2019-11-01T02:47:40Z"
+		},
+		{
+			"checksumSHA1": "aqu3vMmJGJBQUjMve/zd0TlbG14=",
+			"path": "github.com/go-playground/locales",
+			"revision": "9f105231d3a5f6877a2bf8321dfa15ea6f844b1b",
+			"revisionTime": "2019-10-18T04:58:51Z"
+		},
+		{
+			"checksumSHA1": "JgF260rC9YpWyY5WEljjimWLUXs=",
+			"path": "github.com/go-playground/locales/currency",
+			"revision": "9f105231d3a5f6877a2bf8321dfa15ea6f844b1b",
+			"revisionTime": "2019-10-18T04:58:51Z"
+		},
+		{
+			"checksumSHA1": "HVChkE8LKMhgaqaSOu4unWPYAXY=",
+			"path": "github.com/go-playground/universal-translator",
+			"revision": "f87b1403479a348651dbf5f07f5cc6e5fcf07008",
+			"revisionTime": "2019-11-11T20:22:24Z"
+		},
+		{
+			"checksumSHA1": "Y2MOwzNZfl4NRNDbLCZa6sgx7O0=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "irjmS2v8DQclPCTr3L0vGc9m6gU=",
+			"path": "github.com/jinzhu/configor",
+			"revision": "f52abb230c951b14a04e8515ca4e248be7690321",
+			"revisionTime": "2019-07-16T11:32:40Z"
+		},
+		{
+			"checksumSHA1": "W4cByvvu+jwClgwuAKbJn8vlDwI=",
+			"path": "github.com/json-iterator/go",
+			"revision": "05d041de1043ba04b678fb046bd35455a9b1b33b",
+			"revisionTime": "2018-10-24T15:28:41Z"
+		},
+		{
+			"checksumSHA1": "534F4hxmCUmJYO0u8Kr8tEqKboA=",
+			"path": "github.com/leodido/go-urn",
+			"revision": "a0f5013415294bb94553821ace21a1a74c0298cc",
+			"revisionTime": "2019-10-15T22:21:48Z"
+		},
+		{
+			"checksumSHA1": "IQ7SsIWs24sdmY9WnHNf3YV99Yc=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "0e9ddb7c0c0aef74fa25eaba4141e6b5ab7aca2a",
+			"revisionTime": "2019-10-09T15:56:15Z"
+		},
+		{
+			"checksumSHA1": "ZTcgWKWHsrX0RXYVXn5Xeb8Q0go=",
+			"path": "github.com/modern-go/concurrent",
+			"revision": "bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94",
+			"revisionTime": "2018-03-06T01:26:44Z"
+		},
+		{
+			"checksumSHA1": "qvH48wzTIV3QKSDqI0dLFtVjaDI=",
+			"path": "github.com/modern-go/reflect2",
+			"revision": "94122c33edd36123c84d5368cfb2b69df93a0ec8",
+			"revisionTime": "2018-07-18T01:23:57Z"
+		},
+		{
+			"checksumSHA1": "Tutue3nEgM/87jitUcYv6ODwyNE=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "b2ce2384e17bbe0c6d34077efa39dbab3e09123b",
+			"revisionTime": "2018-10-28T12:50:25Z"
+		},
+		{
+			"checksumSHA1": "8mJ7vjP4pj4Y8FH5jVT22mW5acA=",
+			"path": "github.com/ugorji/go/codec",
+			"revision": "42bc974514ff101a54c6b72a0e4dee29d96c0b26",
+			"revisionTime": "2019-08-12T10:43:08Z"
+		},
+		{
+			"checksumSHA1": "7Gocawl8bm27cpAILtuf21xvVD8=",
+			"path": "golang.org/x/sys/unix",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "Pxy1kmAM4h2XhsWnaWN+fIL3ju4=",
+			"path": "gopkg.in/go-playground/validator.v9",
+			"revision": "cd1bd581694a11c089aea885a26247c5f783a4cf",
+			"revisionTime": "2019-09-29T22:20:42Z"
+		},
+		{
+			"checksumSHA1": "ZSWoOPUNRr5+3dhkLK3C4cZAQPk=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/3115826227/baby-fried-rice/module/gateway"
+}

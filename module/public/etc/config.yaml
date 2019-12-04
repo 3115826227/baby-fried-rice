@@ -1,0 +1,1 @@
+postgresurl: postgres://postgres:ps4@localhost:5433/baby_fried_rice?sslmode=disable
