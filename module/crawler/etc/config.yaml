@@ -1,4 +1,5 @@
-postgresurl: postgres://postgres:ps4@localhost:5433/baby_fried_rice?sslmode=disable
+#postgresurl: postgres://postgres:ps4@localhost:5433/baby_fried_rice?sslmode=disable
+postgresurl: postgres://postgres:zh.fei@116.62.36.208:3432/baby_fried_rice?sslmode=disable
 redisurl: localhost:6379
 redispassword:
 redisdb: 3

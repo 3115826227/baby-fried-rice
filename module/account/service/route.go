@@ -1,9 +1,9 @@
 package service
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/account/middlware"
 	"github.com/3115826227/baby-fried-rice/module/account/service/login/handle"
 	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/account/middlware"
 )
 
 func RegisterRoute(engine *gin.Engine) {

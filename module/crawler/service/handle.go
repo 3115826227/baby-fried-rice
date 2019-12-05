@@ -1,15 +1,15 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
 	"fmt"
-	"time"
 	"github.com/3115826227/baby-fried-rice/module/crawler/config"
-	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
+	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/3115826227/baby-fried-rice/module/public/log"
+	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 func findTrainMeta(date string, isDetail bool) (rsp model.RspTrainMetaTrigger) {

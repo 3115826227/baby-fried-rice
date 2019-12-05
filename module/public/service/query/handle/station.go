@@ -1,26 +1,34 @@
 package handle
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
-	"github.com/3115826227/baby-fried-rice/module/public/service/model"
 	"github.com/3115826227/baby-fried-rice/module/public/log"
+	"github.com/3115826227/baby-fried-rice/module/public/service/model"
+	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
+	"github.com/gin-gonic/gin"
+	"net/http"
 	"sort"
 )
 
-func stationGet() (cities []model.StationCity, err error) {
+func CityGet(c *gin.Context) {
 	var stations = make([]model.Station, 0)
-	if err = db.DB.Group("city").Find(stations).Error; err != nil {
+	if err := db.DB.Find(&stations).Error; err != nil {
 		log.Logger.Warn(err.Error())
-		return cities, err
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		return
 	}
-	for _, stations := range stations {
-		cities = append(cities, model.StationCity{City: stations.City})
+	sort.Sort(model.Stations(stations))
+	var rsp = make([]model.RspStationCity, 0)
+	var mp = make(map[string]struct{})
+	for _, station := range stations {
+		if station.City == "" {
+			continue
+		}
+		if _, exist := mp[station.City]; exist {
+			continue
+		}
+		rsp = append(rsp, model.RspStationCity{Name: station.City})
+		mp[station.City] = struct{}{}
 	}
-	sort.Sort(model.StationCities(cities))
-	return
-}
 
-func StationGet(c *gin.Context) {
-
+	SuccessResp(c, "", rsp)
 }

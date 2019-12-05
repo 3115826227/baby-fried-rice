@@ -1,11 +1,11 @@
 package db
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
 	"github.com/3115826227/baby-fried-rice/module/public/config"
 	"github.com/3115826227/baby-fried-rice/module/public/log"
 	"github.com/3115826227/baby-fried-rice/module/public/service/model"
+	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -26,13 +26,13 @@ func init() {
 
 func Sync(engine *gorm.DB) {
 	err := engine.AutoMigrate(
-		new(model.Subject),
-		new(model.Grade),
-		new(model.Course),
-		new(model.MessageType),
-		new(model.Tutor),
-		new(model.Appointment),
-		new(model.Area),
+		//new(model.Subject),
+		//new(model.Grade),
+		//new(model.Course),
+		//new(model.MessageType),
+		//new(model.Tutor),
+		//new(model.Appointment),
+		//new(model.Area),
 
 		new(model.Station),
 		new(model.TrainMeta),

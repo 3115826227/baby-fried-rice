@@ -1,16 +1,16 @@
 package service
 
 import (
-	"net/http"
 	"github.com/3115826227/baby-fried-rice/module/crawler/log"
-	"io/ioutil"
-	"strings"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
-	"time"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
-	"go.uber.org/zap"
 	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"time"
 )
 
 func StationTrigger(c *gin.Context) {

@@ -158,7 +158,7 @@ func EncodePassword(pwd string) string {
 
 /*
 	生成uuid
- */
+*/
 func GenerateID() string {
 	id, _ := uuid.NewV4()
 	return id.String()

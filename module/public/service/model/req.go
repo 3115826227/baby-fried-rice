@@ -8,3 +8,10 @@ type ReqTutorAdd struct {
 	AreaId    string `json:"area_id"`
 	Describe  string `json:"describe"`
 }
+
+type ReqTrainSeatGet struct {
+	From     string `json:"from" binding:"required"`
+	To       string `json:"to" binding:"required"`
+	Date     string `json:"date" binding:"required"`
+	HighOnly bool   `json:"high_only"`
+}

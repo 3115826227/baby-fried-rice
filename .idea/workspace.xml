@@ -2,8 +2,59 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9cea22a4-2a7a-4ad2-9f79-c20aea867b6d" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/module/crawler/model/db/db_test.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/module/public/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/baby-fried-rice.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/emacs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/markdown-navigator.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/markdown-navigator/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etc/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/etc/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/middlware/middlware.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/middlware/middlware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/login/handle/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/login/handle/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/login/handle/role.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/login/handle/role.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/login/handle/tools.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/login/handle/tools.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/model/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/model/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/model/req.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/model/req.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/account/service/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/account/service/route.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/etc/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/etc/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/model/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/model/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/model/db/load.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/model/db/load.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/model/rsp.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/model/rsp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/model/table.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/model/table.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/redis/redis.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/redis/redis_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/redis/redis_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/service/handle.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/handle.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/service/seat.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/seat.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/service/service_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/service_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/service/station.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/station.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/service/tools.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/tools.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/module/crawler/service/trains.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/service/trains.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/utils/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/utils/utils.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/utils/utils_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/utils/utils_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/etc/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/etc/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/handle/area.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/handle/area.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/handle/course.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/handle/course.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/handle/tools.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/handle/tools.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/handle/tools_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/handle/tools_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/job/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/job/route.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/model/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/model/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/model/req.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/model/req.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/model/rsp.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/model/rsp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/model/table.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/model/table.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/query/handle/station.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/query/handle/station.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/query/handle/train.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/query/handle/train.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/query/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/query/route.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/route.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/public/service/square/handle/short.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/service/square/handle/short.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,97 +65,98 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/config/config.go">
+      <file leaf-file-name="train.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/train.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="22">
-              <caret line="8" column="29" lean-forward="true" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="29" />
+            <state relative-caret-position="2175">
+              <caret line="85" column="18" selection-start-line="85" selection-start-column="18" selection-end-line="85" selection-end-column="18" />
               <folding>
-                <element signature="e#16#62#0" expanded="true" />
+                <element signature="e#16#284#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="seat.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
-              <caret line="490" column="13" selection-start-line="490" selection-start-column="13" selection-end-line="490" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="rsp.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/model/rsp.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="283">
-              <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="trains.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="129">
-              <caret line="393" column="51" lean-forward="true" selection-start-line="393" selection-start-column="51" selection-end-line="393" selection-end-column="51" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="73" column="21" selection-start-line="73" selection-start-column="21" selection-end-line="73" selection-end-column="21" />
-              <folding>
-                <element signature="e#14#116#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="table.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/model/table.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="85" column="6" selection-start-line="85" selection-start-column="6" selection-end-line="85" selection-end-column="6" />
-              <folding>
-                <element signature="e#15#50#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.yaml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/etc/config.yaml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-column="83" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/account/config/config.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7">
-              <caret line="15" column="3" selection-start-line="15" selection-start-column="3" selection-end-line="15" selection-end-column="3" />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/account/main.go">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/module/public/main.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="264">
+              <caret line="37" column="23" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
+              <folding>
+                <element signature="e#14#115#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="78">
+              <caret line="3" column="4" lean-forward="true" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="338">
+              <caret line="44" selection-start-line="44" selection-end-line="62" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/Dockerfile">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="430">
+              <caret line="23" column="54" selection-start-line="23" selection-start-column="54" selection-end-line="23" selection-end-column="54" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/public/Dockerfile">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="280">
+              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/public/config/config.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="130">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="route.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/public/service/job/route.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="156">
+              <caret line="9" column="37" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tutor_operator.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="290">
+              <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file leaf-file-name="config.yaml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/account/etc/config.yaml">
+        <entry file="file://$PROJECT_DIR$/module/public/etc/config.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="12" selection-start-column="12" selection-end-column="12" />
+            <state relative-caret-position="52">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
@@ -130,32 +182,16 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/module/account/service/login/handle/role.go" />
-        <option value="$PROJECT_DIR$/module/account/service/model/req.go" />
-        <option value="$PROJECT_DIR$/module/account/service/login/handle/policy.go" />
-        <option value="$PROJECT_DIR$/module/public/service/square/handle/tools.go" />
-        <option value="$PROJECT_DIR$/module/public/service/square/handle/short.go" />
-        <option value="$PROJECT_DIR$/module/public/service/job/handle/education.go" />
-        <option value="$PROJECT_DIR$/module/public/service/job/handle/tutor.go" />
-        <option value="$PROJECT_DIR$/module/public/config/config.go" />
         <option value="$PROJECT_DIR$/module/public/service/model/table_test.go" />
-        <option value="$PROJECT_DIR$/module/public/main.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/tools.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/course.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/tools_test.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/route.go" />
-        <option value="$PROJECT_DIR$/module/public/service/model/req.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/tutor_view.go" />
         <option value="$PROJECT_DIR$/module/public/service/job/handle/area.go" />
         <option value="$PROJECT_DIR$/module/public/service/query/handle/tools.go" />
-        <option value="$PROJECT_DIR$/module/public/service/model/rsp.go" />
-        <option value="$PROJECT_DIR$/module/public/service/query/handle/train.go" />
-        <option value="$PROJECT_DIR$/module/public/service/query/route.go" />
         <option value="$PROJECT_DIR$/module/public/service/route.go" />
-        <option value="$PROJECT_DIR$/module/public/service/model/db/db.go" />
-        <option value="$PROJECT_DIR$/module/public/service/query/handle/station.go" />
-        <option value="$PROJECT_DIR$/module/public/service/model/table.go" />
         <option value="$PROJECT_DIR$/module/crawler/redis/redis_test.go" />
         <option value="$PROJECT_DIR$/module/account/service/model/db/load.go" />
         <option value="$PROJECT_DIR$/module/account/config/config.go" />
@@ -163,24 +199,40 @@
         <option value="$PROJECT_DIR$/module/crawler/service/trains_new.go" />
         <option value="$PROJECT_DIR$/module/crawler/utils/utils_test.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/station.go" />
-        <option value="$PROJECT_DIR$/module/crawler/model/table.go" />
-        <option value="$PROJECT_DIR$/module/crawler/model/db/db.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/city.go" />
         <option value="$PROJECT_DIR$/module/crawler/utils/utils.go" />
         <option value="$PROJECT_DIR$/module/crawler/consumer/consumer.go" />
         <option value="$PROJECT_DIR$/module/crawler/model/rsp.go" />
-        <option value="$PROJECT_DIR$/module/crawler/service/service_test.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/handle.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/router.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/tools.go" />
-        <option value="$PROJECT_DIR$/module/crawler/service/seat.go" />
         <option value="$PROJECT_DIR$/module/crawler/docker/Dockerfile" />
-        <option value="$PROJECT_DIR$/module/crawler/etc/config.yaml" />
         <option value="$PROJECT_DIR$/module/crawler/redis/redis.go" />
         <option value="$PROJECT_DIR$/module/crawler/config/config.go" />
         <option value="$PROJECT_DIR$/module/crawler/Dockerfile" />
         <option value="$PROJECT_DIR$/module/crawler/service/trains.go" />
         <option value="$PROJECT_DIR$/module/crawler/main.go" />
+        <option value="$PROJECT_DIR$/module/crawler/service/service_test.go" />
+        <option value="$PROJECT_DIR$/module/crawler/service/seat.go" />
+        <option value="$PROJECT_DIR$/module/crawler/model/model_test.go" />
+        <option value="$PROJECT_DIR$/module/crawler/model/table.go" />
+        <option value="$PROJECT_DIR$/etc/config.yaml" />
+        <option value="$PROJECT_DIR$/module/crawler/etc/config.yaml" />
+        <option value="$PROJECT_DIR$/module/public/etc/config.yaml" />
+        <option value="$PROJECT_DIR$/module/public/service/model/db/db.go" />
+        <option value="$PROJECT_DIR$/module/public/service/model/table.go" />
+        <option value="$PROJECT_DIR$/module/account/service/model/req.go" />
+        <option value="$PROJECT_DIR$/module/crawler/model/db/db_test.go" />
+        <option value="$PROJECT_DIR$/module/crawler/model/db/db.go" />
+        <option value="$PROJECT_DIR$/module/public/service/model/req.go" />
+        <option value="$PROJECT_DIR$/module/public/service/query/handle/train.go" />
+        <option value="$PROJECT_DIR$/module/public/service/model/rsp.go" />
+        <option value="$PROJECT_DIR$/module/public/service/query/route.go" />
+        <option value="$PROJECT_DIR$/module/public/service/query/handle/station.go" />
+        <option value="$PROJECT_DIR$/module/public/Dockerfile" />
+        <option value="$PROJECT_DIR$/module/public/config/config.go" />
+        <option value="$PROJECT_DIR$/module/public/main.go" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -217,129 +269,6 @@
             </path>
             <path>
               <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-              <item name="config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-              <item name="etc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-              <item name="login" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="account" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-              <item name="login" type="462c0819:PsiDirectoryNode" />
-              <item name="handle" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="config" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="etc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="log" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-              <item name="rsp.go" type="e9541c9c:GoTreeStructureProvider$GoFileNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="redis" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="service" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="crawler" type="462c0819:PsiDirectoryNode" />
-              <item name="utils" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="module" type="462c0819:PsiDirectoryNode" />
-              <item name="gateway" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
-              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
-              <item name="util" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
             <path>
@@ -369,9 +298,9 @@
       <recent name="$PROJECT_DIR$/module/gateway" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/module/public" />
       <recent name="$PROJECT_DIR$/module/crawler/model/db" />
       <recent name="$PROJECT_DIR$/module/crawler" />
-      <recent name="$PROJECT_DIR$/module/public" />
       <recent name="$PROJECT_DIR$/module/public/service/model" />
       <recent name="$PROJECT_DIR$/module/account" />
     </key>
@@ -388,50 +317,59 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go">
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build main.go (1)">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="baby-fried-rice" />
       <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/module/crawler/main.go" />
+      <filePath value="$PROJECT_DIR$/" />
       <package value="github.com/3115826227/baby-fried-rice" />
       <directory value="$PROJECT_DIR$/" />
     </configuration>
-    <configuration name="TestStation in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go build main.go (1)" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="baby-fried-rice" />
-      <working_directory value="$PROJECT_DIR$/module/crawler/service" />
+      <working_directory value="$PROJECT_DIR$/" />
       <go_parameters value="-i" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/3115826227/baby-fried-rice/module/crawler/service" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/module/public/main.go" />
+      <package value="github.com/3115826227/baby-fried-rice" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestStation$" />
     </configuration>
-    <configuration name="TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="baby-fried-rice" />
-      <working_directory value="$PROJECT_DIR$/module/crawler/service" />
+      <working_directory value="$PROJECT_DIR$/module/crawler/model/db" />
       <go_parameters value="-i" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="github.com/3115826227/baby-fried-rice/module/crawler/service" />
+      <package value="github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestTrainMetaTrigger$" />
+      <pattern value="^TestAddTrainCategory$" />
     </configuration>
-    <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="baby-fried-rice" />
-      <working_directory value="$PROJECT_DIR$/module/crawler/service" />
+      <working_directory value="$PROJECT_DIR$/module/crawler/model" />
       <go_parameters value="-i" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="github.com/3115826227/baby-fried-rice/module/crawler/service" />
+      <package value="github.com/3115826227/baby-fried-rice/module/crawler/model" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestTrainsMetaExtract$" />
+      <pattern value="^TestAddTrainSeatCategory$" />
     </configuration>
-    <configuration name="TestZhixingTrainTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="baby-fried-rice" />
+      <working_directory value="$PROJECT_DIR$/module/crawler/model/db" />
+      <go_parameters value="-i" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestAddTrainSeatCategory$" />
+    </configuration>
+    <configuration name="TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="baby-fried-rice" />
       <working_directory value="$PROJECT_DIR$/module/crawler/service" />
       <go_parameters value="-i" />
@@ -440,71 +378,71 @@
       <package value="github.com/3115826227/baby-fried-rice/module/crawler/service" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestZhixingTrainTrigger$" />
+      <pattern value="^TestTrainSeatPrice$" />
     </configuration>
     <list>
-      <item itemvalue="Go Test.TestStation in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-      <item itemvalue="Go Test.TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-      <item itemvalue="Go Test.TestZhixingTrainTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-      <item itemvalue="Go Test.TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-      <item itemvalue="Go Build.go build main.go" />
+      <item itemvalue="Go Test.TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" />
+      <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model" />
+      <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
+      <item itemvalue="Go Build.go build main.go (1)" />
+      <item itemvalue="Go Test.TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build main.go" />
-        <item itemvalue="Go Test.TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-        <item itemvalue="Go Test.TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-        <item itemvalue="Go Test.TestStation in github.com/3115826227/baby-fried-rice/module/crawler/service" />
-        <item itemvalue="Go Test.TestZhixingTrainTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" />
+        <item itemvalue="Go Build.go build main.go (1)" />
+        <item itemvalue="Go Test.TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
+        <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
+        <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model" />
+        <item itemvalue="Go Test.TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" />
       </list>
     </recent_temporary>
   </component>
   <component name="TestHistory">
-    <history-entry file="TestTrainMetaTrigger_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 03m 27s.xml">
-      <configuration name="TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainMetaTrigger_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 04m 47s.xml">
-      <configuration name="TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainMetaTrigger_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 05m 50s.xml">
-      <configuration name="TestTrainMetaTrigger in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 06m 05s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 06m 35s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 18m 14s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 18m 57s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 20m 29s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
-    <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 22m 01s.xml">
-      <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
-    </history-entry>
     <history-entry file="TestTrainsMetaExtract_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.04 at 17h 22m 41s.xml">
       <configuration name="TestTrainsMetaExtract in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainSeatPrice_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.05 at 11h 41m 00s.xml">
+      <configuration name="TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestTrainSeatPrice_in_github_com_3115826227_baby-fried-rice_module_crawler_service - 2019.12.05 at 11h 41m 17s.xml">
+      <configuration name="TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainSeatCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 11h 56m 14s.xml">
+      <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainSeatCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 12h 01m 52s.xml">
+      <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainSeatCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 12h 03m 46s.xml">
+      <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainSeatCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 12h 03m 58s.xml">
+      <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainSeatCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 12h 04m 51s.xml">
+      <configuration name="TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 16h 22m 30s.xml">
+      <configuration name="TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="TestAddTrainCategory_in_github_com_3115826227_baby-fried-rice_module_crawler_model_db - 2019.12.05 at 16h 22m 51s.xml">
+      <configuration name="TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" configurationId="GoTestRunConfiguration" />
     </history-entry>
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1695279" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20243205" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50143063" side_tool="true" weight="0.21454546" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985694" visible="true" weight="0.5915151" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985694" weight="0.27636364" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32969698" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49928468" weight="0.3709091" />
+      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49928468" visible="true" weight="0.3709091" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -528,184 +466,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/module/public/service/model/rsp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="596">
-          <caret line="47" column="1" selection-start-line="47" selection-start-column="1" selection-end-line="47" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/train.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="15" column="5" lean-forward="true" selection-start-line="15" selection-start-column="5" selection-end-line="15" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/client.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1435">
-          <caret line="85" column="34" lean-forward="true" selection-start-line="85" selection-start-column="34" selection-end-line="85" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../PuerkitoBio/goquery/type.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="145">
-          <caret line="8" column="4" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/service/model/db/db.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="152">
-          <caret line="27" column="4" selection-start-line="27" selection-start-column="4" selection-end-line="41" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/station.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="24" lean-forward="true" selection-start-line="24" selection-end-line="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/root.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="48" column="10" selection-start-line="48" selection-start-column="10" selection-end-line="48" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/model/db/db.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="22" column="5" lean-forward="true" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/model/table.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1482">
-          <caret line="57" column="1" lean-forward="true" selection-start-line="57" selection-start-column="1" selection-end-line="57" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/role.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/model/root.go">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../jinzhu/gorm/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="16" column="4" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/model/db/load.go" />
-    <entry file="file://$PROJECT_DIR$/module/account/service/route.go">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/trains_new.go" />
-    <entry file="file://$PROJECT_DIR$/../../../../../1.11.2/libexec/src/strconv/atoi.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="185">
-          <caret line="201" column="5" selection-start-line="201" selection-start-column="5" selection-end-line="201" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="260">
-          <caret line="10" column="15" lean-forward="true" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/gateway/main.go">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/model/rsp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-80">
-          <caret line="2" selection-start-line="2" selection-end-line="15" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/tools.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="104" column="20" selection-start-line="104" selection-start-column="20" selection-end-line="104" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/user.go">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/tools.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="26">
-          <caret line="103" column="21" selection-start-line="103" selection-start-column="21" selection-end-line="103" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/model/db/load.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1020">
-          <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/public/service/model/table.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2359">
-          <caret line="126" column="5" selection-start-line="126" selection-start-column="5" selection-end-line="126" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/model/db/db.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="28" column="27" lean-forward="true" selection-start-line="28" selection-start-column="27" selection-end-line="28" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/redis/redis_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
-          <folding>
-            <element signature="e#15#43#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/utils/utils_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="8" column="22" selection-start-line="8" selection-start-column="22" selection-end-line="8" selection-end-column="22" />
-          <folding>
-            <element signature="e#15#43#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/consumer/consumer.go" />
-    <entry file="file://$PROJECT_DIR$/module/crawler/vendor/github.com/go-redis/redis/command.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="659" column="27" selection-start-line="659" selection-start-column="27" selection-end-line="659" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/service/city.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-698">
@@ -717,27 +477,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="26">
           <caret line="12" column="1" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/router.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="8" column="58" selection-start-line="8" selection-start-column="58" selection-end-line="8" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/service_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="25" column="11" selection-start-line="25" selection-start-column="11" selection-end-line="25" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/station.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-505">
-          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
         </state>
       </provider>
     </entry>
@@ -760,38 +499,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/etc/config.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="78">
-          <caret line="3" column="10" lean-forward="true" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/utils/utils.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="202">
           <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/Dockerfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="23" column="54" selection-start-line="23" selection-start-column="54" selection-end-line="23" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/etc/config.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-column="83" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/account/etc/config.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" selection-start-column="12" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -805,54 +516,308 @@
     <entry file="file://$PROJECT_DIR$/module/account/main.go">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="70">
+          <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="491" column="47" selection-start-line="491" selection-start-column="47" selection-end-line="491" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/station.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/service_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="47" column="16" selection-start-line="47" selection-start-column="16" selection-end-line="47" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/router.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="7" column="47" selection-start-line="7" selection-start-column="47" selection-end-line="7" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/model/model_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="6" selection-start-line="6" selection-end-line="8" selection-end-column="1" />
+          <folding>
+            <element signature="e#15#112#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/model/db/load.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="367">
+          <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/config.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="1" selection-start-line="1" selection-end-line="1" selection-end-column="87" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/model/db/db.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="6" selection-start-line="6" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/etc/config.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="25" lean-forward="true" selection-start-column="25" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/etc/config.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="1" selection-start-line="1" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/model/db/db.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="412">
+          <caret line="37" column="24" selection-start-line="37" selection-start-column="24" selection-end-line="37" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/tools_test.go">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/tools.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="103" column="21" selection-start-line="103" selection-start-column="21" selection-end-line="103" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/user.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-283" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/route.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/role.go">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/root.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-30" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/policy.go">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/login/handle/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="37" column="23" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/account/service/model/req.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-53">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/model/rsp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-172">
+          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/config/config.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="8" column="29" lean-forward="true" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="29" />
+        <state relative-caret-position="26">
+          <caret line="8" selection-start-line="8" selection-end-line="9" />
           <folding>
             <element signature="e#16#62#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/model/rsp.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="490" column="13" selection-start-line="490" selection-start-column="13" selection-end-line="490" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="129">
-          <caret line="393" column="51" lean-forward="true" selection-start-line="393" selection-start-column="51" selection-end-line="393" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/model/table.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
-          <caret line="85" column="6" selection-start-line="85" selection-start-column="6" selection-end-line="85" selection-end-column="6" />
+        <state relative-caret-position="529">
+          <caret line="104" column="8" lean-forward="true" selection-start-line="104" selection-start-column="8" selection-end-line="104" selection-end-column="8" />
           <folding>
             <element signature="e#15#50#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/model/db/db_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="9" column="22" selection-start-line="9" selection-start-column="22" selection-end-line="9" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/model/db/db.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="35" column="33" selection-start-line="35" selection-start-column="33" selection-end-line="35" selection-end-column="33" />
+          <folding>
+            <element signature="e#12#263#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/model/req.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/model/rsp.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="69" column="19" selection-start-line="69" selection-start-column="19" selection-end-line="69" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/route.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/query/route.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="10" column="37" selection-start-line="10" selection-start-column="37" selection-end-line="10" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/model/table.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-202">
+          <caret line="111" column="5" selection-start-line="111" selection-start-column="5" selection-end-line="111" selection-end-column="5" />
+          <folding>
+            <element signature="e#15#50#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/station.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="62">
+          <caret line="17" column="5" selection-start-line="17" selection-start-column="5" selection-end-line="17" selection-end-column="5" />
+          <folding>
+            <element signature="e#16#123#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/query/handle/train.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2175">
+          <caret line="85" column="18" selection-start-line="85" selection-start-column="18" selection-end-line="85" selection-end-column="18" />
+          <folding>
+            <element signature="e#16#284#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/job/route.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="156">
+          <caret line="9" column="37" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/etc/config.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="52">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="430">
+          <caret line="23" column="54" selection-start-line="23" selection-start-column="54" selection-end-line="23" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="73" column="21" selection-start-line="73" selection-start-column="21" selection-end-line="73" selection-end-column="21" />
+        <state relative-caret-position="338">
+          <caret line="44" selection-start-line="44" selection-end-line="62" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/config/config.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="130">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/public/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="37" column="23" selection-start-line="37" selection-start-column="23" selection-end-line="37" selection-end-column="23" />
           <folding>
-            <element signature="e#14#116#0" expanded="true" />
+            <element signature="e#14#115#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="78">
+          <caret line="3" column="4" lean-forward="true" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
         </state>
       </provider>
     </entry>

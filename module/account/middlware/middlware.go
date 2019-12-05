@@ -1,10 +1,10 @@
 package middlware
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/3115826227/baby-fried-rice/module/account/service/login/handle"
-	"net/http"
 	"github.com/3115826227/baby-fried-rice/module/account/service/model"
+	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func Middleware(c *gin.Context) {

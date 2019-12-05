@@ -2,10 +2,10 @@ package db
 
 import (
 	"github.com/3115826227/baby-fried-rice/module/account/config"
+	"github.com/3115826227/baby-fried-rice/module/account/log"
 	"github.com/3115826227/baby-fried-rice/module/account/service/model"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
-	"github.com/3115826227/baby-fried-rice/module/account/log"
 )
 
 var (

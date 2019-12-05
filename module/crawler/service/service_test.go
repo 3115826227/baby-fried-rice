@@ -1,9 +1,9 @@
 package service
 
 import (
-	"testing"
-	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/crawler/model"
+	"testing"
 )
 
 func TestStation(t *testing.T) {
@@ -41,15 +41,15 @@ func TestGetStation(t *testing.T) {
 }
 
 func TestUpdateCity(t *testing.T) {
-	UpdateCity("2019-12-04")
+	//UpdateCity("2019-12-04")
 }
 
 func TestTrainSeatPrice(t *testing.T) {
-	TrainSeatPrice("2019-12-02")
+	TrainSeatPrice("2019-12-06")
 }
 
 func TestCrawler(t *testing.T) {
-	Crawler(SeatRelationInfo{Date: "2019-12-16", From: "北京", To: "衡阳"})
+	//Crawler(SeatRelationInfo{Date: "2019-12-16", From: "北京", To: "衡阳"})
 }
 
 func TestTongChengYiLongTraffic(t *testing.T) {

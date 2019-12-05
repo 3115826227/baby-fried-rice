@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	MsgEnvNotExist = "environment variable %s not exist!"
+	DayLayout = "2006-01-02"
 )
 
 var Config = struct {

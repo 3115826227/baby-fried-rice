@@ -1,9 +1,9 @@
 package handle
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/account/service/model"
 	"github.com/3115826227/baby-fried-rice/module/account/log"
+	"github.com/3115826227/baby-fried-rice/module/account/service/model"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
@@ -15,6 +15,5 @@ func RoleAdd(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
-
 
 }

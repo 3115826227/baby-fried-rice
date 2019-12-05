@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/3115826227/baby-fried-rice/module/crawler/service"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"os"
 	"path"
-	"log"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 /*
 	开启车次信息消费端
- */
+*/
 func TrainMetaConsumerOpen() {
 	for i := 0; i < 2; i++ {
 		go service.ZhixingTrainConsumer()
@@ -28,7 +28,7 @@ func TrainMetaConsumerOpen() {
 
 /*
 	开启列车坐席消费端
- */
+*/
 func TrainSeatConsumerOpen() {
 	for i := 0; i < 4; i++ {
 		go service.SeatInsertConsumer()
@@ -71,5 +71,5 @@ func main() {
 
 	service.Route(engine)
 
-	engine.Run(":8080")
+	engine.Run(":9083")
 }

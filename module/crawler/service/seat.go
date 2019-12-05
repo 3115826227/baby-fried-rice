@@ -2,22 +2,22 @@ package service
 
 import (
 	"fmt"
-	"gopkg.in/gin-gonic/gin.v1/json"
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
+	"github.com/3115826227/baby-fried-rice/module/crawler/log"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
-	"github.com/3115826227/baby-fried-rice/module/crawler/log"
+	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/3115826227/baby-fried-rice/module/crawler/utils"
+	"github.com/gin-gonic/gin"
 	"github.com/json-iterator/go"
 	"go.uber.org/zap"
-	"strings"
-	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
+	"gopkg.in/gin-gonic/gin.v1/json"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
-	"net/http"
-	"io/ioutil"
-	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 )
 
 const (

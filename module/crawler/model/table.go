@@ -1,8 +1,8 @@
 package model
 
 import (
-	"time"
 	"encoding/json"
+	"time"
 )
 
 type CommonField struct {

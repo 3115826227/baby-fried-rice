@@ -1,10 +1,10 @@
 package handle
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
-	"github.com/3115826227/baby-fried-rice/module/public/service/model"
 	"github.com/3115826227/baby-fried-rice/module/public/log"
+	"github.com/3115826227/baby-fried-rice/module/public/service/model"
+	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
@@ -26,7 +26,7 @@ func areaGetByCity(cityCode string) (result model.RspArea, err error) {
 	}
 	var rspLocals = make([]model.RspLocal, 0)
 	for _, local := range locals {
-		rspLocals = append(rspLocals, model.RspLocal{Local: local.Name, Code: local.Code,})
+		rspLocals = append(rspLocals, model.RspLocal{Local: local.Name, Code: local.Code})
 	}
 	result.Province = province.Name
 	result.Code = province.Code

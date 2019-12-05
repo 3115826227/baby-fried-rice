@@ -15,7 +15,7 @@ type ReqLogin struct {
 }
 
 type ReqClientAdd struct {
-	Name      string   `json:"name;" binding:"required"`
+	Name      string   `json:"name" binding:"required"`
 	SchoolIds []string `json:"school_id" binding:"required"`
 }
 

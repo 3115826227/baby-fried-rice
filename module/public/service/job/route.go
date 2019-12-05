@@ -1,8 +1,8 @@
 package job
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/3115826227/baby-fried-rice/module/public/service/job/handle"
+	"github.com/gin-gonic/gin"
 )
 
 func Register(engine *gin.RouterGroup) {

@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestExist(t *testing.T) {

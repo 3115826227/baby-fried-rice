@@ -1,18 +1,18 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
+	"github.com/3115826227/baby-fried-rice/module/crawler/log"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
-	"github.com/3115826227/baby-fried-rice/module/crawler/log"
-	"sort"
 	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
-	"fmt"
-	"time"
-	"github.com/3115826227/baby-fried-rice/module/crawler/config"
+	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
+	"sort"
 	"strconv"
+	"strings"
+	"time"
 )
 
 const (
@@ -156,13 +156,13 @@ func (info *TrainComputeInfo) ComputeRunningAndOverDay() {
 		info.Stations[i].OverDay = info.Stations[i-1].OverDay
 		/*
 			比较本站到达时间与上一站开出时间，判断是否多出了一天
-		 */
+		*/
 		if isOverDay(info.Stations[i].ArriveTime, info.Stations[i-1].StartTime) {
 			info.Stations[i].OverDay += 1
 		}
 		/*
-		 	比较本站开出时间与本站到达时间，判断是否多出了一天
-		 */
+			比较本站开出时间与本站到达时间，判断是否多出了一天
+		*/
 		if isOverDay(info.Stations[i].StartTime, info.Stations[i].ArriveTime) {
 			info.Stations[i].OverDay += 1
 		}

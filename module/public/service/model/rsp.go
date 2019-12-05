@@ -46,3 +46,65 @@ type RspArea struct {
 	Code     string    `json:"code"`
 	Cities   []RspCity `json:"cities"`
 }
+
+type RspTrainMeta struct {
+	//车次
+	Train string `json:"train"`
+	//日期
+	Date string `json:"date"`
+	//途径信息
+	Detail []RspTrainDetail `json:"detail"`
+	//版本
+	Version float32 `json:"version"`
+}
+
+type RspTrainDetail struct {
+	Station    string `json:"station"`
+	Number     int    `json:"number"`
+	ArriveTime string `json:"arrive_time"`
+	StartTime  string `json:"start_time"`
+	StopMinute int    `json:"stop_minute"`
+	OverDay    int    `json:"over_day"`
+}
+
+type RspStationCity struct {
+	Name string `json:"name"`
+}
+
+type RspStation struct {
+	Name string `json:"name"`
+	Code string `json:"code"`
+}
+
+type RspStationDetail struct {
+	City     string       `json:"city"`
+	Stations []RspStation `json:"stations"`
+}
+
+type RspTrainSeatPrice struct {
+	SeatCategory string  `json:"seat_category"`
+	Price        float32 `json:"price"`
+}
+
+type RspTrainSeatDetail struct {
+	Train                string              `json:"train"`
+	Date                 string              `json:"date"`
+	StartStation         string              `json:"start_station"`
+	StartTime            string              `json:"start_time"`
+	ArriveStation        string              `json:"arrive_station"`
+	ArriveTime           string              `json:"arrive_time"`
+	FromStation          string              `json:"from_station"`
+	FromStationStart     string              `json:"from_station_start"`
+	FromStationStartDate string              `json:"from_station_start_date"`
+	ToStation            string              `json:"to_station"`
+	ToStationArrive      string              `json:"to_station_arrive"`
+	ToStationArriveDate  string              `json:"to_station_arrive_date"`
+	Seats                []RspTrainSeatPrice `json:"seats"`
+}
+
+type RspTrainSeat struct {
+	QueryDate  string               `json:"query_date"`
+	FromDetail RspStationDetail     `json:"from_detail"`
+	ToDetail   RspStationDetail     `json:"to_detail"`
+	Trains     []RspTrainSeatDetail `json:"trains"`
+}

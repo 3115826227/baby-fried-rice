@@ -1,10 +1,10 @@
 package db
 
 import (
-	"strings"
-	"go.uber.org/zap"
 	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 	"github.com/3115826227/baby-fried-rice/module/crawler/log"
+	"go.uber.org/zap"
+	"strings"
 )
 
 // 批量 insert 到 postgres

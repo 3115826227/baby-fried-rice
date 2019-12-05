@@ -2,19 +2,19 @@ package service
 
 import (
 	"fmt"
-	"net/http"
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 	"github.com/3115826227/baby-fried-rice/module/crawler/log"
-	"github.com/json-iterator/go"
-	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
-	"go.uber.org/zap"
-	"time"
-	"github.com/gin-gonic/gin"
+	"github.com/3115826227/baby-fried-rice/module/crawler/redis"
 	"github.com/3115826227/baby-fried-rice/module/crawler/utils"
-	"strings"
+	"github.com/gin-gonic/gin"
+	"github.com/json-iterator/go"
+	"go.uber.org/zap"
+	"net/http"
 	"strconv"
-	"github.com/3115826227/baby-fried-rice/module/crawler/config"
+	"strings"
+	"time"
 )
 
 const (
@@ -48,8 +48,10 @@ type TrainConsumerClose struct {
 
 //列车爬取任务
 var trainTaskChan = make(chan TrainTask, 5000)
+
 //列车爬取基本信息
 var trainMetaChan = make(chan model.TrainMeta, 500)
+
 //列车过站信息
 var trainRelationChan = make(chan []model.TrainStationRelation, 500)
 

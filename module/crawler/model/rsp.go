@@ -54,7 +54,7 @@ type RspTrainMetaWayStation struct {
 		DptDate     string `json:"dptDate"`
 		DptCityName string `json:"dptCityName"`
 		ArrCityName string `json:"arrCityName"`
-		S2SBean struct {
+		S2SBean     struct {
 			DayDifference string `json:"dayDifference"`
 		} `json:"s2sBean"`
 		StationItemList []struct {
@@ -79,7 +79,7 @@ type RspQunarTrainSeatPrice struct {
 		ArrCityName string `json:"arrCityName"`
 		S2SBeanList []struct {
 			DayDifference string `json:"dayDifference"`
-			Seats map[string]struct {
+			Seats         map[string]struct {
 				Price float32 `json:"price"`
 				Count int     `json:"count"`
 			} `json:"seats"`
@@ -116,7 +116,7 @@ type RspZhiXingTrainSeatPrice struct {
 			CityName string `json:"CityName"`
 		} `json:"ArriveCity"`
 		TrainItems []struct {
-			TrainName string `json:"TrainName"`
+			TrainName    string `json:"TrainName"`
 			TicketResult struct {
 				TicketItems []struct {
 					SeatTypeName string  `json:"SeatTypeName"`
@@ -130,7 +130,7 @@ type RspZhiXingTrainSeatPrice struct {
 type RspTongChengYiLongTrainSeatPrice struct {
 	Data struct {
 		Trains []struct {
-			TrainNum string `json:"trainNum"`
+			TrainNum    string `json:"trainNum"`
 			TicketState map[string]struct {
 				Cn    string `json:"cn"`
 				Price string `json:"price"`
@@ -158,7 +158,7 @@ type RspMeituanTrainSeatPrice struct {
 	Data struct {
 		FromCityName string `json:"fromCityName"`
 		ToCityName   string `json:"toCityName"`
-		Trains []struct {
+		Trains       []struct {
 			Seats []struct {
 				SeatPrice    float64 `json:"seat_price"`
 				SeatTypeName string  `json:"seat_type_name"`

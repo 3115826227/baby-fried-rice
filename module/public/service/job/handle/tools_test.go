@@ -1,8 +1,8 @@
 package handle
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestAddGrade(t *testing.T) {

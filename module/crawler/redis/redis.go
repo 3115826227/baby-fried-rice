@@ -1,12 +1,12 @@
 package redis
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
+	"github.com/3115826227/baby-fried-rice/module/crawler/log"
 	"github.com/go-redis/redis"
 	"go.uber.org/zap"
-	"github.com/3115826227/baby-fried-rice/module/crawler/log"
-	"github.com/3115826227/baby-fried-rice/module/crawler/config"
-	"time"
 	"strconv"
+	"time"
 )
 
 var rds *redis.Client
