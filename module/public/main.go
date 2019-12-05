@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"github.com/3115826227/baby-fried-rice/module/public/middleware"
 )
 
 func init() {
@@ -33,6 +34,7 @@ func init() {
 func main() {
 	engine := gin.Default()
 
+	engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	engine.Run(":8080")
