@@ -383,7 +383,7 @@ func TrainMetaExecutor(date string) {
 		}
 
 		for _, item := range response.Data.Data {
-			if redis.HashExist(trainMetaCodeTriggerKey, item.StationTrainCode) {
+			if redis.HashExist(trainMetaCodeTriggerKey, item.TrainNo) {
 				continue
 			}
 			var train = model.TrainMeta{
@@ -396,7 +396,7 @@ func TrainMetaExecutor(date string) {
 
 			task := TrainTask{Train: train, Retry: 0}
 			redis.LPush(trainTaskKey, task.ToString())
-			redis.HashAdd(trainMetaCodeTriggerKey, item.StationTrainCode, time.Now().String())
+			redis.HashAdd(trainMetaCodeTriggerKey, item.TrainNo, time.Now().String())
 		}
 
 		redis.HashAdd(trainMetaStationTriggerKey, station.Name, time.Now().String())
