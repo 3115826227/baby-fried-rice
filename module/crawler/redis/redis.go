@@ -130,5 +130,5 @@ func LPush(key string, value string) {
 }
 
 func BRPop(key string) (result []string) {
-	return rds.BLPop(time.Second, key).Val()
+	return rds.BRPop(time.Second, key).Val()
 }

@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9cea22a4-2a7a-4ad2-9f79-c20aea867b6d" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/module/public/middleware/cors.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module/public/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/public/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module/crawler/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/module/crawler/redis/redis.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,14 +13,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.go" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/module/public/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+            <state relative-caret-position="378">
+              <caret line="36" column="16" lean-forward="true" selection-start-line="36" selection-start-column="16" selection-end-line="36" selection-end-column="16" />
               <folding>
                 <element signature="e#14#115#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="redis.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/redis/redis.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="404">
+              <caret line="131" column="7" lean-forward="true" selection-start-line="131" selection-start-column="7" selection-end-line="131" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -38,6 +46,15 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="service_test.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/service/service_test.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="303">
+              <caret line="47" column="30" selection-start-line="47" selection-start-column="30" selection-end-line="47" selection-end-column="30" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
@@ -47,11 +64,38 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="seat.go" pinned="false" current-in-tab="false">
+      <file leaf-file-name="seat.go" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="109">
-              <caret line="85" column="11" lean-forward="true" selection-start-line="85" selection-start-column="11" selection-end-line="85" selection-end-column="11" />
+            <state relative-caret-position="1478">
+              <caret line="504" column="24" lean-forward="true" selection-start-line="504" selection-start-column="24" selection-end-line="504" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="trains.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-8702">
+              <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="station.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/service/station.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="26">
+              <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tools.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/module/crawler/service/tools.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="352">
+              <caret line="183" column="20" selection-start-line="183" selection-start-column="20" selection-end-line="183" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -59,53 +103,8 @@
       <file leaf-file-name="main.go" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="235">
-              <caret line="43" column="1" lean-forward="true" selection-start-line="43" selection-start-column="1" selection-end-line="43" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/crawler/Dockerfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="23" column="54" selection-start-line="23" selection-start-column="54" selection-end-line="23" selection-end-column="54" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/public/Dockerfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/public/config/config.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="9" selection-start-line="9" selection-end-line="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tutor_operator.go" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/public/service/job/handle/tutor_operator.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="config.yaml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module/public/etc/config.yaml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="52">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="-111">
+              <caret line="54" column="18" lean-forward="true" selection-start-line="54" selection-start-column="18" selection-end-line="54" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -155,13 +154,11 @@
         <option value="$PROJECT_DIR$/module/crawler/service/router.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/tools.go" />
         <option value="$PROJECT_DIR$/module/crawler/docker/Dockerfile" />
-        <option value="$PROJECT_DIR$/module/crawler/redis/redis.go" />
         <option value="$PROJECT_DIR$/module/crawler/config/config.go" />
         <option value="$PROJECT_DIR$/module/crawler/Dockerfile" />
         <option value="$PROJECT_DIR$/module/crawler/service/trains.go" />
         <option value="$PROJECT_DIR$/module/crawler/main.go" />
         <option value="$PROJECT_DIR$/module/crawler/service/service_test.go" />
-        <option value="$PROJECT_DIR$/module/crawler/service/seat.go" />
         <option value="$PROJECT_DIR$/module/crawler/model/model_test.go" />
         <option value="$PROJECT_DIR$/module/crawler/model/table.go" />
         <option value="$PROJECT_DIR$/etc/config.yaml" />
@@ -182,6 +179,8 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/module/public/middleware/cors.go" />
         <option value="$PROJECT_DIR$/module/public/main.go" />
+        <option value="$PROJECT_DIR$/module/crawler/redis/redis.go" />
+        <option value="$PROJECT_DIR$/module/crawler/service/seat.go" />
       </list>
     </option>
   </component>
@@ -226,6 +225,13 @@
               <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
               <item name="module" type="462c0819:PsiDirectoryNode" />
               <item name="crawler" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
+              <item name="baby-fried-rice" type="462c0819:PsiDirectoryNode" />
+              <item name="module" type="462c0819:PsiDirectoryNode" />
+              <item name="crawler" type="462c0819:PsiDirectoryNode" />
+              <item name="redis" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="baby-fried-rice" type="b2602c69:ProjectViewProjectNode" />
@@ -309,7 +315,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Build.go build main.go (1)">
+  <component name="RunManager" selected="Go Build.go build main.go">
     <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="baby-fried-rice" />
       <working_directory value="$PROJECT_DIR$/" />
@@ -325,6 +331,15 @@
       <go_parameters value="-i" />
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$/module/public/main.go" />
+      <package value="github.com/3115826227/baby-fried-rice" />
+      <directory value="$PROJECT_DIR$/" />
+    </configuration>
+    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="baby-fried-rice" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/module/crawler/main.go" />
       <package value="github.com/3115826227/baby-fried-rice" />
       <directory value="$PROJECT_DIR$/" />
     </configuration>
@@ -361,31 +376,20 @@
       <filePath value="$PROJECT_DIR$/" />
       <pattern value="^TestAddTrainSeatCategory$" />
     </configuration>
-    <configuration name="TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="baby-fried-rice" />
-      <working_directory value="$PROJECT_DIR$/module/crawler/service" />
-      <go_parameters value="-i" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="github.com/3115826227/baby-fried-rice/module/crawler/service" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestTrainSeatPrice$" />
-    </configuration>
     <list>
-      <item itemvalue="Go Test.TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" />
       <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model" />
       <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
       <item itemvalue="Go Build.go build main.go (1)" />
       <item itemvalue="Go Test.TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
+      <item itemvalue="Go Build.go build main.go" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="Go Build.go build main.go (1)" />
         <item itemvalue="Go Test.TestAddTrainCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
         <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model/db" />
         <item itemvalue="Go Test.TestAddTrainSeatCategory in github.com/3115826227/baby-fried-rice/module/crawler/model" />
-        <item itemvalue="Go Test.TestTrainSeatPrice in github.com/3115826227/baby-fried-rice/module/crawler/service" />
       </list>
     </recent_temporary>
   </component>
@@ -425,16 +429,16 @@
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20243205" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20243205" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50143063" side_tool="true" weight="0.21454546" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4985694" weight="0.27636364" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4985694" visible="true" weight="0.5539394" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32969698" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49928468" visible="true" weight="0.16969697" />
+      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49928468" weight="0.22666667" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -465,23 +469,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/tools.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="155">
-          <caret line="183" column="20" selection-start-line="183" selection-start-column="20" selection-end-line="183" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/log/log.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1120" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/redis/redis.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="551">
-          <caret line="131" column="38" selection-start-line="131" selection-start-column="38" selection-end-line="131" selection-end-column="38" />
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/utils/utils.go">
@@ -503,27 +493,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="70">
-          <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/station.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="26">
-          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/service_test.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="47" column="16" selection-start-line="47" selection-start-column="16" selection-end-line="47" selection-end-column="16" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/module/crawler/service/router.go">
       <provider selected="true" editor-type-id="text-editor">
@@ -782,20 +751,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="109">
-          <caret line="85" column="11" lean-forward="true" selection-start-line="85" selection-start-column="11" selection-end-line="85" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="235">
-          <caret line="43" column="1" lean-forward="true" selection-start-line="43" selection-start-column="1" selection-end-line="43" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module/public/middleware/cors.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
@@ -808,11 +763,60 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/module/public/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+        <state relative-caret-position="378">
+          <caret line="36" column="16" lean-forward="true" selection-start-line="36" selection-start-column="16" selection-end-line="36" selection-end-column="16" />
           <folding>
             <element signature="e#14#115#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/redis/redis.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="404">
+          <caret line="131" column="7" lean-forward="true" selection-start-line="131" selection-start-column="7" selection-end-line="131" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/station.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26">
+          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/tools.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="352">
+          <caret line="183" column="20" selection-start-line="183" selection-start-column="20" selection-end-line="183" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/trains.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8702">
+          <caret line="55" column="5" selection-start-line="55" selection-start-column="5" selection-end-line="55" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/service_test.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="47" column="30" selection-start-line="47" selection-start-column="30" selection-end-line="47" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-111">
+          <caret line="54" column="18" lean-forward="true" selection-start-line="54" selection-start-column="18" selection-end-line="54" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module/crawler/service/seat.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1478">
+          <caret line="504" column="24" lean-forward="true" selection-start-line="504" selection-start-column="24" selection-end-line="504" selection-end-column="24" />
         </state>
       </provider>
     </entry>
