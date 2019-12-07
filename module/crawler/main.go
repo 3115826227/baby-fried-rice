@@ -19,7 +19,7 @@ func TrainMetaConsumerOpen() {
 		//go service.QunarTrainConsumer()
 		go service.MeituanTrainConsumer()
 	}
-	go service.TrainTaskConsumer()
+	//go service.TrainTaskConsumer()
 	for i := 0; i < 4; i++ {
 		go service.TrainRelInsertConsumer()
 	}

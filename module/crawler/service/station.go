@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 )
 
 func StationTrigger(c *gin.Context) {
@@ -49,8 +50,8 @@ func Station() {
 		station.Code = code
 		station.CreatedAt, station.UpdatedAt = now, now
 		list = append(list, *station)
-		redis.Add(station.Name, station.Code)
-		redis.Add(station.Code, station.Name)
+		redis.HashAdd(config.StationCodeNameKey, station.Code, station.Name)
+		redis.HashAdd(config.StationNameCodeKey, station.Name, station.Code)
 	}
 
 	beans := make([][]interface{}, 0)

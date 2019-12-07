@@ -19,6 +19,9 @@ const (
 
 	TrainSeatTriggerPrefix = "train:seat:trigger"
 
+	StationNameCodeKey = "station:name:code"
+	StationCodeNameKey = "station:code:name"
+
 	TrainStationCityUpdateKey = "train:station:city:update"
 
 	RunningStatus = "run"

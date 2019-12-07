@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	seatConsumerKey = "seat"
+	seatConsumerKey = "train:seat:task"
 )
 
 type SeatRelationInfo struct {
@@ -151,13 +151,15 @@ func jindongTraffic(info SeatRelationInfo) {
 				log.Logger.Warn(err.Error())
 				continue
 			}
+			fromCode := redis.HashGet(config.StationNameCodeKey, info.From)
+			toCode := redis.HashGet(config.StationNameCodeKey, info.To)
 			list = append(list, model.TrainStationSeatPrice{
 				Train:             item.TrainCode,
 				Date:              info.Date,
 				StartStation:      info.From,
-				StartStationCode:  redis.Get(info.From),
+				StartStationCode:  fromCode,
 				ArriveStation:     info.To,
-				ArriveStationCode: redis.Get(info.To),
+				ArriveStationCode: toCode,
 				SeatCategoryName:  seats.SeatName,
 				Price:             int(price * 100),
 			})
@@ -193,8 +195,10 @@ func meituanTraffic(info SeatRelationInfo) {
 		}
 	}()
 
+	fromCode := redis.HashGet(config.StationNameCodeKey, info.From)
+	toCode := redis.HashGet(config.StationNameCodeKey, info.To)
 	URL := fmt.Sprintf("https://i.meituan.com/uts/train/train/querytripnew?fromPC=1&train_source=meituanpc@wap&from_station_telecode=%v&to_station_telecode=%v&start_date=%v&isStudentBuying=false",
-		redis.Get(info.From), redis.Get(info.To), info.Date)
+		fromCode, toCode, info.Date)
 
 	data, err := utils.Request(URL)
 	if err != nil {
@@ -221,9 +225,9 @@ func meituanTraffic(info SeatRelationInfo) {
 				Train:             item.TrainCode,
 				Date:              info.Date,
 				StartStation:      info.From,
-				StartStationCode:  redis.Get(info.From),
+				StartStationCode:  fromCode,
 				ArriveStation:     info.To,
-				ArriveStationCode: redis.Get(info.To),
+				ArriveStationCode: toCode,
 				SeatCategoryName:  seats.SeatTypeName,
 				Price:             int(seats.SeatPrice * 100),
 			})
@@ -286,6 +290,8 @@ func tongChengYiLongTraffic(info SeatRelationInfo) {
 		return
 	}
 
+	fromCode := redis.HashGet(config.StationNameCodeKey, info.From)
+	toCode := redis.HashGet(config.StationNameCodeKey, info.To)
 	var list = make([]model.TrainStationSeatPrice, 0)
 	for _, item := range response.Data.Trains {
 		for _, seats := range item.TicketState {
@@ -294,13 +300,14 @@ func tongChengYiLongTraffic(info SeatRelationInfo) {
 				log.Logger.Warn(err.Error())
 				continue
 			}
+
 			list = append(list, model.TrainStationSeatPrice{
 				Train:             item.TrainNum,
 				Date:              info.Date,
 				StartStation:      info.From,
-				StartStationCode:  redis.Get(info.From),
+				StartStationCode:  fromCode,
 				ArriveStation:     info.To,
-				ArriveStationCode: redis.Get(info.To),
+				ArriveStationCode: toCode,
 				SeatCategoryName:  seats.Cn,
 				Price:             int(price * 100),
 			})
@@ -353,6 +360,8 @@ func zhiXingTraffic(info SeatRelationInfo) {
 		return
 	}
 
+	fromCode := redis.HashGet(config.StationNameCodeKey, info.From)
+	toCode := redis.HashGet(config.StationNameCodeKey, info.To)
 	var list = make([]model.TrainStationSeatPrice, 0)
 	for _, item := range response.ResponseBody.TrainItems {
 		for _, seats := range item.TicketResult.TicketItems {
@@ -360,9 +369,9 @@ func zhiXingTraffic(info SeatRelationInfo) {
 				Train:             item.TrainName,
 				Date:              info.Date,
 				StartStation:      info.From,
-				StartStationCode:  redis.Get(info.From),
+				StartStationCode:  fromCode,
 				ArriveStation:     info.To,
-				ArriveStationCode: redis.Get(info.To),
+				ArriveStationCode: toCode,
 				SeatCategoryName:  seats.SeatTypeName,
 				Price:             int(seats.Price * 100),
 			})

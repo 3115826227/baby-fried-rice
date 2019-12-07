@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	trainTaskKey = "train:task"
+	trainTaskKey = "train:meta:task"
 )
 
 type TrainTask struct {
@@ -97,8 +97,10 @@ func meituanTrainTrigger(task TrainTask) {
 	}()
 
 	train := task.Train
+	startStationCode := redis.HashGet(config.StationNameCodeKey, train.StartStation)
+	arriveStationCode := redis.HashGet(config.StationNameCodeKey, train.ArriveStation)
 	URL := fmt.Sprintf("https://i.meituan.com/uts/train/train/timetable?fromPC=1&train_source=meituanpc@wap&train_code=%v&start_date=%v&from_station_telecode=%v&to_station_telecode=%v",
-		train.Train, train.Date, redis.Get(train.StartStation), redis.Get(train.ArriveStation))
+		train.Train, train.Date, startStationCode, arriveStationCode)
 
 	data, err := utils.Request(URL)
 	if err != nil {
@@ -124,7 +126,7 @@ func meituanTrainTrigger(task TrainTask) {
 	list := make([]model.TrainStationRelation, 0)
 	var num = 1
 	for _, item := range response.Data.Stations {
-		stationCode := redis.Get(item.StationName)
+		stationCode := redis.HashGet(config.StationNameCodeKey, item.StationName)
 		var stopTime = 0
 		if num == 1 {
 			item.ArriveTime = item.StartTime
@@ -322,7 +324,7 @@ func QunarTrainTrigger(task TrainTask) {
 	list := make([]model.TrainStationRelation, 0)
 	var num = 1
 	for _, item := range response.Data.StationItemList {
-		stationCode := redis.Get(item.StationName)
+		stationCode := redis.HashGet(config.StationNameCodeKey, item.StationName)
 		if num == 1 {
 			item.ArriveTime = item.StartTime
 		}
