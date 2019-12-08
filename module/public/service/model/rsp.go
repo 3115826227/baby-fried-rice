@@ -101,6 +101,7 @@ type RspTrainSeatDetail struct {
 	ToStationArrive      string              `json:"to_station_arrive"`
 	ToStationArriveDate  string              `json:"to_station_arrive_date"`
 	ToStationNumber      int                 `json:"to_station_number"`
+	RunningMinute        int                 `json:"running_minute"`
 	Seats                []RspTrainSeatPrice `json:"seats"`
 }
 

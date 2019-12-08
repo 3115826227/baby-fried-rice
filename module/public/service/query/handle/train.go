@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"strconv"
 )
 
 func TrainMetaGet(c *gin.Context) {
@@ -145,6 +146,7 @@ order by from_meta.start_time
 		detail.ToStationArrive = strings.TrimSpace(toStationArrive)
 		detail.ToStationArriveDate = tempDate.AddDate(0, 0, toStationOverDay-fromStationOverDay).Format(config.DayLayout)
 		detail.ToStationNumber = toStationNumber
+		detail.RunningMinute = ComputeRunningMinute(detail.FromStationStart, detail.ToStationArrive, toStationOverDay-fromStationOverDay)
 		trainSeatDetailMap[key] = detail
 	}
 
@@ -173,4 +175,15 @@ order by from_meta.start_time
 
 	return
 
+}
+
+func ComputeRunningMinute(startTime, arriveTime string, overDay int) int {
+	return HourMinuteToConvert(arriveTime) - HourMinuteToConvert(startTime) + overDay*24*60
+}
+
+func HourMinuteToConvert(now string) int {
+	nowSlice := strings.Split(now, ":")
+	hour, _ := strconv.Atoi(nowSlice[0])
+	minute, _ := strconv.Atoi(nowSlice[1])
+	return hour*60 + minute
 }
