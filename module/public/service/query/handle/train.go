@@ -140,11 +140,11 @@ order by from_meta.start_time
 		detail.FromStation = fromStation
 		detail.FromStationStart = strings.TrimSpace(fromStationStart)
 		detail.FromStationStartDate = date
+		detail.FromStationNumber = fromStationNumber
 		detail.ToStation = toStation
 		detail.ToStationArrive = strings.TrimSpace(toStationArrive)
-
 		detail.ToStationArriveDate = tempDate.AddDate(0, 0, toStationOverDay-fromStationOverDay).Format(config.DayLayout)
-
+		detail.ToStationNumber = toStationNumber
 		trainSeatDetailMap[key] = detail
 	}
 

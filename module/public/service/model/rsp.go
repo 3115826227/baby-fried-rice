@@ -96,9 +96,11 @@ type RspTrainSeatDetail struct {
 	FromStation          string              `json:"from_station"`
 	FromStationStart     string              `json:"from_station_start"`
 	FromStationStartDate string              `json:"from_station_start_date"`
+	FromStationNumber    int                 `json:"from_station_number"`
 	ToStation            string              `json:"to_station"`
 	ToStationArrive      string              `json:"to_station_arrive"`
 	ToStationArriveDate  string              `json:"to_station_arrive_date"`
+	ToStationNumber      int                 `json:"to_station_number"`
 	Seats                []RspTrainSeatPrice `json:"seats"`
 }
 
