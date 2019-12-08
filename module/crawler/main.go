@@ -19,7 +19,7 @@ func TrainMetaConsumerOpen() {
 		//go service.QunarTrainConsumer()
 		go service.MeituanTrainConsumer()
 	}
-	//go service.TrainTaskConsumer()
+	go service.TrainTaskConsumer()
 	for i := 0; i < 4; i++ {
 		go service.TrainRelInsertConsumer()
 	}
@@ -38,7 +38,7 @@ func TrainSeatConsumerOpen() {
 		go service.ZhiXingConsumer()
 		//go service.QunarConsumer()
 		go service.MeituanConsumer()
-		go service.JindongConsumer()
+		//go service.JindongConsumer()
 	}
 	go service.SeatConsumer()
 }
@@ -71,5 +71,5 @@ func main() {
 
 	service.Route(engine)
 
-	engine.Run(":9083")
+	engine.Run(":8080")
 }
