@@ -20,5 +20,7 @@ func RegisterRoute(engine *gin.Engine) {
 	app.GET("/user", handle.UserDetail)
 	app.PATCH("/user", handle.UserUpdate)
 
+	app.GET("/root", handle.RootDetail)
+
 	app.POST("/client", handle.ClientAdd)
 }

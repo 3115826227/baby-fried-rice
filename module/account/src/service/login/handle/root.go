@@ -63,7 +63,18 @@ func RootLogin(c *gin.Context) {
 }
 
 func RootDetail(c *gin.Context) {
+	userMeta := GetUserMeta(c)
+	root, err := model.GetUserDetail(userMeta.UserId)
+	if err != nil {
+		ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
+		return
+	}
+	var rsp model.RspUserData
+	rsp.UserId = root.ID
+	rsp.Username = root.Username
+	rsp.LoginName = root.LoginName
 
+	SuccessResp(c, "", rsp)
 }
 
 func RootLogout(c *gin.Context) {
