@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/public/middleware"
 	"github.com/3115826227/baby-fried-rice/module/public/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
@@ -8,7 +9,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"github.com/3115826227/baby-fried-rice/module/public/middleware"
 )
 
 func init() {

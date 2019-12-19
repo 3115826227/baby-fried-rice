@@ -68,6 +68,54 @@
 			"revisionTime": "2019-11-11T20:22:24Z"
 		},
 		{
+			"checksumSHA1": "D1yrzbSFjWxVCHz4n9PeiLzZZeI=",
+			"path": "github.com/go-redis/redis",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "z12gGj6VbVBcPOvof1aCM+DVGRU=",
+			"path": "github.com/go-redis/redis/internal",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "GQZsUVg/+6UpQAYpc4luMvMutSI=",
+			"path": "github.com/go-redis/redis/internal/consistenthash",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "l66eTZiJqueypc56HXCakGDm784=",
+			"path": "github.com/go-redis/redis/internal/hashtag",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "WoUjtqpn00RUnAgZLljk3lWfpSQ=",
+			"path": "github.com/go-redis/redis/internal/pool",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "zCo0t+gRBbctwyIpkDLrqRFtXew=",
+			"path": "github.com/go-redis/redis/internal/proto",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "sjbjSJrTdvyDwNjrWjTNeXgUhaU=",
+			"path": "github.com/go-redis/redis/internal/singleflight",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
+			"checksumSHA1": "1PH2NoAB/u3IZmLYyCrIbOzqLZ4=",
+			"path": "github.com/go-redis/redis/internal/util",
+			"revision": "11cf9400d58a23fe233f2544ed4cd55b7a373f89",
+			"revisionTime": "2018-12-11T11:17:41Z"
+		},
+		{
 			"checksumSHA1": "Y2MOwzNZfl4NRNDbLCZa6sgx7O0=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": ""
@@ -121,6 +169,46 @@
 			"revisionTime": "2019-08-12T10:43:08Z"
 		},
 		{
+			"checksumSHA1": "LMxoZVoe/GQHHmTj6EMacYvvg5w=",
+			"path": "go.uber.org/atomic",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "+EWyJYcB1u0jXO4tGsDEF9+wMic=",
+			"path": "go.uber.org/multierr",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "I/Xodmjv7scstb7iB5+54hb93e8=",
+			"path": "go.uber.org/zap",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "eC/XVln77aRfE/VocbN0NWdlRdg=",
+			"path": "go.uber.org/zap/buffer",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "MuxOAtZEsJitlWBzhmpm2vGiHok=",
+			"path": "go.uber.org/zap/internal/bufferpool",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "uC0L9eCSAYcCWNC8udJk/t1vvIU=",
+			"path": "go.uber.org/zap/internal/color",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "b80CJExrVpXu3SA1iCQ6uLqTn2c=",
+			"path": "go.uber.org/zap/internal/exit",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "3dYpwv4iu7F9yE6XdMplSV7EFbY=",
+			"path": "go.uber.org/zap/zapcore",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "7Gocawl8bm27cpAILtuf21xvVD8=",
 			"path": "golang.org/x/sys/unix",
 			"revision": ""
@@ -130,6 +218,11 @@
 			"path": "gopkg.in/go-playground/validator.v9",
 			"revision": "cd1bd581694a11c089aea885a26247c5f783a4cf",
 			"revisionTime": "2019-09-29T22:20:42Z"
+		},
+		{
+			"checksumSHA1": "TM3Neoy1xRAKyZYMGzKc41sDFW4=",
+			"path": "gopkg.in/natefinch/lumberjack.v2",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "ZSWoOPUNRr5+3dhkLK3C4cZAQPk=",

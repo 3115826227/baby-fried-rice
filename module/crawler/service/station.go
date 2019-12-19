@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 	"github.com/3115826227/baby-fried-rice/module/crawler/log"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model"
 	"github.com/3115826227/baby-fried-rice/module/crawler/model/db"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"github.com/3115826227/baby-fried-rice/module/crawler/config"
 )
 
 func StationTrigger(c *gin.Context) {

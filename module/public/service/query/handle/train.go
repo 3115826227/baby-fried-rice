@@ -8,9 +8,9 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
 )
 
 func TrainMetaGet(c *gin.Context) {
