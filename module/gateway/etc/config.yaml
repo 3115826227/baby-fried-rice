@@ -4,7 +4,7 @@ redis:
   redisdb: 9
   redismaxidleconnections: 3
   redisidletimeoutseconds: 240
-accounturl: http://localhost:9081
+accounturl: http://localhost:9088
 publicurl: http://localhost:9081
-imurl: http://localhost:9081
+imurl: http://localhost:9089
 squareurl: http://localhost:9081

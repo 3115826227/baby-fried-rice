@@ -1,21 +1,24 @@
 package middleware
 
 import (
+	"encoding/json"
+	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/gateway/src/redis"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"fmt"
-	"github.com/3115826227/baby-fried-rice/module/gateway/src/redis"
-	"encoding/json"
 )
 
 func CheckToken(c *gin.Context) {
 	token := c.GetHeader(HeaderToken)
 
 	if token == "" {
-		util.ErrorResp(c, http.StatusUnauthorized, util.CodeRequiredLogin, util.CodeRequiredLoginMsg)
-		c.Abort()
-		return
+		token = c.Query(HeaderToken)
+		if token == "" {
+			util.ErrorResp(c, http.StatusUnauthorized, util.CodeRequiredLogin, util.CodeRequiredLoginMsg)
+			c.Abort()
+			return
+		}
 	}
 
 	tokenKey := fmt.Sprintf("%v:%v", TokenPrefix, token)

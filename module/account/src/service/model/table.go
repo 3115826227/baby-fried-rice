@@ -1,10 +1,10 @@
 package model
 
 import (
-	"time"
-	"github.com/jinzhu/gorm"
-	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
 	"github.com/3115826227/baby-fried-rice/module/account/src/log"
+	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
 func init() {
@@ -16,7 +16,12 @@ func Sync(engine *gorm.DB) {
 		new(AccountRoot),
 		new(AccountUser),
 		new(AccountClient),
+		new(AccountUserDetail),
+		new(AccountUserSchoolDetail),
 		new(School),
+		new(SchoolDepartment),
+		new(SchoolCommunity),
+		new(SchoolUserCertification),
 		new(ClientSchoolRelation),
 		new(Area),
 	).Error
@@ -64,20 +69,94 @@ func (relation *ClientSchoolRelation) TableName() string {
 
 type School struct {
 	ID       string `gorm:"column:id"`
-	Name     string
-	Province string
-	City     string
+	Name     string `gorm:"column:name"`
+	Province string `gorm:"column:province"`
+	City     string `gorm:"column:city"`
+}
+
+func (table *School) TableName() string {
+	return "account_school"
+}
+
+type SchoolDepartment struct {
+	CommonField
+
+	SchoolId string `gorm:"school_id"`
+	Name     string `gorm:"name"`
+	FullName string `gorm:"full_name"`
+	IsLeaf   int    `gorm:"is_leaf"`
+	ParentId string `gorm:"parent_id"`
+}
+
+func (table *SchoolDepartment) TableName() string {
+	return "account_school_department"
+}
+
+type SchoolCommunity struct {
+	CommonField
+
+	SchoolId      string    `gorm:"school_id"`
+	Name          string    `gorm:"name"`
+	Origin        string    `gorm:"origin"`
+	EstablishTime time.Time `gorm:"column:establish_time;type:timestamp with time zone"`
+}
+
+func (table *SchoolCommunity) TableName() string {
+	return "account_school_community"
+}
+
+type SchoolUserCertification struct {
+	CommonField
+
+	Identify           string `gorm:"column:identify;type:varchar(255);unique"`
+	Name               string `gorm:"column:name;type:varchar(255)"`
+	SchoolDepartmentId string `gorm:"column:school_department_id;type:varchar(255)"`
+}
+
+func (table *SchoolUserCertification) TableName() string {
+	return "account_school_user_certification"
 }
 
 type AccountUser struct {
 	CommonField
 
 	LoginName  string `gorm:"column:login_name;type:varchar(255);"`
-	Username   string `gorm:"column:username;type:varchar(255);"`
-	SchoolID   string `gorm:"column:school_id"`
 	Password   string `gorm:"column:password;type:varchar(255);"`
-	EncodeType string
-	Verify     int
+	EncodeType string `gorm:"column:encode_type"`
+}
+
+type AccountUserDetail struct {
+	CommonField
+
+	Username   string `gorm:"column:username"`
+	SchoolId   string `gorm:"column:school_id"`
+	Verify     int    `gorm:"column:verify"`
+	Birthday   string `gorm:"column:birthday"`
+	Gender     int    `gorm:"column:gender"`
+	Age        int    `gorm:"column:age"`
+	HeadImgUrl string `gorm:"column:head_img_url"`
+	Phone      string `gorm:"column:phone"`
+	Wx         string `gorm:"column:wx"`
+	QQ         string `gorm:"column:qq"`
+	Addr       string `gorm:"column:addr"`
+	Hometown   string `gorm:"column:hometown"`
+	Ethnic     string `gorm:"column:ethnic"`
+}
+
+func (table *AccountUserDetail) TableName() string {
+	return "account_user_detail"
+}
+
+type AccountUserSchoolDetail struct {
+	CommonField
+
+	Name               string `gorm:"column:name"`
+	Identify           string `gorm:"column:identify"`
+	SchoolDepartmentId string `gorm:"school_department_id"`
+}
+
+func (table *AccountUserSchoolDetail) TableName() string {
+	return "account_user_school_detail"
 }
 
 type Area struct {
@@ -85,4 +164,8 @@ type Area struct {
 	Name       string
 	ParentCode string
 	Level      int
+}
+
+func (table *Area) TableName() string {
+	return "area"
 }

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/3115826227/baby-fried-rice/module/gateway/src/middleware"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/config"
+	"github.com/3115826227/baby-fried-rice/module/gateway/src/middleware"
+	"github.com/gin-gonic/gin"
 	"net/http/httputil"
 )
 
@@ -19,8 +19,8 @@ func RegisterRouter(engine *gin.Engine) {
 	user.Use(middleware.CheckToken)
 
 	user.Any("/account/*any", HandleAccountProxy)
-	user.Any("/public/", HandlePublicProxy)
-	user.Any("/im/", HandleImProxy)
+	user.Any("/public/*any", HandlePublicProxy)
+	user.Any("/im/*any", HandleImProxy)
 	user.Any("/square/", HandleSquareProxy)
 }
 

@@ -1,15 +1,15 @@
 package model
 
 import (
-	"gopkg.in/gin-gonic/gin.v1/json"
-	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
 	"github.com/3115826227/baby-fried-rice/module/account/src/log"
+	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
+	"gopkg.in/gin-gonic/gin.v1/json"
 )
 
 type UserMeta struct {
 	//用户ID
 	UserId string `json:"userId"`
-	//学校ID 
+	//学校ID
 	SchoolId string `json:"schoolId"`
 	//请求ID
 	ReqId string `json:"reqId"`
@@ -34,7 +34,7 @@ func IsDuplicateLoginNameByUser(loginName string) bool {
 	return count != 0
 }
 
-func GetUserDetail(id string) (user AccountUser, err error) {
+func GetUserDetail(id string) (user AccountUserDetail, err error) {
 	if err = db.DB.Where("id = ?", id).Find(&user).Error; err != nil {
 		log.Logger.Warn(err.Error())
 	}

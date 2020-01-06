@@ -1,9 +1,9 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/config"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/log"
+	"github.com/go-redis/redis"
 )
 
 var rds *redis.Client

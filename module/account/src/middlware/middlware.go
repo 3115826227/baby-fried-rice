@@ -1,7 +1,7 @@
 package middlware
 
 import (
-	"github.com/3115826227/baby-fried-rice/module/account/src/service/login/handle"
+	"github.com/3115826227/baby-fried-rice/module/account/src/service/handle"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/gin-gonic/gin"
 	"net/http"

@@ -5,10 +5,10 @@ import (
 	_ "github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"os"
 	"path"
-	"log"
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func init() {

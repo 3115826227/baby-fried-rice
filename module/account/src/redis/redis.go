@@ -1,10 +1,10 @@
 package redis
 
 import (
-	"github.com/go-redis/redis"
-	"github.com/3115826227/baby-fried-rice/module/account/src/log"
-	"time"
 	"github.com/3115826227/baby-fried-rice/module/account/src/config"
+	"github.com/3115826227/baby-fried-rice/module/account/src/log"
+	"github.com/go-redis/redis"
+	"time"
 )
 
 var rds *redis.Client
@@ -24,6 +24,14 @@ func init() {
 
 func AddAccountToken(key, value string) {
 	Add(key, value, 3*time.Hour)
+}
+
+func DeleteAccountToken(key string) {
+	rds.Del(key)
+}
+
+func GetAccountToken(key string) (value string, err error) {
+	return rds.Get(key).Result()
 }
 
 func Add(key, value string, expire time.Duration) {

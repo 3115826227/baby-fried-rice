@@ -33,3 +33,23 @@ type ReqUserAdd struct {
 type ReqUserUpdate struct {
 	Username string `json:"username"`
 }
+
+type ReqUserVerify struct {
+	Identify string `json:"identify"`
+	Name     string `json:"name"`
+}
+
+type ReqSchoolDepartmentAdd struct {
+	SchoolId string `json:"school_id" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	ParentId string `json:"parent_id"`
+}
+
+type ReqSchoolDepartmentUpdate struct {
+	SchoolDepartmentId string `json:"school_department_id" binding:"required"`
+	ReqSchoolDepartmentAdd
+}
+
+type ReqSchoolCertificationDelete struct {
+	Id []string `json:"id"`
+}

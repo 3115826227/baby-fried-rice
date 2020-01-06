@@ -4,11 +4,11 @@ import (
 	_ "github.com/3115826227/baby-fried-rice/module/gateway/src/config"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/service"
 	"github.com/gin-gonic/gin"
-	"path"
-	"os"
 	"go.uber.org/zap/zapcore"
-	"log"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
+	"os"
+	"path"
 )
 
 func init() {
