@@ -1,7 +1,9 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
+	"net"
 	"time"
 )
 
@@ -18,6 +20,7 @@ type UniversalOptions struct {
 
 	// Common options.
 
+	Dialer             func(ctx context.Context, network, addr string) (net.Conn, error)
 	OnConnect          func(*Conn) error
 	Password           string
 	MaxRetries         int
@@ -46,13 +49,15 @@ type UniversalOptions struct {
 	MasterName string
 }
 
-func (o *UniversalOptions) cluster() *ClusterOptions {
+// Cluster returns cluster options created from the universal options.
+func (o *UniversalOptions) Cluster() *ClusterOptions {
 	if len(o.Addrs) == 0 {
 		o.Addrs = []string{"127.0.0.1:6379"}
 	}
 
 	return &ClusterOptions{
 		Addrs:     o.Addrs,
+		Dialer:    o.Dialer,
 		OnConnect: o.OnConnect,
 
 		Password: o.Password,
@@ -80,7 +85,8 @@ func (o *UniversalOptions) cluster() *ClusterOptions {
 	}
 }
 
-func (o *UniversalOptions) failover() *FailoverOptions {
+// Failover returns failover options created from the universal options.
+func (o *UniversalOptions) Failover() *FailoverOptions {
 	if len(o.Addrs) == 0 {
 		o.Addrs = []string{"127.0.0.1:26379"}
 	}
@@ -88,7 +94,9 @@ func (o *UniversalOptions) failover() *FailoverOptions {
 	return &FailoverOptions{
 		SentinelAddrs: o.Addrs,
 		MasterName:    o.MasterName,
-		OnConnect:     o.OnConnect,
+
+		Dialer:    o.Dialer,
+		OnConnect: o.OnConnect,
 
 		DB:       o.DB,
 		Password: o.Password,
@@ -112,7 +120,8 @@ func (o *UniversalOptions) failover() *FailoverOptions {
 	}
 }
 
-func (o *UniversalOptions) simple() *Options {
+// Simple returns basic options created from the universal options.
+func (o *UniversalOptions) Simple() *Options {
 	addr := "127.0.0.1:6379"
 	if len(o.Addrs) > 0 {
 		addr = o.Addrs[0]
@@ -120,6 +129,7 @@ func (o *UniversalOptions) simple() *Options {
 
 	return &Options{
 		Addr:      addr,
+		Dialer:    o.Dialer,
 		OnConnect: o.OnConnect,
 
 		DB:       o.DB,
@@ -147,14 +157,18 @@ func (o *UniversalOptions) simple() *Options {
 // --------------------------------------------------------------------
 
 // UniversalClient is an abstract client which - based on the provided options -
-// can connect to either clusters, or sentinel-backed failover instances or simple
-// single-instance servers. This can be useful for testing cluster-specific
-// applications locally.
+// can connect to either clusters, or sentinel-backed failover instances
+// or simple single-instance servers. This can be useful for testing
+// cluster-specific applications locally.
 type UniversalClient interface {
 	Cmdable
+	Context() context.Context
+	AddHook(Hook)
 	Watch(fn func(*Tx) error, keys ...string) error
+	Do(args ...interface{}) *Cmd
+	DoContext(ctx context.Context, args ...interface{}) *Cmd
 	Process(cmd Cmder) error
-	WrapProcess(fn func(oldProcess func(cmd Cmder) error) func(cmd Cmder) error)
+	ProcessContext(ctx context.Context, cmd Cmder) error
 	Subscribe(channels ...string) *PubSub
 	PSubscribe(channels ...string) *PubSub
 	Close() error
@@ -162,6 +176,7 @@ type UniversalClient interface {
 
 var _ UniversalClient = (*Client)(nil)
 var _ UniversalClient = (*ClusterClient)(nil)
+var _ UniversalClient = (*Ring)(nil)
 
 // NewUniversalClient returns a new multi client. The type of client returned depends
 // on the following three conditions:
@@ -171,9 +186,9 @@ var _ UniversalClient = (*ClusterClient)(nil)
 // 3. otherwise, a single-node redis Client will be returned.
 func NewUniversalClient(opts *UniversalOptions) UniversalClient {
 	if opts.MasterName != "" {
-		return NewFailoverClient(opts.failover())
+		return NewFailoverClient(opts.Failover())
 	} else if len(opts.Addrs) > 1 {
-		return NewClusterClient(opts.cluster())
+		return NewClusterClient(opts.Cluster())
 	}
-	return NewClient(opts.simple())
+	return NewClient(opts.Simple())
 }

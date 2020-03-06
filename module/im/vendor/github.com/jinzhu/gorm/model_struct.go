@@ -17,16 +17,20 @@ var DefaultTableNameHandler = func(db *DB, defaultTableName string) string {
 	return defaultTableName
 }
 
+// lock for mutating global cached model metadata
+var structsLock sync.Mutex
+
+// global cache of model metadata
 var modelStructsMap sync.Map
 
 // ModelStruct model definition
 type ModelStruct struct {
-	PrimaryFields    []*StructField
-	StructFields     []*StructField
-	ModelType        reflect.Type
+	PrimaryFields []*StructField
+	StructFields  []*StructField
+	ModelType     reflect.Type
 
 	defaultTableName string
-	l sync.Mutex
+	l                sync.Mutex
 }
 
 // TableName returns model's table name
@@ -40,9 +44,11 @@ func (s *ModelStruct) TableName(db *DB) string {
 			s.defaultTableName = tabler.TableName()
 		} else {
 			tableName := ToTableName(s.ModelType.Name())
-			if db == nil || !db.parent.singularTable {
+			db.parent.RLock()
+			if db == nil || (db.parent != nil && !db.parent.singularTable) {
 				tableName = inflection.Plural(tableName)
 			}
+			db.parent.RUnlock()
 			s.defaultTableName = tableName
 		}
 	}
@@ -70,52 +76,52 @@ type StructField struct {
 }
 
 // TagSettingsSet Sets a tag in the tag settings map
-func (s *StructField) TagSettingsSet(key, val string) {
-	s.tagSettingsLock.Lock()
-	defer s.tagSettingsLock.Unlock()
-	s.TagSettings[key] = val
+func (sf *StructField) TagSettingsSet(key, val string) {
+	sf.tagSettingsLock.Lock()
+	defer sf.tagSettingsLock.Unlock()
+	sf.TagSettings[key] = val
 }
 
 // TagSettingsGet returns a tag from the tag settings
-func (s *StructField) TagSettingsGet(key string) (string, bool) {
-	s.tagSettingsLock.RLock()
-	defer s.tagSettingsLock.RUnlock()
-	val, ok := s.TagSettings[key]
+func (sf *StructField) TagSettingsGet(key string) (string, bool) {
+	sf.tagSettingsLock.RLock()
+	defer sf.tagSettingsLock.RUnlock()
+	val, ok := sf.TagSettings[key]
 	return val, ok
 }
 
 // TagSettingsDelete deletes a tag
-func (s *StructField) TagSettingsDelete(key string) {
-	s.tagSettingsLock.Lock()
-	defer s.tagSettingsLock.Unlock()
-	delete(s.TagSettings, key)
+func (sf *StructField) TagSettingsDelete(key string) {
+	sf.tagSettingsLock.Lock()
+	defer sf.tagSettingsLock.Unlock()
+	delete(sf.TagSettings, key)
 }
 
-func (structField *StructField) clone() *StructField {
+func (sf *StructField) clone() *StructField {
 	clone := &StructField{
-		DBName:          structField.DBName,
-		Name:            structField.Name,
-		Names:           structField.Names,
-		IsPrimaryKey:    structField.IsPrimaryKey,
-		IsNormal:        structField.IsNormal,
-		IsIgnored:       structField.IsIgnored,
-		IsScanner:       structField.IsScanner,
-		HasDefaultValue: structField.HasDefaultValue,
-		Tag:             structField.Tag,
+		DBName:          sf.DBName,
+		Name:            sf.Name,
+		Names:           sf.Names,
+		IsPrimaryKey:    sf.IsPrimaryKey,
+		IsNormal:        sf.IsNormal,
+		IsIgnored:       sf.IsIgnored,
+		IsScanner:       sf.IsScanner,
+		HasDefaultValue: sf.HasDefaultValue,
+		Tag:             sf.Tag,
 		TagSettings:     map[string]string{},
-		Struct:          structField.Struct,
-		IsForeignKey:    structField.IsForeignKey,
+		Struct:          sf.Struct,
+		IsForeignKey:    sf.IsForeignKey,
 	}
 
-	if structField.Relationship != nil {
-		relationship := *structField.Relationship
+	if sf.Relationship != nil {
+		relationship := *sf.Relationship
 		clone.Relationship = &relationship
 	}
 
 	// copy the struct field tagSettings, they should be read-locked while they are copied
-	structField.tagSettingsLock.Lock()
-	defer structField.tagSettingsLock.Unlock()
-	for key, value := range structField.TagSettings {
+	sf.tagSettingsLock.Lock()
+	defer sf.tagSettingsLock.Unlock()
+	for key, value := range sf.TagSettings {
 		clone.TagSettings[key] = value
 	}
 
@@ -163,7 +169,18 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 	}
 
 	// Get Cached model struct
-	if value, ok := modelStructsMap.Load(reflectType); ok && value != nil {
+	isSingularTable := false
+	if scope.db != nil && scope.db.parent != nil {
+		scope.db.parent.RLock()
+		isSingularTable = scope.db.parent.singularTable
+		scope.db.parent.RUnlock()
+	}
+
+	hashKey := struct {
+		singularTable bool
+		reflectType   reflect.Type
+	}{isSingularTable, reflectType}
+	if value, ok := modelStructsMap.Load(hashKey); ok && value != nil {
 		return value.(*ModelStruct)
 	}
 
@@ -189,7 +206,7 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 					modelStruct.PrimaryFields = append(modelStruct.PrimaryFields, field)
 				}
 
-				if _, ok := field.TagSettingsGet("DEFAULT"); ok {
+				if _, ok := field.TagSettingsGet("DEFAULT"); ok && !field.IsPrimaryKey {
 					field.HasDefaultValue = true
 				}
 
@@ -340,7 +357,7 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 									}
 
 									joinTableHandler := JoinTableHandler{}
-									joinTableHandler.Setup(relationship, ToTableName(many2many), reflectType, elemType)
+									joinTableHandler.Setup(relationship, many2many, reflectType, elemType)
 									relationship.JoinTableHandler = &joinTableHandler
 									field.Relationship = relationship
 								} else {
@@ -406,8 +423,12 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 									for idx, foreignKey := range foreignKeys {
 										if foreignField := getForeignField(foreignKey, toFields); foreignField != nil {
 											if associationField := getForeignField(associationForeignKeys[idx], modelStruct.StructFields); associationField != nil {
-												// source foreign keys
+												// mark field as foreignkey, use global lock to avoid race
+												structsLock.Lock()
 												foreignField.IsForeignKey = true
+												structsLock.Unlock()
+
+												// association foreign keys
 												relationship.AssociationForeignFieldNames = append(relationship.AssociationForeignFieldNames, associationField.Name)
 												relationship.AssociationForeignDBNames = append(relationship.AssociationForeignDBNames, associationField.DBName)
 
@@ -510,8 +531,12 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 								for idx, foreignKey := range foreignKeys {
 									if foreignField := getForeignField(foreignKey, toFields); foreignField != nil {
 										if scopeField := getForeignField(associationForeignKeys[idx], modelStruct.StructFields); scopeField != nil {
+											// mark field as foreignkey, use global lock to avoid race
+											structsLock.Lock()
 											foreignField.IsForeignKey = true
-											// source foreign keys
+											structsLock.Unlock()
+
+											// association foreign keys
 											relationship.AssociationForeignFieldNames = append(relationship.AssociationForeignFieldNames, scopeField.Name)
 											relationship.AssociationForeignDBNames = append(relationship.AssociationForeignDBNames, scopeField.DBName)
 
@@ -569,7 +594,10 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 								for idx, foreignKey := range foreignKeys {
 									if foreignField := getForeignField(foreignKey, modelStruct.StructFields); foreignField != nil {
 										if associationField := getForeignField(associationForeignKeys[idx], toFields); associationField != nil {
+											// mark field as foreignkey, use global lock to avoid race
+											structsLock.Lock()
 											foreignField.IsForeignKey = true
+											structsLock.Unlock()
 
 											// association foreign keys
 											relationship.AssociationForeignFieldNames = append(relationship.AssociationForeignFieldNames, associationField.Name)
@@ -612,7 +640,7 @@ func (scope *Scope) GetModelStruct() *ModelStruct {
 		}
 	}
 
-	modelStructsMap.Store(reflectType, &modelStruct)
+	modelStructsMap.Store(hashKey, &modelStruct)
 
 	return &modelStruct
 }
@@ -625,6 +653,9 @@ func (scope *Scope) GetStructFields() (fields []*StructField) {
 func parseTagSetting(tags reflect.StructTag) map[string]string {
 	setting := map[string]string{}
 	for _, str := range []string{tags.Get("sql"), tags.Get("gorm")} {
+		if str == "" {
+			continue
+		}
 		tags := strings.Split(str, ";")
 		for _, value := range tags {
 			v := strings.Split(value, ":")

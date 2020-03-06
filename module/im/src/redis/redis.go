@@ -1,32 +1,24 @@
 package redis
 
 import (
-	"github.com/3115826227/baby-fried-rice/module/gateway/src/config"
-	"github.com/3115826227/baby-fried-rice/module/gateway/src/log"
-	"github.com/go-redis/redis"
+	"github.com/3115826227/baby-fried-rice/module/im/src/config"
+	"github.com/3115826227/baby-fried-rice/module/im/src/log"
+	"github.com/garyburd/redigo/redis"
 )
 
-var rds *redis.Client
+var rds redis.Conn
 
 func init() {
-	rds = redis.NewClient(&redis.Options{
-		Addr:     config.Config.Redis.URL,
-		Password: config.Config.Redis.Password,
-		PoolSize: 20,
-		DB:       config.Config.Redis.Db,
-	})
-	if err := rds.Ping().Err(); err != nil {
+	var err error
+	rds, err = redis.Dial("tcp", config.Config.RedisUrl)
+	if err != nil {
 		log.Logger.Warn(err.Error())
-		return
+		panic(err)
 	}
 }
 
-func Add(key, value string) {
-	rds.Append(key, value)
-}
-
 func Get(key string) (string, error) {
-	str, err := rds.Get(key).Result()
+	str, err := redis.String(rds.Do("get",key))
 	if err != nil {
 		return "", err
 	}

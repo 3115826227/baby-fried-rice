@@ -7,7 +7,7 @@ import (
 )
 
 var Config = struct {
-	PostgresUrl   string `env:"POSTGRES_URL" required:"true"`
+	MysqlUrl      string `env:"MYSQL_URL" required:"true"`
 	RedisUrl      string `env:"REDIS_URL" required:"true"`
 	RedisPassword string `env:"REDIS_PASSWORD"`
 	RedisDB       int    `env:"REDIS_DB" default:"9"`

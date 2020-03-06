@@ -28,14 +28,14 @@ func init() {
 
 type IntCommonField struct {
 	ID        int       `gorm:"AUTO_INCREMENT;column:id;" json:"id"`
-	CreatedAt time.Time `gorm:"column:create_time;type:timestamp with time zone" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp with time zone" json:"-"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 type StringCommonField struct {
 	ID        string    `gorm:"column:id;type:char(36);primary_key;not null"`
-	CreatedAt time.Time `gorm:"column:create_time;type:timestamp with time zone" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp with time zone" json:"-"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 //用户等级表

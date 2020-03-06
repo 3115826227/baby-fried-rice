@@ -4,7 +4,7 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/im/src/config"
 	"github.com/3115826227/baby-fried-rice/module/im/src/log"
 	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
+	_ "github.com/go-sql-driver/mysql"
 	"go.uber.org/zap"
 )
 
@@ -18,7 +18,7 @@ func GetDB() *gorm.DB {
 
 func init() {
 	var err error
-	MainDB, err = gorm.Open("postgres", config.Config.PostgresUrl)
+	MainDB, err = gorm.Open("mysql", config.Config.MysqlUrl)
 	if err != nil {
 		panic(err)
 	} else {

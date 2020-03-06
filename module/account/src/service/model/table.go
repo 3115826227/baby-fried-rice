@@ -32,8 +32,8 @@ func Sync(engine *gorm.DB) {
 
 type CommonField struct {
 	ID        string    `gorm:"column:id;type:char(36);primary_key;not null"`
-	CreatedAt time.Time `gorm:"column:create_time;type:timestamp with time zone" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp with time zone" json:"-"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 type AccountRoot struct {
@@ -98,7 +98,7 @@ type SchoolCommunity struct {
 	SchoolId      string    `gorm:"school_id"`
 	Name          string    `gorm:"name"`
 	Origin        string    `gorm:"origin"`
-	EstablishTime time.Time `gorm:"column:establish_time;type:timestamp with time zone"`
+	EstablishTime time.Time `gorm:"column:establish_time;type:timestamp"`
 }
 
 func (table *SchoolCommunity) TableName() string {
