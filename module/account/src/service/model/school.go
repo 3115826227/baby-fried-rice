@@ -1,8 +1,8 @@
 package model
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/account/src/log"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
-	"github.com/3115826227/baby-fried-rice/module/im/src/log"
 )
 
 func FindCertification(identify, name string) (certify SchoolUserCertification, err error) {
