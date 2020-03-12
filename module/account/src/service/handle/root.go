@@ -14,7 +14,7 @@ import (
 
 func RootAdd() error {
 	var count = 0
-	err := db.DB.Find(&model.AccountRoot{}).Count(&count).Error
+	err := db.DB.Model(&model.AccountRoot{}).Count(&count).Error
 	if err != nil {
 		log.Logger.Warn(err.Error())
 		return err
