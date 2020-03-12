@@ -6,9 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func init() {
+	err := handle.RootAdd()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func RegisterRoute(engine *gin.Engine) {
 
 	engine.POST("/api/root/login", handle.RootLogin)
+	engine.POST("/api/admin/login", handle.AdminLogin)
 
 	engine.POST("/api/user/register", handle.UserRegister)
 	engine.POST("/api/user/login", handle.UserLogin)
@@ -32,6 +40,7 @@ func RegisterRoute(engine *gin.Engine) {
 	app.DELETE("/school/certification", handle.SchoolCertificationDelete)
 
 	app.GET("/root", handle.RootDetail)
+	app.POST("/root/admin", handle.AddAdmin)
 
 	app.POST("/client", handle.ClientAdd)
 }

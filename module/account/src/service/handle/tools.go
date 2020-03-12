@@ -70,6 +70,7 @@ const (
 	AdminReqId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
 	RootReqId  = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 
+	AdminPassword = "1234"
 	UserEncryMd5 = "md5"
 )
 

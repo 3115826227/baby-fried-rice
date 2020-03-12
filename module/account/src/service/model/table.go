@@ -14,6 +14,7 @@ func init() {
 func Sync(engine *gorm.DB) {
 	err := engine.AutoMigrate(
 		new(AccountRoot),
+		new(AccountAdmin),
 		new(AccountUser),
 		new(AccountClient),
 		new(AccountUserDetail),
@@ -37,6 +38,16 @@ type CommonField struct {
 }
 
 type AccountRoot struct {
+	CommonField
+
+	LoginName  string `gorm:"column:login_name;type:varchar(255);"`
+	Username   string
+	Password   string
+	EncodeType string
+	ReqId      string `gorm:"column:req_id;type:varchar(255);"`
+}
+
+type AccountAdmin struct {
 	CommonField
 
 	LoginName  string `gorm:"column:login_name;type:varchar(255);"`

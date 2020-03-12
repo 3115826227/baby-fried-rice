@@ -10,10 +10,10 @@ var rds *redis.Client
 
 func init() {
 	rds = redis.NewClient(&redis.Options{
-		Addr:     config.Config.Redis.URL,
-		Password: config.Config.Redis.Password,
+		Addr:     config.Config.RedisUrl,
+		Password: config.Config.RedisPassword,
 		PoolSize: 20,
-		DB:       config.Config.Redis.Db,
+		DB:       config.Config.RedisDB,
 	})
 	if err := rds.Ping().Err(); err != nil {
 		log.Logger.Warn(err.Error())

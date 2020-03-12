@@ -14,6 +14,10 @@ type ReqLogin struct {
 	Password  string `json:"password" binding:"required"`   // 密码
 }
 
+type ReqAdminAdd struct {
+	LoginName string `json:"login_name" binding:"required"` // 账号名称
+}
+
 type ReqClientAdd struct {
 	Name      string   `json:"name" binding:"required"`
 	SchoolIds []string `json:"school_id" binding:"required"`

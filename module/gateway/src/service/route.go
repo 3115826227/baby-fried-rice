@@ -11,6 +11,7 @@ func RegisterRouter(engine *gin.Engine) {
 	api := engine.Group("/api")
 
 	api.POST("/root/login", HandleAccountProxy)
+	api.POST("/admin/login", HandleAccountProxy)
 	api.POST("/user/register", HandleAccountProxy)
 	api.POST("/user/login", HandleAccountProxy)
 
