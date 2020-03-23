@@ -91,3 +91,40 @@ func AddAdmin(c *gin.Context) {
 
 	c.JSON(http.StatusOK, model.RspOkResponse{})
 }
+
+func InitAdmin(c *gin.Context) {
+	var err error
+	var req model.ReqAdminAdd
+	if err = c.ShouldBind(&req); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	userMeta := GetUserMeta(c)
+	_, err = model.GetRootDetail(userMeta.UserId)
+	if err != nil {
+		ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
+		return
+	}
+
+	var admin = new(model.AccountAdmin)
+	admin.ID = GenerateID()
+	admin.LoginName = req.LoginName
+	admin.Super = true
+	admin.Password = EncodePassword(AdminPassword)
+	admin.EncodeType = UserEncryMd5
+
+	var relation = &model.AccountAdminRoleRelation{
+		AdminId: admin.ID,
+		RoleId:  1,
+	}
+
+	var beans = make([]interface{}, 0)
+	beans = append(beans, &admin)
+	beans = append(beans, &relation)
+	if err := db.CreateMulti(beans...); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, sysErrResponse)
+		return
+	}
+
+	c.JSON(http.StatusOK, model.RspOkResponse{})
+}

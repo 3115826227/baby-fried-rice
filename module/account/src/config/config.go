@@ -13,6 +13,15 @@ var Config = struct {
 	TokenSecret   string
 }{}
 
+var Permission struct {
+	Permission interface{} `env:"PERMISSION" required:"true"`
+}
+
+const (
+	TimeLayout = "2006-01-02 15:04:05"
+	DateLayout = "2006-01-02"
+)
+
 var Root = os.Getenv("GOPATH") + "/src/github.com/3115826227/baby-fried-rice/module/account"
 
 func init() {
@@ -24,5 +33,8 @@ func init() {
 	Config.TokenSecret, ok = os.LookupEnv("TOKEN_SECRET")
 	if !ok {
 		Config.TokenSecret = "baby"
+	}
+	if err = configor.Load(&Permission, "/etc/permission.yaml"); err != nil {
+		panic(err)
 	}
 }

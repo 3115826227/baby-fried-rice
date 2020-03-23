@@ -13,6 +13,10 @@ func init() {
 
 func Sync(engine *gorm.DB) {
 	err := engine.AutoMigrate(
+		new(AdminPermission),
+		new(AdminRole),
+		new(AdminRolePermissionRelation),
+		new(AccountAdminRoleRelation),
 		new(AccountRoot),
 		new(AccountAdmin),
 		new(AccountUser),
@@ -37,6 +41,46 @@ type CommonField struct {
 	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
+type CommonIntField struct {
+	ID        int    `gorm:"column:id;AUTO_INCREMENT"`
+	CreatedAt string `gorm:"column:create_time;" json:"-"`
+	UpdatedAt string `gorm:"column:update_time;" json:"-"`
+}
+
+type AdminPermission struct {
+	ID       int    `gorm:"column:id;primary_key;not null"`
+	Name     string `gorm:"column:name"`
+	Path     string `gorm:"column:path"`
+	Method   string `gorm:"column:method"`
+	Types    int    `gorm:"column:types"`
+	ParentId int    `gorm:"column:parent_id"`
+}
+
+func (table *AdminPermission) TableName() string {
+	return "admin_permission"
+}
+
+type AdminRole struct {
+	CommonIntField
+
+	Name string `gorm:"column:name"`
+}
+
+func (table *AdminRole) TableName() string {
+	return "admin_role"
+}
+
+type AdminRolePermissionRelation struct {
+	CommonIntField
+
+	RoleId       int
+	PermissionId int
+}
+
+func (table *AdminRolePermissionRelation) TableName() string {
+	return "admin_role_permission_relation"
+}
+
 type AccountRoot struct {
 	CommonField
 
@@ -47,12 +91,20 @@ type AccountRoot struct {
 	ReqId      string `gorm:"column:req_id;type:varchar(255);"`
 }
 
+type AccountAdminRoleRelation struct {
+	CommonIntField
+
+	AdminId string
+	RoleId  int
+}
+
 type AccountAdmin struct {
 	CommonField
 
 	LoginName  string `gorm:"column:login_name;type:varchar(255);"`
 	Username   string
 	Password   string
+	Super      bool `gorm:"column:super"`
 	EncodeType string
 	ReqId      string `gorm:"column:req_id;type:varchar(255);"`
 }

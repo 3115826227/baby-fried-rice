@@ -7,6 +7,9 @@ import (
 )
 
 func init() {
+	handle.PermissionInit()
+	handle.RoleInit()
+	handle.AdminRelationInit()
 	err := handle.RootAdd()
 	if err != nil {
 		panic(err)
@@ -41,6 +44,7 @@ func RegisterRoute(engine *gin.Engine) {
 
 	app.GET("/root", handle.RootDetail)
 	app.POST("/root/admin", handle.AddAdmin)
+	app.POST("/root/admin/init", handle.InitAdmin)
 
 	app.POST("/client", handle.ClientAdd)
 }
