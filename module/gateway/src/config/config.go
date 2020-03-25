@@ -25,7 +25,7 @@ var Root = os.Getenv("GOPATH") + "/src/github.com/3115826227/baby-fried-rice/mod
 
 func init() {
 	var err error
-	if err = configor.Load(&Config, "/etc/config.yaml"); err != nil {
+	if err = configor.Load(&Config, "etc/config.yaml"); err != nil {
 		panic(err)
 	}
 	Config.ParserAccountUrl, err = url.Parse(Config.AccountUrl)

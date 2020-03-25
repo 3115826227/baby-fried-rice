@@ -8,8 +8,6 @@ import (
 
 func init() {
 	handle.PermissionInit()
-	handle.RoleInit()
-	handle.AdminRelationInit()
 	err := handle.RootAdd()
 	if err != nil {
 		panic(err)
@@ -35,6 +33,13 @@ func RegisterRoute(engine *gin.Engine) {
 	app.GET("/user/refresh", handle.UserRefresh)
 	app.POST("/user/verify", handle.UserVerify)
 
+	app.GET("/admin/role", handle.RoleGet)
+
+	app.POST("/admin/sub", handle.SubAdminAdd)
+	app.GET("/admin/sub", handle.SubAdminGet)
+	app.PATCH("/admin/sub")
+	app.DELETE("/admin/sub", )
+
 	app.POST("/school/department", handle.SchoolDepartmentAdd)
 	app.PATCH("/school/department", handle.SchoolDepartmentUpdate)
 	app.GET("/school/department", handle.SchoolDepartments)
@@ -43,8 +48,11 @@ func RegisterRoute(engine *gin.Engine) {
 	app.DELETE("/school/certification", handle.SchoolCertificationDelete)
 
 	app.GET("/root", handle.RootDetail)
-	app.POST("/root/admin", handle.AddAdmin)
 	app.POST("/root/admin/init", handle.InitAdmin)
+
+	app.GET("/root/system/docker/image", handle.ImagesGet)
+	app.GET("/root/system/docker/container", handle.ContainersGet)
+	app.GET("/root/system/docker/stats", handle.StatsGet)
 
 	app.POST("/client", handle.ClientAdd)
 }

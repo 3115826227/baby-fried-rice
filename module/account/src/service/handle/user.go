@@ -46,7 +46,7 @@ func UserRegister(c *gin.Context) {
 
 /*
 	用户实名制认证
- */
+*/
 func UserVerify(c *gin.Context) {
 	var err error
 	var req model.ReqUserVerify
@@ -113,7 +113,7 @@ func UserLogin(c *gin.Context) {
 	req.Password = strings.TrimSpace(req.Password)
 
 	var user = model.AccountUser{}
-	err = db.DB.Where("login_name = ? and password = ?", req.LoginName, EncodePassword(req.Password)).First(&user).Error
+	err = db.DB.Debug().Where("login_name = ? and password = ?", req.LoginName, EncodePassword(req.Password)).Find(&user).Error
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, sysErrResponse)
@@ -141,9 +141,9 @@ func UserLogin(c *gin.Context) {
 		SchoolId: detail.SchoolId,
 	}
 	var loginResult = model.LoginResult{
-		UserInfo: userInfo,
-		Token:    token,
-		Policies: make(map[string][]string),
+		UserInfo:   userInfo,
+		Token:      token,
+		Permission: make([]int, 0),
 	}
 	var result = model.RspLogin{
 		RspSuccess: model.RspSuccess{Code: 0},

@@ -14,8 +14,19 @@ type ReqLogin struct {
 	Password  string `json:"password" binding:"required"`   // 密码
 }
 
+type ReqAdminLogin struct {
+	LoginName string `json:"login_name" binding:"required"` // 账号名称
+	Password  string `json:"password" binding:"required"`   // 密码
+	SchoolId  string `json:"school_id" binding:"required"`  //学校id
+}
+
 type ReqAdminAdd struct {
 	LoginName string `json:"login_name" binding:"required"` // 账号名称
+}
+
+type ReqAdminInit struct {
+	LoginName string `json:"login_name" binding:"required"` // 账号名称
+	SchoolId  string `json:"school_id" binding:"required"`  //学校id
 }
 
 type ReqClientAdd struct {

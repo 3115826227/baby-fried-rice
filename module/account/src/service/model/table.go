@@ -42,7 +42,7 @@ type CommonField struct {
 }
 
 type CommonIntField struct {
-	ID        int    `gorm:"column:id;AUTO_INCREMENT"`
+	ID        int    `gorm:"column:id;AUTO_INCREMENT" json:"id"`
 	CreatedAt string `gorm:"column:create_time;" json:"-"`
 	UpdatedAt string `gorm:"column:update_time;" json:"-"`
 }
@@ -63,7 +63,8 @@ func (table *AdminPermission) TableName() string {
 type AdminRole struct {
 	CommonIntField
 
-	Name string `gorm:"column:name"`
+	Name     string `gorm:"column:name;" json:"name"`
+	SchoolId string `gorm:"column:school_id" json:"-"`
 }
 
 func (table *AdminRole) TableName() string {
@@ -104,7 +105,9 @@ type AccountAdmin struct {
 	LoginName  string `gorm:"column:login_name;type:varchar(255);"`
 	Username   string
 	Password   string
-	Super      bool `gorm:"column:super"`
+	Name       string `gorm:"column:name;not null"`
+	Super      bool   `gorm:"column:super"`
+	SchoolId   string `gorm:"column:school_id"`
 	EncodeType string
 	ReqId      string `gorm:"column:req_id;type:varchar(255);"`
 }

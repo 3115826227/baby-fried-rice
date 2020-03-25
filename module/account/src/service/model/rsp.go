@@ -20,6 +20,7 @@ type RspUserData struct {
 	LoginName string `json:"login_name"`
 	Username  string `json:"username"`
 	SchoolId  string `json:"school_id"`
+	IsSuper   bool   `json:"is_super"`
 }
 
 type RspUserDetail struct {
@@ -39,9 +40,10 @@ type RspLogin struct {
 }
 
 type LoginResult struct {
-	UserInfo RspUserData         `json:"user_info"`
-	Token    string              `json:"token"`
-	Policies map[string][]string `json:"policies"`
+	UserInfo   RspUserData `json:"user_info"`
+	Token      string      `json:"token"`
+	Role       []AdminRole `json:"role"`
+	Permission []int       `json:"permission"`
 }
 
 type SchoolDepartments struct {
@@ -54,4 +56,10 @@ type RspSchoolDepartment struct {
 	SchoolId    string              `json:"school_id"`
 	SchoolName  string              `json:"school_name"`
 	Departments []SchoolDepartments `json:"departments"`
+}
+
+type RspSubAdmin struct {
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	Name     string `json:"name"`
 }

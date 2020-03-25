@@ -1,25 +1,23 @@
 package handle
 
 import (
-	"fmt"
-	"github.com/3115826227/baby-fried-rice/module/account/src/config"
 	"github.com/3115826227/baby-fried-rice/module/account/src/log"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"time"
 )
 
-func RoleInit() {
-	roleName := "管理员"
-	now := time.Now().Format(config.TimeLayout)
-	sql := fmt.Sprintf(`insert into admin_role values(1,'%v', '%v', '%v') ON DUPLICATE KEY UPDATE name = '%v',update_time = '%v'`,
-		now, now, roleName, roleName, now)
-	if err := db.DB.Debug().Model(&model.AdminRole{}).Exec(sql).Error; err != nil {
+func RoleGet(c *gin.Context) {
+	userMeta := GetUserMeta(c)
+
+	var roles = make([]model.AdminRole, 0)
+	if err := db.DB.Model(&model.AdminRole{}).Where("school_id = ?", userMeta.SchoolId).Find(&roles).Error; err != nil {
 		log.Logger.Warn(err.Error())
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
+	SuccessResp(c, "", roles)
 }
 
 func RoleAdd(c *gin.Context) {

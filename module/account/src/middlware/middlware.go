@@ -20,7 +20,7 @@ func MiddlewareSetUserMeta() gin.HandlerFunc {
 		reqId := header.Get(handle.HeaderReqId)
 		isSuper := header.Get(handle.HeaderIsSuper)
 
-		if isSuper == "" || userId == "" || platform == "" || reqId == "" {
+		if isSuper == "" || userId == "" {
 			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"code":    400,
 				"message": "请求头错误",

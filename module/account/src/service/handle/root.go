@@ -51,7 +51,7 @@ func RootLogin(c *gin.Context) {
 	req.Password = strings.TrimSpace(req.Password)
 
 	var root = model.AccountRoot{}
-	err = db.DB.Find(&root).Where("login_name = ? and password = ?", req.LoginName, EncodePassword(req.Password)).Error
+	err = db.DB.Debug().Where("login_name = ? and password = ?", req.LoginName, EncodePassword(req.Password)).Find(&root).Error
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, sysErrResponse)
@@ -71,9 +71,9 @@ func RootLogin(c *gin.Context) {
 		Username:  root.Username,
 	}
 	var loginResult = model.LoginResult{
-		UserInfo: userInfo,
-		Token:    token,
-		Policies: make(map[string][]string),
+		UserInfo:   userInfo,
+		Token:      token,
+		Permission: make([]int, 0),
 	}
 	var result = model.RspLogin{
 		RspSuccess: model.RspSuccess{Code: 0},

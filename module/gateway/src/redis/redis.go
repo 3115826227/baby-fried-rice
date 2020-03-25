@@ -24,6 +24,7 @@ func init() {
 func Get(key string) (string, error) {
 	str, err := rds.Get(key).Result()
 	if err != nil {
+		log.Logger.Warn(err.Error())
 		return "", err
 	}
 	return str, nil

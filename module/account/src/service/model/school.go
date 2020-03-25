@@ -18,3 +18,10 @@ func GetCertifications(id ...string) (certifications []SchoolUserCertification, 
 	}
 	return
 }
+
+func GetSchoolById(id string) (school School, err error) {
+	if err = db.DB.Where("id = ?", id).Find(&school).Error; err != nil {
+		log.Logger.Warn(err.Error())
+	}
+	return
+}
