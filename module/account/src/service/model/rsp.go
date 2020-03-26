@@ -73,3 +73,47 @@ type RspAdminPermissions struct {
 	Children []RspAdminPermissions `json:"children"`
 	ParentId int                   `json:"-"`
 }
+
+type RspImages struct {
+	Id         string   `json:"id"`
+	Name       []string `json:"name"`
+	Size       int64    `json:"size"`
+	Timestamp  int64    `json:"timestamp"`
+	CreateTime string   `json:"create_time"`
+}
+
+type RspContainers struct {
+	Id         string           `json:"id"`
+	Name       string           `json:"name"`
+	ImageId    string           `json:"image_id"`
+	ImageName  string           `json:"image_name"`
+	Timestamp  int64            `json:"timestamp"`
+	CreateTime string           `json:"create_time"`
+	State      string           `json:"state"`
+	Status     string           `json:"status"`
+	Ports      []ContainerPorts `json:"ports"`
+}
+
+type ContainerPorts struct {
+	Ip          string `json:"ip"`
+	PrivatePort uint16 `json:"private_port"`
+	PublicPort  uint16 `json:"public_port"`
+}
+
+type RspCmdContainerStats struct {
+	Id             string `json:"id"`
+	Name           string `json:"name"`
+	UseLimitMemory string `json:"use_limit_memory"`
+	MemoryPercent  string `json:"memory_percent"`
+	CpuPercent     string `json:"cpu_percent"`
+}
+
+type RspContainerStats struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+
+	UseMemory        uint64 `json:"use_memory"`
+	LimitMemory      uint64 `json:"limit_memory"`
+	UseMemoryPercent string `json:"use_memory_percent"`
+	UseCPUPercent    string `json:"use_cpu_percent"`
+}

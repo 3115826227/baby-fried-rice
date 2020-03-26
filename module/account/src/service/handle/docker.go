@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"awesomeProject/docker_client/config"
-	"awesomeProject/docker_client/model"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/account/src/config"
 	"github.com/3115826227/baby-fried-rice/module/account/src/log"
+	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/gin"
