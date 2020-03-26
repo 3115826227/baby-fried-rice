@@ -48,12 +48,12 @@ type CommonIntField struct {
 }
 
 type AdminPermission struct {
-	ID       int    `gorm:"column:id;primary_key;not null"`
-	Name     string `gorm:"column:name"`
-	Path     string `gorm:"column:path"`
-	Method   string `gorm:"column:method"`
-	Types    int    `gorm:"column:types"`
-	ParentId int    `gorm:"column:parent_id"`
+	ID       int    `gorm:"column:id;primary_key;not null" json:"id"`
+	Name     string `gorm:"column:name" json:"name"`
+	Path     string `gorm:"column:path" json:"path"`
+	Method   string `gorm:"column:method" json:"method"`
+	Types    int    `gorm:"column:types" json:"types"`
+	ParentId int    `gorm:"column:parent_id" json:"parent_id"`
 }
 
 func (table *AdminPermission) TableName() string {
@@ -134,10 +134,10 @@ func (relation *ClientSchoolRelation) TableName() string {
 }
 
 type School struct {
-	ID       string `gorm:"column:id"`
-	Name     string `gorm:"column:name"`
-	Province string `gorm:"column:province"`
-	City     string `gorm:"column:city"`
+	ID       string `gorm:"column:id" json:"id"`
+	Name     string `gorm:"column:name" json:"name"`
+	Province string `gorm:"column:province" json:"province"`
+	City     string `gorm:"column:city" json:"city"`
 }
 
 func (table *School) TableName() string {

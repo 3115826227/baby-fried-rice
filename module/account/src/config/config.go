@@ -29,7 +29,7 @@ var Root = os.Getenv("GOPATH") + "/src/github.com/3115826227/baby-fried-rice/mod
 
 func init() {
 	var err error
-	if err = configor.Load(&Config, Root+"/etc/config.yaml"); err != nil {
+	if err = configor.Load(&Config, "/etc/config.yaml"); err != nil {
 		panic(err)
 	}
 	var ok bool
@@ -37,7 +37,7 @@ func init() {
 	if !ok {
 		Config.TokenSecret = "baby"
 	}
-	if err = configor.Load(&Permission, Root+"/etc/permission.yaml"); err != nil {
+	if err = configor.Load(&Permission, "/etc/permission.yaml"); err != nil {
 		panic(err)
 	}
 }

@@ -63,3 +63,13 @@ type RspSubAdmin struct {
 	Username string `json:"username"`
 	Name     string `json:"name"`
 }
+
+type RspAdminPermissions struct {
+	Id       int                   `json:"id"`
+	Name     string                `json:"name"`
+	Method   string                `json:"method"`
+	Path     string                `json:"path"`
+	Types    int                   `json:"types"`
+	Children []RspAdminPermissions `json:"children"`
+	ParentId int                   `json:"-"`
+}

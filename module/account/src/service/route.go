@@ -3,11 +3,13 @@ package service
 import (
 	"github.com/3115826227/baby-fried-rice/module/account/src/middlware"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/handle"
+	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/gin-gonic/gin"
 )
 
 func init() {
 	handle.PermissionInit()
+	model.InitSchool()
 	err := handle.RootAdd()
 	if err != nil {
 		panic(err)
@@ -22,6 +24,10 @@ func RegisterRoute(engine *gin.Engine) {
 	engine.POST("/api/user/register", handle.UserRegister)
 	engine.POST("/api/user/login", handle.UserLogin)
 
+	public := engine.Group("/api/user/")
+	public.GET("/school", handle.SchoolGet)
+	public.GET("/admin/permission", handle.PermissionAllGet)
+
 	app := engine.Group("/api/account")
 
 	app.Use(middlware.MiddlewareSetUserMeta())
@@ -34,6 +40,7 @@ func RegisterRoute(engine *gin.Engine) {
 	app.POST("/user/verify", handle.UserVerify)
 
 	app.GET("/admin/role", handle.RoleGet)
+	app.GET("/admin/permission", handle.PermissionGet)
 
 	app.POST("/admin/sub", handle.SubAdminAdd)
 	app.GET("/admin/sub", handle.SubAdminGet)

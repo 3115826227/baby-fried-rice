@@ -7,6 +7,7 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Permission struct {
@@ -59,5 +60,62 @@ func PermissionDFS(parentId int, data interface{}, permissions []model.AdminPerm
 }
 
 func PermissionGet(c *gin.Context) {
+	role := c.Query("role_id")
+	var permissions = make([]int, 0)
+	var relations = make([]model.AdminRolePermissionRelation, 0)
+	if err := db.DB.Debug().Model(&model.AdminRolePermissionRelation{}).Where("role_id = ?", role).Find(&relations).Error; err != nil {
+		log.Logger.Warn(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	for _, r := range relations {
+		permissions = append(permissions, r.PermissionId)
+	}
+	var rsp = make([]model.AdminPermission, 0)
+	if err := db.DB.Debug().Model(&model.AdminPermission{}).Where("id in (?)", permissions).Find(&rsp).Error; err != nil {
+		log.Logger.Warn(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	SuccessResp(c, "", rsp)
+}
 
+func PermissionAllGet(c *gin.Context) {
+
+	var permissions = make([]model.AdminPermission, 0)
+	if err := db.DB.Debug().Model(&model.AdminPermission{}).Find(&permissions).Error; err != nil {
+		log.Logger.Warn(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	var rsp = make([]model.RspAdminPermissions, 0)
+	var mp = make(map[int]model.RspAdminPermissions)
+	for _, p := range permissions {
+		mp[p.ID] = model.RspAdminPermissions{
+			Id:       p.ID,
+			Name:     p.Name,
+			Method:   p.Method,
+			Path:     p.Path,
+			Types:    p.Types,
+			ParentId: p.ParentId,
+			Children: make([]model.RspAdminPermissions, 0),
+		}
+	}
+	for _, p := range mp {
+		if p.ParentId == 0 {
+			DFSGetAdminPermission(&p, mp)
+			rsp = append(rsp, p)
+		}
+	}
+
+	SuccessResp(c, "", rsp)
+}
+
+func DFSGetAdminPermission(permission *model.RspAdminPermissions, mp map[int]model.RspAdminPermissions) {
+	for _, p := range mp {
+		if p.ParentId == permission.Id {
+			DFSGetAdminPermission(&p, mp)
+			permission.Children = append(permission.Children, p)
+		}
+	}
 }
