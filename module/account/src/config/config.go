@@ -21,8 +21,12 @@ const (
 	TimeLayout = "2006-01-02 15:04:05"
 	DateLayout = "2006-01-02"
 
-	DefaultRoleName = "默认"
-	AdminRoleName   = "管理员"
+	DefaultRoleName      = "默认"
+	AdminRoleName        = "管理员"
+	RootSchoolOrganizeId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa"
+
+	StudentVerifyTrue  = "已认证"
+	StudentVerifyFalse = "未认证"
 )
 
 var Root = os.Getenv("GOPATH") + "/src/github.com/3115826227/baby-fried-rice/module/account"

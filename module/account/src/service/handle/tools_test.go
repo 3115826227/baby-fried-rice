@@ -33,3 +33,8 @@ func TestEncodePassword(t *testing.T) {
 func TestAddRoot(t *testing.T) {
 	AddRoot()
 }
+
+func TestGetLabel(t *testing.T) {
+	label := GetLabel("922e36e7-e43f-4a23-81d2-d52fa651b12d")
+	fmt.Println(label)
+}

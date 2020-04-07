@@ -24,14 +24,21 @@ func UserRegister(c *gin.Context) {
 		ErrorResp(c, http.StatusBadRequest, ErrCodeDuplicateName, ErrCodeM[ErrCodeDuplicateName])
 		return
 	}
+	var now = time.Now()
 	var user model.AccountUser
 	user.ID = GenerateID()
 	user.LoginName = req.LoginName
 	user.Password = EncodePassword(req.Password)
 	user.EncodeType = UserEncryMd5
+	user.CreatedAt = now
+	user.UpdatedAt = now
 
 	var detail model.AccountUserDetail
 	detail.ID = user.ID
+	detail.Username = req.Username
+	detail.Gender = req.Gender
+	detail.CreatedAt = now
+	detail.UpdatedAt = now
 
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &user)
@@ -55,15 +62,19 @@ func UserVerify(c *gin.Context) {
 		return
 	}
 
-	var certify model.SchoolUserCertification
-	certify, err = model.FindCertification(req.Identify, req.Name)
-	if err != nil {
+	var student model.AccountSchoolStudent
+	var organizes = make([]model.AccountSchoolOrganize, 0)
+	if err := db.DB.Debug().Where("school_id = ?", req.SchoolId).Find(&organizes).Error; err != nil {
+		log.Logger.Warn(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
-	var department model.SchoolDepartment
-	department, err = model.FindDepartmentById(certify.SchoolDepartmentId)
-	if err != nil {
+	var org = make([]string, 0)
+	for _, o := range organizes {
+		org = append(org, o.ID)
+	}
+	if err := db.DB.Debug().Where("name = ? and identify = ? and org_id in (?)", req.Name, req.Identify, org).Find(&student).Error; err != nil {
+		log.Logger.Warn(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
@@ -76,16 +87,24 @@ func UserVerify(c *gin.Context) {
 		}
 	}()
 
-	var updateMap = map[string]interface{}{"school_id": department.SchoolId, "verify": 1}
-	if err = tx.Model(model.AccountUserDetail{}).Where("id = ?", userMeta.UserId).Update(updateMap).Error; err != nil {
+	var updateMap = map[string]interface{}{"school_id": req.SchoolId, "verify": true}
+	if err = tx.Model(&model.AccountUserDetail{}).Where("id = ?", userMeta.UserId).Update(updateMap).Error; err != nil {
 		log.Logger.Warn(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	var updateStudentMap = map[string]interface{}{"status": true}
+	if err = tx.Model(&model.AccountSchoolStudent{}).Where("id = ?", student.ID).Update(updateStudentMap).Error; err != nil {
+		log.Logger.Warn(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 	var schoolDetail model.AccountUserSchoolDetail
 	schoolDetail.ID = userMeta.UserId
-	schoolDetail.Name = certify.Name
-	schoolDetail.Identify = certify.Identify
-	schoolDetail.SchoolDepartmentId = certify.SchoolDepartmentId
+	schoolDetail.Name = student.Name
+	schoolDetail.Identify = student.Identify
+	schoolDetail.Number = student.Number
+	schoolDetail.OrgId = student.OrgId
 	if err = tx.Create(&schoolDetail).Error; err != nil {
 		log.Logger.Warn(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, sysErrResponse)
@@ -153,6 +172,7 @@ func UserLogin(c *gin.Context) {
 	var userMeta = &model.UserMeta{
 		UserId:   user.ID,
 		IsSuper:  "0",
+		Username: detail.Username,
 		SchoolId: detail.SchoolId,
 		ReqId:    user.ID,
 		Platform: "pc",
@@ -209,10 +229,40 @@ func UserDetail(c *gin.Context) {
 		ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
 		return
 	}
-	var rsp model.RspUserData
+	var rsp model.RspUserDetail
+	var login = model.AccountUser{}
+	if err := db.DB.Debug().Where("id = ?", userMeta.UserId).Find(&login).Error; err != nil {
+		ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
+		return
+	}
+	rsp.LoginName = login.LoginName
 	rsp.UserId = user.ID
 	rsp.Username = user.Username
 	rsp.SchoolId = user.SchoolId
+	rsp.Gender = user.Gender
+	rsp.Age = user.Age
+	rsp.Verify = user.Verify
+	if user.Verify {
+		detail, err := model.GetUserSchoolDetail(user.ID)
+		if err != nil {
+			ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
+			return
+		}
+		labels := strings.Split(GetLabel(detail.OrgId), "-")
+		rsp.Faculty = labels[1]
+		rsp.Grade = labels[2]
+		rsp.Major = labels[3]
+		var school model.School
+		if err := db.DB.Debug().Model(&model.School{}).Where("id = ?", user.SchoolId).Find(&school).Error; err != nil {
+			log.Logger.Warn(err.Error())
+			ErrorResp(c, http.StatusBadRequest, ErrCodeAccountNotFound, ErrCodeM[ErrCodeAccountNotFound])
+			return
+		}
+		rsp.School = school.Name
+		rsp.Name = detail.Name
+		rsp.Identify = detail.Identify
+		rsp.Number = detail.Number
+	}
 
 	SuccessResp(c, "", rsp)
 }
@@ -249,4 +299,39 @@ func UserUpdate(c *gin.Context) {
 
 func UserDelete(c *gin.Context) {
 
+}
+
+func UserInfoGet(c *gin.Context) {
+	id := c.Query("id")
+
+	var rsp model.RspUserInfo
+	var detail model.AccountUserDetail
+	if err := db.DB.Debug().Model(&model.AccountUserDetail{}).Where("id = ?", id).Find(&detail).Error; err != nil {
+		log.Logger.Warn(err.Error())
+		c.JSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	rsp.Id = detail.ID
+	rsp.Username = detail.Username
+	rsp.Verify = detail.Verify
+	rsp.Gender = detail.Gender
+	rsp.Age = detail.Age
+
+	if detail.Verify {
+		var school model.AccountUserSchoolDetail
+		if err := db.DB.Debug().Model(&model.AccountUserSchoolDetail{}).Where("id = ?", id).Find(&school).Error; err != nil {
+			log.Logger.Warn(err.Error())
+			c.JSON(http.StatusBadRequest, paramErrResponse)
+			return
+		}
+		labels := strings.Split(GetLabel(school.OrgId), "-")
+		rsp.School = labels[0]
+		rsp.Faculty = labels[1]
+		rsp.Grade = labels[2]
+		rsp.Major = labels[3]
+		rsp.Name = school.Name
+		rsp.Number = school.Number
+	}
+
+	SuccessResp(c, "", rsp)
 }

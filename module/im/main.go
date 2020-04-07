@@ -1,14 +1,14 @@
 package main
 
 import (
-	"github.com/3115826227/baby-fried-rice/module/im/src/middleware"
+	"log"
+	"os"
+	"path"
+
 	"github.com/3115826227/baby-fried-rice/module/im/src/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"log"
-	"os"
-	"path"
 )
 
 func init() {
@@ -34,8 +34,8 @@ func init() {
 func main() {
 	engine := gin.Default()
 
-	engine.Use(middleware.Cors())
+	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
-	engine.Run(":9089")
+	engine.Run(":8080")
 }

@@ -1,9 +1,10 @@
 all: testdeps
 	go test ./...
 	go test ./... -short -race
-	go test ./... -run=NONE -bench=. -benchmem
 	env GOOS=linux GOARCH=386 go test ./...
-	golangci-lint run
+	go vet
+	go get github.com/gordonklaus/ineffassign
+	ineffassign .
 
 testdeps: testdata/redis/src/redis-server
 
@@ -14,7 +15,8 @@ bench: testdeps
 
 testdata/redis:
 	mkdir -p $@
-	wget -qO- http://download.redis.io/releases/redis-5.0.7.tar.gz | tar xvz --strip-components=1 -C $@
+	wget -qO- https://github.com/antirez/redis/archive/unstable.tar.gz | tar xvz --strip-components=1 -C $@
 
 testdata/redis/src/redis-server: testdata/redis
+	sed -i.bak 's/libjemalloc.a/libjemalloc.a -lrt/g' $</src/Makefile
 	cd $< && make all

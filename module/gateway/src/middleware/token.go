@@ -37,6 +37,7 @@ func CheckToken(c *gin.Context) {
 	}
 	header := c.Request.Header
 	header.Set(HeaderUserId, userMeta.UserId)
+	header.Set(HeaderUsername, userMeta.Username)
 	header.Set(HeaderSchoolId, userMeta.SchoolId)
 	header.Set(HeaderReqId, userMeta.ReqId)
 	header.Set(HeaderIsSuper, userMeta.IsSuper)

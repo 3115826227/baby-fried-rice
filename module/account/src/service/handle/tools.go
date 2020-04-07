@@ -71,7 +71,7 @@ const (
 	RootReqId  = "ffffffff-ffff-ffff-ffff-ffffffffffff"
 
 	AdminPassword = "1234"
-	UserEncryMd5 = "md5"
+	UserEncryMd5  = "md5"
 )
 
 const (
@@ -82,6 +82,7 @@ const (
 	GinIsSuper = "IsSuper"
 
 	HeaderUserId   = "userId"
+	HeaderUsername = "username"
 	HeaderSchoolId = "schoolId"
 	HeaderPlatform = "platform"
 	HeaderReqId    = "reqId"

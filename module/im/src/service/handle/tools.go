@@ -3,6 +3,7 @@ package handle
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/im/src/log"
 	"github.com/3115826227/baby-fried-rice/module/im/src/redis"
 	"github.com/3115826227/baby-fried-rice/module/im/src/service/model"
 	"github.com/gin-gonic/gin"
@@ -92,6 +93,7 @@ const (
 	GinIsSuper = "IsSuper"
 
 	HeaderUserId   = "userId"
+	HeaderUsername = "username"
 	HeaderSchoolId = "schoolId"
 	HeaderPlatform = "platform"
 	HeaderReqId    = "reqId"
@@ -140,8 +142,7 @@ func GetUserMeta(c *gin.Context) *model.UserMeta {
 	return c.MustGet(GinContextKeyUserMeta).(*model.UserMeta)
 }
 
-func GetUserMetaByToken(c *gin.Context) (userMeta *model.UserMeta, err error) {
-	token := c.Query("token")
+func GetUserMetaByToken(c *gin.Context, token string) (userMeta *model.UserMeta, err error) {
 	if token == "" {
 		ErrorResp(c, http.StatusUnauthorized, CodeRequiredLogin, CodeRequiredLoginMsg)
 		c.Abort()
@@ -152,6 +153,7 @@ func GetUserMetaByToken(c *gin.Context) (userMeta *model.UserMeta, err error) {
 	var str string
 	str, err = redis.Get(tokenKey)
 	if err != nil {
+		log.Logger.Warn(err.Error())
 		ErrorResp(c, http.StatusUnauthorized, CodeRequiredLogin, CodeRequiredLoginMsg)
 		c.Abort()
 		return

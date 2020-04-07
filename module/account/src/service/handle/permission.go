@@ -8,6 +8,7 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model/db"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"sort"
 )
 
 type Permission struct {
@@ -88,17 +89,17 @@ func PermissionAllGet(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
-	var rsp = make([]model.RspAdminPermissions, 0)
-	var mp = make(map[int]model.RspAdminPermissions)
+	var rsp = make([]model.RspAdminPermission, 0)
+	var mp = make(map[int]model.RspAdminPermission)
 	for _, p := range permissions {
-		mp[p.ID] = model.RspAdminPermissions{
+		mp[p.ID] = model.RspAdminPermission{
 			Id:       p.ID,
 			Name:     p.Name,
 			Method:   p.Method,
 			Path:     p.Path,
 			Types:    p.Types,
 			ParentId: p.ParentId,
-			Children: make([]model.RspAdminPermissions, 0),
+			Children: make([]model.RspAdminPermission, 0),
 		}
 	}
 	for _, p := range mp {
@@ -108,10 +109,11 @@ func PermissionAllGet(c *gin.Context) {
 		}
 	}
 
+	sort.Sort(model.RspAdminPermissions(rsp))
 	SuccessResp(c, "", rsp)
 }
 
-func DFSGetAdminPermission(permission *model.RspAdminPermissions, mp map[int]model.RspAdminPermissions) {
+func DFSGetAdminPermission(permission *model.RspAdminPermission, mp map[int]model.RspAdminPermission) {
 	for _, p := range mp {
 		if p.ParentId == permission.Id {
 			DFSGetAdminPermission(&p, mp)

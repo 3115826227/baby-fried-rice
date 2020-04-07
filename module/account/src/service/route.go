@@ -33,6 +33,7 @@ func RegisterRoute(engine *gin.Engine) {
 	app.Use(middlware.MiddlewareSetUserMeta())
 
 	app.GET("/user", handle.UserDetail)
+	app.GET("/user/info", handle.UserInfoGet)
 	app.PATCH("/user/password", handle.UserPasswordUpdate)
 	app.PATCH("/user", handle.UserUpdate)
 	app.GET("/user/logout", handle.UserLogout)
@@ -46,6 +47,15 @@ func RegisterRoute(engine *gin.Engine) {
 	app.GET("/admin/sub", handle.SubAdminGet)
 	app.PATCH("/admin/sub")
 	app.DELETE("/admin/sub", )
+
+	app.POST("/admin/school/organize", handle.OrganizeAdd)
+	app.GET("/admin/school/organize", handle.OrganizeGet)
+	app.PUT("/admin/school/organize", handle.OrganizeUpdate)
+	app.PUT("/admin/school/organize/status", handle.OrganizeStatus)
+	app.DELETE("/admin/school/organize", handle.OrganizeDelete)
+
+	app.GET("/admin/school/student", handle.StudentGet)
+	app.POST("/admin/school/student", handle.StudentAdd)
 
 	app.POST("/school/department", handle.SchoolDepartmentAdd)
 	app.PATCH("/school/department", handle.SchoolDepartmentUpdate)

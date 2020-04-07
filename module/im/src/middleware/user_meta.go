@@ -11,6 +11,7 @@ func MiddlewareSetUserMeta() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		header := context.Request.Header
 		userId := header.Get(handle.HeaderUserId)
+		userName := header.Get(handle.HeaderUsername)
 		schoolId := header.Get(handle.HeaderSchoolId)
 		platform := header.Get(handle.HeaderPlatform)
 		reqId := header.Get(handle.HeaderReqId)
@@ -25,6 +26,7 @@ func MiddlewareSetUserMeta() gin.HandlerFunc {
 
 		userMeta := model.UserMeta{
 			UserId:   userId,
+			Username: userName,
 			SchoolId: schoolId,
 			ReqId:    reqId,
 			Platform: platform,

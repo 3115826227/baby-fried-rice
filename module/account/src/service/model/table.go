@@ -24,6 +24,8 @@ func Sync(engine *gorm.DB) {
 		new(AccountUserDetail),
 		new(AccountUserSchoolDetail),
 		new(School),
+		new(AccountSchoolOrganize),
+		new(AccountSchoolStudent),
 		new(SchoolDepartment),
 		new(SchoolCommunity),
 		new(SchoolUserCertification),
@@ -42,9 +44,9 @@ type CommonField struct {
 }
 
 type CommonIntField struct {
-	ID        int    `gorm:"column:id;AUTO_INCREMENT" json:"id"`
-	CreatedAt string `gorm:"column:create_time;" json:"-"`
-	UpdatedAt string `gorm:"column:update_time;" json:"-"`
+	ID        int       `gorm:"column:id;AUTO_INCREMENT" json:"id"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 type AdminPermission struct {
@@ -194,19 +196,19 @@ type AccountUser struct {
 type AccountUserDetail struct {
 	CommonField
 
-	Username   string `gorm:"column:username"`
-	SchoolId   string `gorm:"column:school_id"`
-	Verify     int    `gorm:"column:verify"`
-	Birthday   string `gorm:"column:birthday"`
-	Gender     int    `gorm:"column:gender"`
-	Age        int    `gorm:"column:age"`
-	HeadImgUrl string `gorm:"column:head_img_url"`
-	Phone      string `gorm:"column:phone"`
-	Wx         string `gorm:"column:wx"`
-	QQ         string `gorm:"column:qq"`
-	Addr       string `gorm:"column:addr"`
-	Hometown   string `gorm:"column:hometown"`
-	Ethnic     string `gorm:"column:ethnic"`
+	Username string `gorm:"column:username"`
+	SchoolId string `gorm:"column:school_id"`
+	Verify   bool   `gorm:"column:verify"`
+	Birthday string `gorm:"column:birthday"`
+	Gender   bool   `gorm:"column:gender"`
+	Age      int    `gorm:"column:age"`
+	//HeadImgUrl string `gorm:"column:head_img_url"`
+	Phone    string `gorm:"column:phone"`
+	Wx       string `gorm:"column:wx"`
+	QQ       string `gorm:"column:qq"`
+	Addr     string `gorm:"column:addr"`
+	Hometown string `gorm:"column:hometown"`
+	Ethnic   string `gorm:"column:ethnic"`
 }
 
 func (table *AccountUserDetail) TableName() string {
@@ -216,9 +218,10 @@ func (table *AccountUserDetail) TableName() string {
 type AccountUserSchoolDetail struct {
 	CommonField
 
-	Name               string `gorm:"column:name"`
-	Identify           string `gorm:"column:identify"`
-	SchoolDepartmentId string `gorm:"school_department_id"`
+	Name     string `gorm:"column:name"`
+	Identify string `gorm:"column:identify"`
+	Number   string `gorm:"column:number"`
+	OrgId    string `gorm:"column:org_id"`
 }
 
 func (table *AccountUserSchoolDetail) TableName() string {
@@ -234,4 +237,32 @@ type Area struct {
 
 func (table *Area) TableName() string {
 	return "area"
+}
+
+type AccountSchoolOrganize struct {
+	CommonField
+	Label    string
+	ParentId string
+	SchoolId string
+	Status   bool
+	Count    int `gorm:"-"`
+}
+
+func (table *AccountSchoolOrganize) TableName() string {
+	return "account_school_organize"
+}
+
+type AccountSchoolStudent struct {
+	CommonField
+
+	Name     string
+	Identify string
+	Status   bool
+	Number   string
+	Phone    string
+	OrgId    string
+}
+
+func (table *AccountSchoolStudent) TableName() string {
+	return "account_school_student"
 }

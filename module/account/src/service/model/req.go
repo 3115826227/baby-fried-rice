@@ -36,6 +36,8 @@ type ReqClientAdd struct {
 
 type ReqUserRegister struct {
 	ReqLogin
+	Username string `json:"username" binding:"required"` //昵称
+	Gender   bool   `json:"gender" binding:"required"`   //性别
 }
 
 type ReqUserAdd struct {
@@ -50,6 +52,7 @@ type ReqUserUpdate struct {
 }
 
 type ReqUserVerify struct {
+	SchoolId string `json:"school_id"`
 	Identify string `json:"identify"`
 	Name     string `json:"name"`
 }
@@ -67,4 +70,28 @@ type ReqSchoolDepartmentUpdate struct {
 
 type ReqSchoolCertificationDelete struct {
 	Id []string `json:"id"`
+}
+
+type ReqSchoolOrganizeAdd struct {
+	Label    string `json:"label" binding:"required"`
+	ParentId string `json:"parent_id" binding:"required"`
+	SchoolId string `json:"school_id" binding:"required"`
+	Status   string `json:"status" binding:"required"`
+}
+
+type ReqSchoolOrganizedUpdate struct {
+	Id    string `json:"id" binding:"required"`
+	Label string `json:"label" binding:"required"`
+}
+
+type ReqSchoolOrganizedStatusUpdate struct {
+	Id     string `json:"id" binding:"required"`
+	Status string `json:"status" binding:"required"`
+}
+
+type ReqSchoolStudentAdd struct {
+	Organize string `json:"organize"`
+	Number   string `json:"number"`
+	Name     string `json:"name"`
+	Identify string `json:"identify"`
 }

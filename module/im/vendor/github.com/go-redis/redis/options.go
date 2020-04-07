@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -12,17 +11,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-redis/redis/v7/internal/pool"
+	"github.com/go-redis/redis/internal/pool"
 )
 
 // Limiter is the interface of a rate limiter or a circuit breaker.
 type Limiter interface {
-	// Allow returns nil if operation is allowed or an error otherwise.
-	// If operation is allowed client must ReportResult of the operation
-	// whether it is a success or a failure.
+	// Allow returns a nil if operation is allowed or an error otherwise.
+	// If operation is allowed client must report the result of operation
+	// whether is a success or a failure.
 	Allow() error
-	// ReportResult reports the result of the previously allowed operation.
-	// nil indicates a success, non-nil error usually indicates a failure.
+	// ReportResult reports the result of previously allowed operation.
+	// nil indicates a success, non-nil error indicates a failure.
 	ReportResult(result error)
 }
 
@@ -35,7 +34,7 @@ type Options struct {
 
 	// Dialer creates new network connection and has priority over
 	// Network and Addr options.
-	Dialer func(ctx context.Context, network, addr string) (net.Conn, error)
+	Dialer func() (net.Conn, error)
 
 	// Hook that is called when new connection is established.
 	OnConnect func(*Conn) error
@@ -96,32 +95,23 @@ type Options struct {
 
 	// TLS Config to use. When set TLS will be negotiated.
 	TLSConfig *tls.Config
-
-	// Limiter interface used to implemented circuit breaker or rate limiter.
-	Limiter Limiter
 }
 
 func (opt *Options) init() {
-	if opt.Addr == "" {
-		opt.Addr = "localhost:6379"
-	}
 	if opt.Network == "" {
-		if strings.HasPrefix(opt.Addr, "/") {
-			opt.Network = "unix"
-		} else {
-			opt.Network = "tcp"
-		}
+		opt.Network = "tcp"
 	}
 	if opt.Dialer == nil {
-		opt.Dialer = func(ctx context.Context, network, addr string) (net.Conn, error) {
+		opt.Dialer = func() (net.Conn, error) {
 			netDialer := &net.Dialer{
 				Timeout:   opt.DialTimeout,
 				KeepAlive: 5 * time.Minute,
 			}
 			if opt.TLSConfig == nil {
-				return netDialer.DialContext(ctx, network, addr)
+				return netDialer.Dial(opt.Network, opt.Addr)
+			} else {
+				return tls.DialWithDialer(netDialer, opt.Network, opt.Addr, opt.TLSConfig)
 			}
-			return tls.DialWithDialer(netDialer, network, addr, opt.TLSConfig)
 		}
 	}
 	if opt.PoolSize == 0 {
@@ -152,9 +142,6 @@ func (opt *Options) init() {
 		opt.IdleCheckFrequency = time.Minute
 	}
 
-	if opt.MaxRetries == -1 {
-		opt.MaxRetries = 0
-	}
 	switch opt.MinRetryBackoff {
 	case -1:
 		opt.MinRetryBackoff = 0
@@ -167,11 +154,6 @@ func (opt *Options) init() {
 	case 0:
 		opt.MaxRetryBackoff = 512 * time.Millisecond
 	}
-}
-
-func (opt *Options) clone() *Options {
-	clone := *opt
-	return &clone
 }
 
 // ParseURL parses an URL into Options that can be used to connect to Redis.
@@ -230,9 +212,7 @@ func ParseURL(redisURL string) (*Options, error) {
 
 func newConnPool(opt *Options) *pool.ConnPool {
 	return pool.NewConnPool(&pool.Options{
-		Dialer: func(ctx context.Context) (net.Conn, error) {
-			return opt.Dialer(ctx, opt.Network, opt.Addr)
-		},
+		Dialer:             opt.Dialer,
 		PoolSize:           opt.PoolSize,
 		MinIdleConns:       opt.MinIdleConns,
 		MaxConnAge:         opt.MaxConnAge,

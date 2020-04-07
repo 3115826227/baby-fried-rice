@@ -7,6 +7,7 @@ const (
 	HeaderToken = "token"
 
 	HeaderUserId   = "userId"
+	HeaderUsername = "username"
 	HeaderSchoolId = "schoolId"
 	HeaderPlatform = "platform"
 	HeaderReqId    = "reqId"
@@ -18,6 +19,8 @@ const (
 type UserMeta struct {
 	//用户ID
 	UserId string `json:"userId"`
+	//用户名
+	Username string `json:"username"`
 	//学校ID
 	SchoolId string `json:"schoolId"`
 	//请求ID

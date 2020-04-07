@@ -17,21 +17,29 @@ type RespSuccessData struct {
 
 type RspUserData struct {
 	UserId    string `json:"user_id"`
-	LoginName string `json:"login_name"`
 	Username  string `json:"username"`
+	LoginName string `json:"login_name"`
 	SchoolId  string `json:"school_id"`
 	IsSuper   bool   `json:"is_super"`
 }
 
 type RspUserDetail struct {
-	UserId     string `json:"user_id"`
-	Username   string `json:"username"`
-	Gender     int    `json:"gender"`
-	Age        int    `json:"age"`
-	HeadImgUrl string `json:"head_img_url"`
-	Phone      string `json:"phone"`
-	Verify     int    `json:"verify"`
-	SchoolId   string `json:"school_id"`
+	UserId    string `json:"user_id"`
+	LoginName string `json:"login_name"`
+	Name      string `json:"name"`
+	Username  string `json:"username"`
+	Gender    bool   `json:"gender"`
+	Age       int    `json:"age"`
+	//HeadImgUrl string `json:"head_img_url"`
+	Phone    string `json:"phone"`
+	Verify   bool   `json:"verify"`
+	School   string `json:"school"`
+	Faculty  string `json:"faculty"`
+	Grade    string `json:"grade"`
+	Major    string `json:"major"`
+	Number   string `json:"number"`
+	Identify string `json:"identify"`
+	SchoolId string `json:"school_id"`
 }
 
 type RspLogin struct {
@@ -64,14 +72,28 @@ type RspSubAdmin struct {
 	Name     string `json:"name"`
 }
 
-type RspAdminPermissions struct {
-	Id       int                   `json:"id"`
-	Name     string                `json:"name"`
-	Method   string                `json:"method"`
-	Path     string                `json:"path"`
-	Types    int                   `json:"types"`
-	Children []RspAdminPermissions `json:"children"`
-	ParentId int                   `json:"-"`
+type RspAdminPermission struct {
+	Id       int                  `json:"id"`
+	Name     string               `json:"name"`
+	Method   string               `json:"method"`
+	Path     string               `json:"path"`
+	Types    int                  `json:"types"`
+	Children []RspAdminPermission `json:"children"`
+	ParentId int                  `json:"-"`
+}
+
+type RspAdminPermissions []RspAdminPermission
+
+func (rsp RspAdminPermissions) Len() int {
+	return len(rsp)
+}
+
+func (rsp RspAdminPermissions) Swap(i, j int) {
+	rsp[i], rsp[j] = rsp[j], rsp[i]
+}
+
+func (rsp RspAdminPermissions) Less(i, j int) bool {
+	return rsp[i].Id < rsp[j].Id
 }
 
 type RspImages struct {
@@ -116,4 +138,56 @@ type RspContainerStats struct {
 	LimitMemory      uint64 `json:"limit_memory"`
 	UseMemoryPercent string `json:"use_memory_percent"`
 	UseCPUPercent    string `json:"use_cpu_percent"`
+}
+
+type RspSchoolOrganizes []RspSchoolOrganize
+
+func (rsp RspSchoolOrganizes) Len() int {
+	return len(rsp)
+}
+
+func (rsp RspSchoolOrganizes) Swap(i, j int) {
+	rsp[i], rsp[j] = rsp[j], rsp[i]
+}
+
+func (rsp RspSchoolOrganizes) Less(i, j int) bool {
+	return rsp[i].Id < rsp[j].Id
+}
+
+type RspSchoolOrganize struct {
+	Id         string              `json:"id"`
+	Label      string              `json:"label"`
+	ParentId   string              `json:"parent_id"`
+	Count      int                 `json:"count"`
+	Status     bool                `json:"status"`
+	CreateTime string              `json:"create_time"`
+	UpdateTime string              `json:"update_time"`
+	SchoolId   string              `json:"school_id"`
+	Children   []RspSchoolOrganize `json:"children"`
+}
+
+type RspSchoolOrganizeStudent struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Number     string `json:"number"`
+	Label      string `json:"label"`
+	Identify   string `json:"identify"`
+	Phone      string `json:"phone"`
+	Status     string `json:"verify"`
+	UpdateTime string `json:"update_time"`
+}
+
+type RspUserInfo struct {
+	Id string `json:"id"`
+	Name      string `json:"name"`
+	Username  string `json:"username"`
+	Gender    bool   `json:"gender"`
+	Age       int    `json:"age"`
+	//HeadImgUrl string `json:"head_img_url"`
+	Verify   bool   `json:"verify"`
+	School   string `json:"school"`
+	Faculty  string `json:"faculty"`
+	Grade    string `json:"grade"`
+	Major    string `json:"major"`
+	Number   string `json:"number"`
 }

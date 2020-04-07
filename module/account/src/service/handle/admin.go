@@ -173,7 +173,7 @@ func InitAdmin(c *gin.Context) {
 	admin.EncodeType = UserEncryMd5
 	admin.SchoolId = school.ID
 
-	var now = time.Now().Format(config.TimeLayout)
+	var now = time.Now()
 	//添加默认角色
 	var defaultRole = model.AdminRole{
 		Name:     config.DefaultRoleName,
@@ -223,6 +223,17 @@ func InitAdmin(c *gin.Context) {
 			beans = append(beans, &relations)
 		}
 	}
+	var organize = model.AccountSchoolOrganize{
+		Label:     school.Name,
+		ParentId: config.RootSchoolOrganizeId,
+		SchoolId: school.ID,
+		Status:   true,
+		Count:    0,
+	}
+	organize.ID = GenerateID()
+	organize.CreatedAt = time.Now()
+	organize.UpdatedAt = time.Now()
+	beans = append(beans, &organize)
 	beans = append(beans, &admin)
 	beans = append(beans, &relation)
 	beans = append(beans, &defaultRole)

@@ -34,6 +34,7 @@ func FriendAdd(c *gin.Context) {
 	relativeFriend.ID = GenerateID()
 	relativeFriend.Origin = req.UserId
 	relativeFriend.Friend = userMeta.UserId
+	relativeFriend.FriendRemark = userMeta.Username
 
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &friend)
@@ -78,7 +79,8 @@ func Friends(c *gin.Context) {
 	userMeta := GetUserMeta(c)
 	res, err := model.GetFriend(userMeta.UserId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		log.Logger.Warn(err.Error())
+		c.JSON(http.StatusBadRequest, sysErrResponse)
 		return
 	}
 	var rsp = make([]model.RspFriendCategory, 0)

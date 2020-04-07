@@ -9,6 +9,8 @@ import (
 type UserMeta struct {
 	//用户ID
 	UserId string `json:"userId"`
+	//用户名
+	Username string `json:"username"`
 	//学校ID
 	SchoolId string `json:"schoolId"`
 	//请求ID
@@ -39,4 +41,11 @@ func GetUserDetail(id string) (user AccountUserDetail, err error) {
 		log.Logger.Warn(err.Error())
 	}
 	return user, err
+}
+
+func GetUserSchoolDetail(id string) (school AccountUserSchoolDetail, err error) {
+	if err = db.DB.Debug().Where("id = ?", id).Find(&school).Error; err != nil {
+		log.Logger.Warn(err.Error())
+	}
+	return
 }

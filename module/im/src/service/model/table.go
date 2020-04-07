@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"github.com/3115826227/baby-fried-rice/module/im/src/log"
 	"github.com/3115826227/baby-fried-rice/module/im/src/service/model/db"
 	"time"
@@ -184,12 +185,17 @@ func (table *FriendRelation) TableName() string {
 
 //好友消息表
 type FriendMessage struct {
-	IntCommonField
+	Id        string `gorm:"column:id;type:char(36);primary_key;not null" json:"id"`
+	Content   string `gorm:"column:content" json:"content"`
+	Timestamp int64  `gorm:"column:timestamp" json:"timestamp"`
+	Friend    string `gorm:"column:friend" json:"friend"`
+	Origin    string `gorm:"column:origin" json:"origin"`
+	Read      bool   `gorm:"column:read" json:"read"`
+}
 
-	Content   string `gorm:"column:content"`
-	Timestamp int    `gorm:"column:timestamp"`
-	Friend    string `gorm:"column:friend"`
-	Origin    string `gorm:"column:origin"`
+func (table *FriendMessage) ToString() string {
+	data, _ := json.Marshal(table)
+	return string(data)
 }
 
 func (table *FriendMessage) TableName() string {

@@ -16,6 +16,7 @@ func RegisterRouter(engine *gin.Engine) {
 	api.POST("/user/login", HandleAccountProxy)
 	api.GET("/user/school", HandleAccountProxy)
 	api.GET("/user/admin/permission", HandleAccountProxy)
+	api.GET("/user/friend/chat", HandleImProxy)
 
 	user := api.Group("")
 	user.Use(middleware.GenerateUUID)
