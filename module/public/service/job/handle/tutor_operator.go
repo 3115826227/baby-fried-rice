@@ -1,11 +1,13 @@
 package handle
 
 import (
+	"github.com/3115826227/baby-fried-rice/module/public/config"
 	"github.com/3115826227/baby-fried-rice/module/public/log"
 	"github.com/3115826227/baby-fried-rice/module/public/service/model"
 	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -29,14 +31,14 @@ func IsValidSubject(id int) bool {
 	return count != 0
 }
 
-func IsValidCourse(subjectId, gradeId int) bool {
+func IsValidCourse(name string) (model.Course, bool) {
 	var course model.Course
 	var count = 0
-	if err := db.DB.Where("subject_id = ? and grade_id = ?", subjectId, gradeId).First(&course).Count(&count).Error; err != nil {
+	if err := db.DB.Where("name = ?", name).First(&course).Count(&count).Error; err != nil {
 		log.Logger.Warn(err.Error())
-		return false
+		return model.Course{}, false
 	}
-	return count != 0
+	return course, count != 0
 }
 
 func IsValidArea(code string) bool {
@@ -61,26 +63,34 @@ func TutorAdd(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
-	if req.Title == "" || req.Salary == 0 || req.GradeId == 0 ||
-		req.SubjectId == 0 || req.AreaId == "" || req.Describe == "" {
+	salary, err := strconv.Atoi(req.Salary)
+	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
-	if !IsValidCourse(req.SubjectId, req.GradeId) || !IsValidArea(req.AreaId) {
+	if req.Title == "" || salary == 0 || req.Area == "" || req.Describe == "" || req.Emergency == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		return
+	}
+	course, exist := IsValidCourse(req.Course)
+	if !exist {
 		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 
 	var tutor model.Tutor
 	var now = time.Now()
-	tutor.UserId = GetUserID(c)
+	//tutor.UserId = GetUserID(c)
 	tutor.CreatedAt, tutor.UpdatedAt = now, now
 	tutor.Title = req.Title
-	tutor.SubjectId = req.SubjectId
-	tutor.GradeId = req.GradeId
+	tutor.SubjectId = course.SubjectId
+	tutor.GradeId = course.GradeId
 	tutor.Describe = req.Describe
-	tutor.AreaId = req.AreaId
-	tutor.Salary = req.Salary
+	tutor.Area = req.Area
+	tutor.Salary = salary
+	if req.Emergency == config.TutorEmergency {
+		tutor.Emergency = true
+	}
 
 	err = db.DB.Create(&tutor).Error
 	if err != nil {

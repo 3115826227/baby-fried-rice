@@ -2,6 +2,7 @@ package handle
 
 import (
 	"fmt"
+	"github.com/3115826227/baby-fried-rice/module/public/log"
 	"github.com/3115826227/baby-fried-rice/module/public/service/model"
 	"github.com/3115826227/baby-fried-rice/module/public/service/model/db"
 	"github.com/gin-gonic/gin"
@@ -42,8 +43,8 @@ func SubjectGet(c *gin.Context) {
 		}
 	} else {
 		var sql = fmt.Sprintf(`
-select subject.* from subject inner join course
-on subject.id = course.subject_id where course.grade_id = %v`, gradeId)
+select public_job_tutor_subject.* from public_job_tutor_subject inner join public_job_tutor_course
+on public_job_tutor_subject.id = public_job_tutor_course.subject_id where public_job_tutor_course.grade_id = %v`, gradeId)
 		rows, err := db.DB.Raw(sql).Rows()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, sysErrResponse)
@@ -59,6 +60,26 @@ on subject.id = course.subject_id where course.grade_id = %v`, gradeId)
 			}
 			result = append(result, *rspSubject)
 		}
+	}
+
+	sort.Sort(model.RspSubjects(result))
+
+	SuccessResp(c, "", result)
+}
+
+func CourseGet(c *gin.Context) {
+	var result = make([]model.RspCourse, 0)
+	var courses = make([]model.Course, 0)
+	if err := db.DB.Find(&courses).Error;err != nil {
+		log.Logger.Warn(err.Error())
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		return
+	}
+	for _, c := range courses {
+		result = append(result, model.RspCourse{
+			Id:   c.ID,
+			Name: c.Name,
+		})
 	}
 
 	SuccessResp(c, "", result)

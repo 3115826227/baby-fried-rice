@@ -56,6 +56,12 @@
 			"revisionTime": "2019-11-11T20:22:24Z"
 		},
 		{
+			"checksumSHA1": "+ze/R7mgeilvYDWnkTC9jSp6z0g=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "dd9d356b496cd5c37543d3dd0ffbef75714b88ec",
+			"revisionTime": "2020-02-25T15:24:38Z"
+		},
+		{
 			"checksumSHA1": "Y2MOwzNZfl4NRNDbLCZa6sgx7O0=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": ""
@@ -71,6 +77,12 @@
 			"path": "github.com/jinzhu/gorm",
 			"revision": "742154be9a26e849f02d296073c077e0a7c23828",
 			"revisionTime": "2018-10-07T00:49:37Z"
+		},
+		{
+			"checksumSHA1": "eECxSkwh0WmhLwaxHfkvcLOWS08=",
+			"path": "github.com/jinzhu/gorm/dialects/mysql",
+			"revision": "7ea143b5484fe28148d5c73cfd43b26e8a89c94e",
+			"revisionTime": "2020-03-05T06:48:31Z"
 		},
 		{
 			"checksumSHA1": "4eelJOSLZoDzLuaJvgilOBVNovU=",

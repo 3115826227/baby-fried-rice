@@ -1,2 +1,1 @@
-#postgresurl: postgres://postgres:ps4@localhost:5433/baby_fried_rice?sslmode=disable
-postgresurl: postgres://postgres:zh.fei@116.62.36.208:3432/baby_fried_rice?sslmode=disable
+mysqlurl: root:admin@tcp(localhost:3306)/baby_fried_rice?charset=utf8&parseTime=True&loc=Local

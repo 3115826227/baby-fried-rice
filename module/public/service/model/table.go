@@ -7,14 +7,14 @@ import (
 
 type CommonIntField struct {
 	ID        int       `gorm:"AUTO_INCREMENT;column:id;"`
-	CreatedAt time.Time `gorm:"column:create_time;type:timestamp with time zone" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp with time zone" json:"-"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 type CommonStringField struct {
 	ID        string    `gorm:"column:id;type:char(36);primary_key;not null"`
-	CreatedAt time.Time `gorm:"column:create_time;type:timestamp with time zone" json:"-"`
-	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp with time zone" json:"-"`
+	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
+	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
 type MessageType struct {
@@ -23,7 +23,7 @@ type MessageType struct {
 }
 
 func (messageType *MessageType) TableName() string {
-	return "job_message_type"
+	return "public_job_message_type"
 }
 
 type Subject struct {
@@ -31,9 +31,17 @@ type Subject struct {
 	Name string `gorm:"column:name;unique"`
 }
 
+func (table *Subject) TableName() string {
+	return "public_job_tutor_subject"
+}
+
 type Grade struct {
 	ID   int    `gorm:"AUTO_INCREMENT;column:id;"`
 	Name string `gorm:"column:name;unique"`
+}
+
+func (table *Grade) TableName() string {
+	return "public_job_tutor_grade"
 }
 
 type Grades []Grade
@@ -57,6 +65,10 @@ type Course struct {
 	Name      string
 }
 
+func (table *Course) TableName() string {
+	return "public_job_tutor_course"
+}
+
 //家教
 type Tutor struct {
 	CommonIntField
@@ -72,15 +84,17 @@ type Tutor struct {
 	//年级
 	GradeId int
 	//地区
-	AreaId string
+	Area string
 	//创建id
 	UserId string
 	//信息状态
 	Status int
+	//紧急状态
+	Emergency bool
 }
 
 func (tutor *Tutor) TableName() string {
-	return "job_tutor"
+	return "public_job_tutor"
 }
 
 type Appointment struct {
@@ -92,7 +106,7 @@ type Appointment struct {
 }
 
 func (appointment *Appointment) TableName() string {
-	return "job_appointment"
+	return "public_job_tutor_appointment"
 }
 
 type Area struct {

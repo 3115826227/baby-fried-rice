@@ -2,11 +2,11 @@ package model
 
 type ReqTutorAdd struct {
 	Title     string `json:"title"`
-	Salary    int    `json:"salary"`
-	SubjectId int    `json:"subject_id"`
-	GradeId   int    `json:"grade_id"`
-	AreaId    string `json:"area_id"`
+	Salary    string `json:"salary"`
+	Course    string `json:"course"`
+	Area      string `json:"area"`
 	Describe  string `json:"describe"`
+	Emergency string `json:"emergency"`
 }
 
 type ReqTrainSeatGet struct {

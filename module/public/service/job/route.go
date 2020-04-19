@@ -5,10 +5,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func init()  {
+	//handle.AddSubject()
+	//handle.AddGrade()
+	//handle.AddCourse()
+}
+
 func Register(engine *gin.RouterGroup) {
 
-	engine.POST("/tutor", handle.TutorAdd)
+	tutor := engine.Group("/job/tutor")
 
-	engine.GET("/grade", handle.GradeGet)
-	engine.GET("/subject", handle.SubjectGet)
+	tutor.POST("", handle.TutorAdd)
+	tutor.GET("", handle.TutorGet)
+
+	tutor.GET("/grade", handle.GradeGet)
+	tutor.GET("/subject", handle.SubjectGet)
+	tutor.GET("/course", handle.CourseGet)
 }

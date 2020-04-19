@@ -25,6 +25,36 @@ type RspSubject struct {
 	Name string `json:"name"`
 }
 
+type RspSubjects []RspSubject
+
+func (rsp RspSubjects) Len() int {
+	return len(rsp)
+}
+
+func (rsp RspSubjects) Swap(i, j int) {
+	rsp[i], rsp[j] = rsp[j], rsp[i]
+}
+
+func (rsp RspSubjects) Less(i, j int) bool {
+	return rsp[i].Id < rsp[j].Id
+}
+
+type RspCourse struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type RspTutor struct {
+	Id       int    `json:"id"`
+	Title    string `json:"name"`
+	Salary   int    `json:"salary"`
+	Describe string `json:"describe"`
+	Subject  string     `json:"subject"`
+	Grade    string    `json:"grade"`
+	Area     string `json:"area"`
+	UserId   string `json:"user_id"`
+}
+
 type RspStreet struct {
 	Street string `json:"street"`
 }
