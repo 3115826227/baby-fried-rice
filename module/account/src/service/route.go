@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/3115826227/baby-fried-rice/module/account/src/middlware"
+	"github.com/3115826227/baby-fried-rice/module/account/src/middleware"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/handle"
 	"github.com/3115826227/baby-fried-rice/module/account/src/service/model"
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func RegisterRoute(engine *gin.Engine) {
 
 	app := engine.Group("/api/account")
 
-	app.Use(middlware.MiddlewareSetUserMeta())
+	app.Use(middleware.MiddlewareSetUserMeta())
 
 	app.GET("/user", handle.UserDetail)
 	app.GET("/user/info", handle.UserInfoGet)

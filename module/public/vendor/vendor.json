@@ -3,9 +3,220 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "4lfxHokoS021uEd4uADy2atnXP4=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/config",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "LxetsUJlSo2Z5RSPp18HZ7rtG+I=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/log",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "mwuHbH84oISBCfzWogz+pqV9OTo=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/redis",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "NHkSm68xmfQF1VxIMOaTxteWtDU=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/service/handle",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "fUHn4sRM/zP5k4QWGwKwruKOuJg=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/service/model",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "Qac5eV0rKEo3X+jeTs0Vu1MqVHQ=",
+			"path": "github.com/3115826227/baby-fried-rice/module/account/src/service/model/db",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
 			"checksumSHA1": "Pc2ORQp+VY3Un/dkh4QwLC7R6lE=",
 			"path": "github.com/BurntSushi/toml",
 			"revision": ""
+		},
+		{
+			"checksumSHA1": "blOHP3HPYU+IeV6yWCalQuuM+zE=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/dgrijalva/jwt-go",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "Gj+xR1VgFKKmFXYOJMnAczC3Znk=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/distribution/digestset",
+			"path": "github.com/docker/distribution/digestset",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "2Fe4D6PGaVE2he4fUeenLmhC1lE=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/distribution/reference",
+			"path": "github.com/docker/distribution/reference",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "zWZkfPQHtA1hbZliOiUFPFW37+M=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api",
+			"path": "github.com/docker/docker/api",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "rOHC0haxchPUDGm0Fuqf6bJ51Mk=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types",
+			"path": "github.com/docker/docker/api/types",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "/jF0HVFiLzUUuywSjp4F/piM7BM=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/blkiodev",
+			"path": "github.com/docker/docker/api/types/blkiodev",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "lsxFU6qegOtXClSTthOvfPtly5I=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/container",
+			"path": "github.com/docker/docker/api/types/container",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "fF+hqcXRnyL/ZeDFP7b5HSa734Q=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/events",
+			"path": "github.com/docker/docker/api/types/events",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "y9EA6+kZQLx6kCM277CFHTm4eiw=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/filters",
+			"path": "github.com/docker/docker/api/types/filters",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "KuC0C6jo1t7tlvIqb7G3u1FIaZU=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/image",
+			"path": "github.com/docker/docker/api/types/image",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "k9CaJVvYL7SxcIP72ng/YcOuF9k=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/mount",
+			"path": "github.com/docker/docker/api/types/mount",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "qZNE4g8YWfV6ryZp8kN9BwWYCeM=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/network",
+			"path": "github.com/docker/docker/api/types/network",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "m4Jg5WnW75I65nvkEno8PElSXik=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/registry",
+			"path": "github.com/docker/docker/api/types/registry",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "OQEUS/2J2xVHpfvcsxcXzYqBSeY=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/strslice",
+			"path": "github.com/docker/docker/api/types/strslice",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "0ofbdbjt0ubpopiwMrdJIqgFM+M=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/swarm",
+			"path": "github.com/docker/docker/api/types/swarm",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "txs5EKTbKgVyKmKKSnaH3fr+odA=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/swarm/runtime",
+			"path": "github.com/docker/docker/api/types/swarm/runtime",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "V8OZpLS8i1HfO4lAzUzEw2BgnfQ=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/time",
+			"path": "github.com/docker/docker/api/types/time",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "MZsgRjJJ0D/gAsXfKiEys+op6dE=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/versions",
+			"path": "github.com/docker/docker/api/types/versions",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "spcvrvaKWq0/KOaZVpRNuRPiLLo=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/api/types/volume",
+			"path": "github.com/docker/docker/api/types/volume",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "s2hiWvTvdjxIvlahrYpSYk0qFKk=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/client",
+			"path": "github.com/docker/docker/client",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "dF9WiXuwISBPd8bQfqpuoWtB3jk=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/docker/errdefs",
+			"path": "github.com/docker/docker/errdefs",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "1IPGX6/BnX7QN4DjbBk0UafTB2U=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/go-connections/nat",
+			"path": "github.com/docker/go-connections/nat",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "jUfDG3VQsA2UZHvvIXncgiddpYA=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/go-connections/sockets",
+			"path": "github.com/docker/go-connections/sockets",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "KGILLnJybU/+xWJu8rgM4CpYT2M=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/go-connections/tlsconfig",
+			"path": "github.com/docker/go-connections/tlsconfig",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "0o/uepI6WDKqPNMXPbjeml1ciNo=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/docker/go-units",
+			"path": "github.com/docker/go-units",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
 		},
 		{
 			"checksumSHA1": "qlEzrgKgIkh7y0ePm9BNo1cNdXo=",
@@ -56,10 +267,73 @@
 			"revisionTime": "2019-11-11T20:22:24Z"
 		},
 		{
+			"checksumSHA1": "D1yrzbSFjWxVCHz4n9PeiLzZZeI=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis",
+			"path": "github.com/go-redis/redis",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "z12gGj6VbVBcPOvof1aCM+DVGRU=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal",
+			"path": "github.com/go-redis/redis/internal",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "GQZsUVg/+6UpQAYpc4luMvMutSI=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/consistenthash",
+			"path": "github.com/go-redis/redis/internal/consistenthash",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "l66eTZiJqueypc56HXCakGDm784=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/hashtag",
+			"path": "github.com/go-redis/redis/internal/hashtag",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "WoUjtqpn00RUnAgZLljk3lWfpSQ=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/pool",
+			"path": "github.com/go-redis/redis/internal/pool",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "zCo0t+gRBbctwyIpkDLrqRFtXew=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/proto",
+			"path": "github.com/go-redis/redis/internal/proto",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "sjbjSJrTdvyDwNjrWjTNeXgUhaU=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/singleflight",
+			"path": "github.com/go-redis/redis/internal/singleflight",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "1PH2NoAB/u3IZmLYyCrIbOzqLZ4=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/go-redis/redis/internal/util",
+			"path": "github.com/go-redis/redis/internal/util",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
 			"checksumSHA1": "+ze/R7mgeilvYDWnkTC9jSp6z0g=",
 			"path": "github.com/go-sql-driver/mysql",
 			"revision": "dd9d356b496cd5c37543d3dd0ffbef75714b88ec",
 			"revisionTime": "2020-02-25T15:24:38Z"
+		},
+		{
+			"checksumSHA1": "zwcsZ0hRuISSXkuJBeaO4grlZ18=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/gogo/protobuf/proto",
+			"path": "github.com/gogo/protobuf/proto",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
 		},
 		{
 			"checksumSHA1": "Y2MOwzNZfl4NRNDbLCZa6sgx7O0=",
@@ -133,6 +407,41 @@
 			"revisionTime": "2018-07-18T01:23:57Z"
 		},
 		{
+			"checksumSHA1": "0lSX9qmKL1rZMG01W/PxSE/AkpY=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/opencontainers/go-digest",
+			"path": "github.com/opencontainers/go-digest",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "0vsIK/09u0FwE89WDfSFJvOXui4=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/opencontainers/image-spec/specs-go",
+			"path": "github.com/opencontainers/image-spec/specs-go",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "jdbXRRzeu0njLE9/nCEZG+Yg/Jk=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/opencontainers/image-spec/specs-go/v1",
+			"path": "github.com/opencontainers/image-spec/specs-go/v1",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "PdQm3s8DoVJ17Vk8n7o5iPa7PK0=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/pkg/errors",
+			"path": "github.com/pkg/errors",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "Tutue3nEgM/87jitUcYv6ODwyNE=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/github.com/satori/go.uuid",
+			"path": "github.com/satori/go.uuid",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
 			"checksumSHA1": "8mJ7vjP4pj4Y8FH5jVT22mW5acA=",
 			"path": "github.com/ugorji/go/codec",
 			"revision": "42bc974514ff101a54c6b72a0e4dee29d96c0b26",
@@ -179,9 +488,37 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "aFpql3G+Nw8zkzfqLWQJNZC8pu0=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/golang.org/x/net/context/ctxhttp",
+			"path": "golang.org/x/net/context/ctxhttp",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "eIoaD6Kj5iiWn4oxbJDeev/2YSA=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/golang.org/x/net/internal/socks",
+			"path": "golang.org/x/net/internal/socks",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
+			"checksumSHA1": "28Sn0XihdqNv3MysxyRalibC3Tg=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/golang.org/x/net/proxy",
+			"path": "golang.org/x/net/proxy",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
+		},
+		{
 			"checksumSHA1": "7Gocawl8bm27cpAILtuf21xvVD8=",
 			"path": "golang.org/x/sys/unix",
 			"revision": ""
+		},
+		{
+			"checksumSHA1": "LGcHsIoKmKZO2gfN/g+UWm9AfC0=",
+			"origin": "github.com/3115826227/baby-fried-rice/module/account/vendor/gopkg.in/gin-gonic/gin.v1/json",
+			"path": "gopkg.in/gin-gonic/gin.v1/json",
+			"revision": "f0738128cd2e4f36d61462e343466f6cd58d10fa",
+			"revisionTime": "2020-04-19T15:12:52Z"
 		},
 		{
 			"checksumSHA1": "Pxy1kmAM4h2XhsWnaWN+fIL3ju4=",

@@ -21,7 +21,7 @@ ENV TZ=Asia/Shanghai LANG=C.UTF-8 TERM=xterm \
 
 WORKDIR /go/src/github.com/3115826227/baby-fried-rice/module/public
 
-RUN touch /etc/config.yaml && mkdir -p /baby/logs/ && apk --update --no-cache add ca-certificates
+RUN touch /etc/config.yaml && mkdir -p /baby/logs/
 
 COPY --from=build /go/src/github.com/3115826227/baby-fried-rice/module/public/main .
 
