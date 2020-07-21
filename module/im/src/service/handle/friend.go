@@ -13,26 +13,49 @@ const (
 )
 
 /*
+	获取好友添加请求列表
+*/
+
+/*
+	修改好友添加方式
+*/
+
+/*
+	查看添加好友请求列表
+*/
+
+/*
 	添加好友
 */
 func FriendAdd(c *gin.Context) {
 	var req model.FriendAddReq
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 	//todo 对userId的验证
 	userMeta := GetUserMeta(c)
 
+	var permission = model.FriendAddPermission{}
+	if err := db.GetDB().Debug().Where("id = ?", userMeta.UserId).Find(&permission).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
+		return
+	}
+	if permission.Permission != 0 {
+
+	}
+
 	var friend = model.FriendRelation{}
 	var relativeFriend = model.FriendRelation{}
 	friend.ID = GenerateID()
 	friend.Origin = userMeta.UserId
-	friend.Friend = req.UserId
+	friend.Friend = req.AccountId
 	friend.FriendRemark = req.Remark
 
 	relativeFriend.ID = GenerateID()
-	relativeFriend.Origin = req.UserId
+	relativeFriend.Origin = req.AccountId
 	relativeFriend.Friend = userMeta.UserId
 	relativeFriend.FriendRemark = userMeta.Username
 
@@ -41,8 +64,8 @@ func FriendAdd(c *gin.Context) {
 	beans = append(beans, &relativeFriend)
 
 	if err := db.CreateMulti(beans...); err != nil {
-		log.Logger.Warn(err.Error())
-		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 	c.JSON(http.StatusOK, model.RspOkResponse{})
@@ -54,19 +77,19 @@ func FriendAdd(c *gin.Context) {
 func FriendRemarkUpdate(c *gin.Context) {
 	var req model.FriendRemarkUpdateReq
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, paramErrResponse)
 		return
 	}
 
 	_, err := model.FindFriendRelationById(req.Id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, paramErrResponse)
 		return
 	}
 	var updateMap = map[string]interface{}{"friend_remark": req.Remark}
 	if err := db.GetDB().Model(model.FriendRelation{}).Where("id = ?", req.Id).Update(updateMap).Error; err != nil {
 		log.Logger.Warn(err.Error())
-		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 	c.JSON(http.StatusOK, model.RspOkResponse{})
@@ -79,8 +102,8 @@ func Friends(c *gin.Context) {
 	userMeta := GetUserMeta(c)
 	res, err := model.GetFriend(userMeta.UserId)
 	if err != nil {
-		log.Logger.Warn(err.Error())
-		c.JSON(http.StatusBadRequest, sysErrResponse)
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 	var rsp = make([]model.RspFriendCategory, 0)
@@ -117,13 +140,13 @@ func FriendDelete(c *gin.Context) {
 	id := c.Query("id")
 	friend, err := model.FindFriendRelationById(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 	userMeta := GetUserMeta(c)
 	relativeFriend, err := model.FindFriendRelation(friend.Friend, userMeta.UserId)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 
@@ -139,7 +162,7 @@ func FriendDelete(c *gin.Context) {
 	}
 
 	if err := db.DeleteMulti(beans); err != nil {
-		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 	c.JSON(http.StatusOK, model.RspOkResponse{})

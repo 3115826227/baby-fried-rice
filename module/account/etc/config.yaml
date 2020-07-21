@@ -1,3 +1,0 @@
-mysqlurl: root:admin@tcp(localhost:3306)/baby_fried_rice?charset=utf8&parseTime=True&loc=Local
-redisurl: localhost:6379
-redispassword: 123456

@@ -34,8 +34,7 @@ func init() {
 func main() {
 	engine := gin.Default()
 
-	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
-	engine.Run(":8080")
+	engine.Run(":8072")
 }

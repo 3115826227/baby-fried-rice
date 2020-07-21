@@ -44,6 +44,10 @@ func HashAdd(key, field, value string) {
 	}
 }
 
+func HashDelete(key, field string) {
+	rds.HDel(key, field)
+}
+
 func BLPop(key string) ([]string, error) {
 	return rds.BLPop(5*time.Second, key).Result()
 }

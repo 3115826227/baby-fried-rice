@@ -8,6 +8,7 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/im/src/service/model"
 	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -134,8 +135,7 @@ func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
 }
 
 func GenerateID() string {
-	id, _ := uuid.NewV4()
-	return id.String()
+	return uuid.NewV4().String()
 }
 
 func GetUserMeta(c *gin.Context) *model.UserMeta {
@@ -164,5 +164,20 @@ func GetUserMetaByToken(c *gin.Context, token string) (userMeta *model.UserMeta,
 		c.Abort()
 		return
 	}
+	return
+}
+
+func Get(url string) (data []byte, err error) {
+	client := &http.Client{}
+	var req *http.Request
+	req, err = http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Logger.Warn(err.Error())
+		return
+	}
+	var res *http.Response
+	res, err = client.Do(req)
+	defer res.Body.Close()
+	data, err = ioutil.ReadAll(res.Body)
 	return
 }

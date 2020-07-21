@@ -41,7 +41,7 @@ type RspChat struct {
 	Origin    string `json:"origin"`
 	Friend    string `json:"friend"`
 	ChatTo    string `json:"chat_to"`
-	Id        string `json:"id"`
+	Id        int    `json:"id"`
 	Types     int    `json:"types"`
 	Remark    string `json:"remark"`
 	Content   string `json:"content"`

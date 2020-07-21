@@ -2,6 +2,38 @@ package model
 
 import "encoding/json"
 
+type ChatMessageSend struct {
+	Token       string   `json:"token"`        //用来校验消息是否真实
+	MessageType int      `json:"message_type"` //消息类型 1-个人消息，2-群组消息
+	BodyType    int      `json:"body_type"`    //消息内容类型
+	Body        []byte   `json:"body"`         //消息内容
+	Timestamp   int64    `json:"timestamp"`    //消息产生时间
+	GroupID     string   `json:"group_id"`     //消息群组id
+	Sender      string   `json:"sender"`       //消息发送者ID
+	Receive     []string `json:"receive"`      //消息接受者ID
+}
+
+func (message *ChatMessageSend) ToString() string {
+	data, _ := json.Marshal(message)
+	return string(data)
+}
+
+type ChatMessageReceive struct {
+	MessageID    int    `json:"message_id"`
+	MessageType  int    `json:"message_type"`
+	Body         []byte `json:"body"`          //消息内容
+	Timestamp    int64  `json:"timestamp"`     //消息产生时间
+	GroupID      string `json:"group_id"`      //消息群组id
+	Sender       string `json:"sender"`        //消息发送者ID
+	SenderRemark string `json:"sender_remark"` //消息发送者昵称
+	Receive      string `json:"receive"`       //消息接受者ID
+}
+
+func (message *ChatMessageReceive) ToString() string {
+	data, _ := json.Marshal(message)
+	return string(data)
+}
+
 type FriendChatMessageReq struct {
 	Origin     string `json:"origin"`
 	Friend     string `json:"friend"`
@@ -24,16 +56,29 @@ type FriendCategoryAddReq struct {
 }
 
 type FriendCategoryUpdateReq struct {
-	CategoryId int    `json:"category_id"`
-	Name       string `json:"name"`
+	CategoryId int    `json:"category_id" binding:"required"`
+	Name       string `json:"name" binding:"required"`
 }
 
 type FriendAddReq struct {
-	UserId string `json:"user_id"`
-	Remark string `json:"remark"`
+	AccountId string `json:"account_id"`
+	Remark    string `json:"remark"`
 }
 
 type FriendRemarkUpdateReq struct {
 	Id     string `json:"id"`
 	Remark string `json:"remark"`
+}
+
+type GroupAddReq struct {
+	Friends []struct {
+		Id     string `json:"id"`
+		Remark string `json:"remark"`
+	} `json:"friends"`
+	Name string `json:"name"`
+}
+
+type ReqOfficialGroupAdd struct {
+	Organize string `json:"organize" binding:"required"`
+	Name     string `json:"name" binding:"required"`
 }

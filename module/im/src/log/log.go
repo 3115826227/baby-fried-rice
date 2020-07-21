@@ -22,6 +22,7 @@ var (
 func init() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	var logLevel zapcore.Level
 	logLevelStr := os.Getenv("LOG_LEVEL")
@@ -53,6 +54,7 @@ func init() {
 	} else {
 		// 打印到控制台
 		cfg := zap.NewProductionConfig()
+		cfg.EncoderConfig.EncodeLevel = zapcore.LowercaseColorLevelEncoder
 		cfg.Level = zap.NewAtomicLevelAt(logLevel)
 		cfg.Encoding = "console"
 		cfg.EncoderConfig = encoderConfig

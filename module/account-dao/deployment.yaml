@@ -1,0 +1,115 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: account-dao-config
+  namespace: baby
+data:
+  config.yaml: |
+    mysqlurl: root:root@tcp(116.62.36.208:8306)/baby_fried_rice?charset=utf8&parseTime=True&loc=Local
+  permission.yaml: |
+    permission:
+      -
+        id: 1
+        name: 系统管理
+        path: /system
+        method: GET
+        types: 1
+        children:
+          -
+            id: 101
+            name: 系统设置
+            path: /system
+            method: GET
+            types: 2
+            children:
+      -
+        id: 2
+        name: 用户管理
+        path: /user
+        types: 1
+        method: GET
+        children:
+      -
+        id: 3
+        name: 组织管理
+        path: /org
+        types: 1
+        method: GET
+        children:
+          -
+            id: 301
+            name: 查询组织
+            types: 2
+            path: /org
+            method: GET
+            children:
+          -
+            id: 303
+            name: 添加组织
+            types: 2
+            path: /org
+            method: POST
+            children:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-dao-svc
+  namespace: baby
+spec:
+  type: NodePort
+  selector:
+    app: account-dao
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account-dao-deploy
+  namespace: baby
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: account-dao
+  template:
+    metadata:
+      labels:
+        app: account-dao
+    spec:
+      containers:
+        - name: account-dao
+          image: 116.62.36.208:8500/account-dao:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: httpd
+              containerPort: 8080
+          volumeMounts:
+            - mountPath: /etc/config.yaml
+              subPath: config.yaml
+              name: config-volume
+            - mountPath: /etc/permission.yaml
+              subPath: permission.yaml
+              name: permission-volume
+            - mountPath: /baby/logs
+              name: account-dao-log
+      volumes:
+        - name: config-volume
+          configMap:
+            name: account-dao-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+        - name: permission-volume
+          configMap:
+            name: account-dao-config
+            items:
+              - key: permission.yaml
+                path: permission.yaml
+        - name: account-dao-log
+          nfs:
+            server: 116.62.36.208
+            path: /root/nfs_data

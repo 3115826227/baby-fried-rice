@@ -12,3 +12,7 @@ func TestGet(t *testing.T) {
 	}
 	fmt.Println(str)
 }
+
+func TestAdd(t *testing.T)  {
+
+}

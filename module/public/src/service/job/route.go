@@ -5,8 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func init()  {
+func init() {
 	//handle.AddSalary()
+	//handle.AddSubject()
 	//handle.AddGrade()
 	//handle.AddCourse()
 }

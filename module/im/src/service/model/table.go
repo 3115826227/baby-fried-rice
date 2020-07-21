@@ -19,8 +19,9 @@ func init() {
 		&FriendCategoryRelation{},
 		&FriendRelation{},
 		&FriendMessage{},
-		&UserLevelMeta{},
-		&UserFriendDetail{},
+		&UserDetail{},
+		&FriendAddMeta{},
+		&FriendAddPermission{},
 	).Error
 	if err != nil {
 		log.Logger.Warn(err.Error())
@@ -34,30 +35,21 @@ type IntCommonField struct {
 }
 
 type StringCommonField struct {
-	ID        string    `gorm:"column:id;type:char(36);primary_key;not null"`
+	ID        string    `gorm:"column:id;type:char(36);primary_key;not null" json:"id"`
 	CreatedAt time.Time `gorm:"column:create_time;type:timestamp" json:"-"`
 	UpdatedAt time.Time `gorm:"column:update_time;type:timestamp" json:"-"`
 }
 
-//用户等级表
-type UserLevelMeta struct {
-	IntCommonField
-
-	Name     string `gorm:"column:name;unique"`
-	ParentId int    `gorm:"column:parent_id"`
+/*
+	用户表
+*/
+type UserDetail struct {
+	UserId    string `gorm:"column:user_id;unique"`
+	AccountId string `gorm:"column:account_id;not null"`
 }
 
-func (table *UserLevelMeta) TableName() string {
-	return "im_user_level_meta"
-}
-
-type UserFriendDetail struct {
-	UserId string `gorm:"column:user_id;unique"`
-	Level  int    `gorm:"column:level"`
-}
-
-func (table *UserFriendDetail) TableName() string {
-	return "im_user_friend_detail"
+func (table *UserDetail) TableName() string {
+	return "im_user_detail"
 }
 
 //群分类元信息表
@@ -86,11 +78,11 @@ func (table *FriendGroupCategoryRelation) TableName() string {
 type FriendGroupMeta struct {
 	StringCommonField
 
-	Name               string `gorm:"column:name;unique_index:idx_friend_group_name_origin"`
-	Level              string `gorm:"column:level"`
-	Official           int    `gorm:"column:official"`
-	SchoolDepartmentId string `gorm:"column:school_department_id"`
-	Origin             string `gorm:"column:origin;unique_index:idx_friend_group_name_origin"`
+	Name               string `gorm:"column:name;unique_index:idx_friend_group_name_origin" json:"name"`
+	Level              string `gorm:"column:level" json:"level"`
+	Official           bool   `gorm:"column:official" json:"official"`
+	SchoolDepartmentId string `gorm:"column:school_department_id" json:"school_department_id"`
+	Origin             string `gorm:"column:origin;unique_index:idx_friend_group_name_origin" json:"origin"`
 }
 
 func (table *FriendGroupMeta) TableName() string {
@@ -126,12 +118,20 @@ type FriendGroupMessage struct {
 
 	GroupId   string `gorm:"column:group_id"`
 	Content   string `gorm:"column:content"`
-	Timestamp int    `gorm:"column:timestamp"`
-	Origin    string `gorm:"column:origin"`
+	Timestamp int64  `gorm:"column:timestamp"`
+	Sender    string `gorm:"column:sender"`
 }
 
 func (table *FriendGroupMessage) TableName() string {
 	return "im_friend_group_message"
+}
+
+//群消息接收人表
+type FriendGroupMessageReceive struct {
+	GroupId   string `json:"group_id"`
+	MessageId int    `json:"message_id"`
+	UserId    string `json:"user_id"`
+	Read      bool   `json:"read"`
 }
 
 //好友分类元信息表
@@ -185,11 +185,11 @@ func (table *FriendRelation) TableName() string {
 
 //好友消息表
 type FriendMessage struct {
-	Id        string `gorm:"column:id;type:char(36);primary_key;not null" json:"id"`
+	IntCommonField
 	Content   string `gorm:"column:content" json:"content"`
 	Timestamp int64  `gorm:"column:timestamp" json:"timestamp"`
-	Friend    string `gorm:"column:friend" json:"friend"`
-	Origin    string `gorm:"column:origin" json:"origin"`
+	Receive   string `gorm:"column:receive" json:"receive"`
+	Sender    string `gorm:"column:sender" json:"sender"`
 	Read      bool   `gorm:"column:read" json:"read"`
 }
 
@@ -200,4 +200,47 @@ func (table *FriendMessage) ToString() string {
 
 func (table *FriendMessage) TableName() string {
 	return "im_friend_message"
+}
+
+type UserUnreadMessage struct {
+	UserId      string `json:"user_id"`
+	MessageType int    `json:"message_type"`
+	Friend      string `json:"friend"`
+	Group       string `json:"group"`
+	Unread      int    `json:"unread"`
+	LastMessage int    `json:"last_message"`
+}
+
+func (table *UserUnreadMessage) TableName() string {
+	return "im_user_unread_message"
+}
+
+/*
+	添加好友请求记录表
+*/
+type FriendAddMeta struct {
+	IntCommonField
+
+	AskOrReceive bool   `json:"ask_or_receive"`
+	Origin       string `json:"origin"`
+	Friend       string `json:"friend"`
+	//0-忽略，1-同意，2-拒绝
+	Agree int `json:"agree"`
+}
+
+func (table *FriendAddMeta) TableName() string {
+	return "im_friend_add_meta"
+}
+
+/*
+	添加好友权限表
+*/
+type FriendAddPermission struct {
+	StringCommonField
+	//0-无需认证，1-需要同意方可添加，默认0
+	Permission int `json:"permission"`
+}
+
+func (table *FriendAddPermission) TableName() string {
+	return "im_friend_add_permission"
 }

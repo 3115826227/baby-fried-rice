@@ -16,7 +16,8 @@ import (
 func FriendCategoryAdd(c *gin.Context) {
 	var req model.FriendCategoryAddReq
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 
@@ -24,7 +25,8 @@ func FriendCategoryAdd(c *gin.Context) {
 	userMeta := GetUserMeta(c)
 	category.Origin = userMeta.UserId
 	category.Name = req.Name
-	if err := db.GetDB().Create(&category).Error; err != nil {
+	if err := db.GetDB().Debug().Create(&category).Error; err != nil {
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
@@ -33,25 +35,26 @@ func FriendCategoryAdd(c *gin.Context) {
 }
 
 /*
-	修改好友分类
+	修改好友分类名称
 */
 func FriendCategoryUpdate(c *gin.Context) {
 	var req model.FriendCategoryUpdateReq
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 
-	_, err := model.FindFriendCategory(req.CategoryId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+	if _, err := model.FindFriendCategory(req.CategoryId); err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 
 	var updateMap = map[string]interface{}{"name": req.Name}
-	if err := db.GetDB().Model(model.FriendCategoryMeta{}).Where("id = ?", req.CategoryId).Updates(updateMap).Error; err != nil {
+	if err := db.GetDB().Debug().Model(model.FriendCategoryMeta{}).Where("id = ?", req.CategoryId).Updates(updateMap).Error; err != nil {
 		log.Logger.Warn(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, paramErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, paramErrResponse)
 		return
 	}
 
@@ -78,25 +81,24 @@ func FriendCategory(c *gin.Context) {
 func FriendCategoryDelete(c *gin.Context) {
 	id, err := strconv.Atoi(c.Query("id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.JSON(http.StatusBadRequest, paramErrResponse)
 		return
 	}
 	category, err := model.FindFriendCategory(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
 	relations, err := model.GetFriendCategoryRelation(category.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, paramErrResponse)
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
-	var beans = make([][]interface{}, 0)
-	beans = append(beans, []interface{}{category})
-	for _, relation := range relations {
-		beans = append(beans, []interface{}{relation})
+	if len(relations) != 0 {
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		return
 	}
-	if err := db.DeleteMulti(beans); err != nil {
+	if err := db.GetDB().Debug().Delete(&category).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}

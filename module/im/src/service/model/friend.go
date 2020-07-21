@@ -23,15 +23,15 @@ left join im_friend_category_meta as c on b.category_id = c.id where a.origin = 
 }
 
 func FindFriendRelationById(id string) (relation FriendRelation, err error) {
-	if err = db.GetDB().Where("id = ?", id).First(&relation).Error; err != nil {
-		log.Logger.Warn(err.Error())
+	if err = db.GetDB().Debug().Where("id = ?", id).First(&relation).Error; err != nil {
+		log.Logger.Error(err.Error())
 	}
 	return
 }
 
 func FindFriendRelation(origin, friend string) (relation FriendRelation, err error) {
-	if err = db.GetDB().Where("origin = ? and friend = ?", origin, friend).First(&relation).Error; err != nil {
-		log.Logger.Warn(err.Error())
+	if err = db.GetDB().Debug().Where("origin = ? and friend = ?", origin, friend).First(&relation).Error; err != nil {
+		log.Logger.Error(err.Error())
 	}
 	return
 }

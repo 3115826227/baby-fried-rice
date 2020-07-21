@@ -8,12 +8,13 @@ import (
 
 func Register(engine *gin.Engine) {
 
-	engine.GET("/api/user/friend/chat", handle.FriendChatHandle)
+	engine.GET("/api/user/chat", handle.ChatHandle)
 	engine.Use(middleware.MiddlewareSetUserMeta())
 	app := engine.Group("/api/im")
 
-	app.GET("/chat/message/new", handle.ChatMessageNewGet)
-	app.GET("/chat/message/friend/history", handle.FriendHistoryMessageGet)
+	app.GET("/chat/message/unread", handle.GetUnreadMessageHandle)
+	app.GET("/chat/message/new")
+	app.GET("/chat/message/history", handle.GetHistoryMessageHandle)
 
 	app.POST("/friend", handle.FriendAdd)
 	app.PATCH("/friend/remark", handle.FriendRemarkUpdate)
@@ -25,6 +26,7 @@ func Register(engine *gin.Engine) {
 	app.GET("/friend/category", handle.FriendCategory)
 	app.DELETE("/friend/category", handle.FriendCategoryDelete)
 
-	app.POST("/official/group")
-	app.POST("/group")
+	app.POST("/official/group", handle.OfficialGroupAdd)
+	app.POST("/group", handle.GroupAdd)
+	app.GET("/group/list", handle.GroupListGet)
 }

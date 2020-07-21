@@ -10,26 +10,38 @@ import (
 func RegisterRouter(engine *gin.Engine) {
 	api := engine.Group("/api")
 
-	api.POST("/root/login", HandleAccountProxy)
-	api.POST("/admin/login", HandleAccountProxy)
-	api.POST("/user/register", HandleAccountProxy)
-	api.POST("/user/login", HandleAccountProxy)
-	api.GET("/user/school", HandleAccountProxy)
-	api.GET("/user/admin/permission", HandleAccountProxy)
+	api.POST("/root/login", HandleAccountRootProxy)
+	api.POST("/admin/login", HandleAccountAdminProxy)
+	api.POST("/user/register", HandleAccountUserProxy)
+	api.POST("/user/login", HandleAccountUserProxy)
+	api.GET("/user/school", HandleAccountUserProxy)
+	api.GET("/user/admin/permission", HandleAccountUserProxy)
 	api.GET("/user/friend/chat", HandleImProxy)
 
 	user := api.Group("")
 	user.Use(middleware.GenerateUUID)
 	user.Use(middleware.CheckToken)
 
-	user.Any("/account/*any", HandleAccountProxy)
+	user.Any("/account/user/*any", HandleAccountUserProxy)
+	user.Any("/account/admin/*any", HandleAccountAdminProxy)
+	user.Any("/account/root/*any", HandleAccountRootProxy)
 	user.Any("/public/*any", HandlePublicProxy)
 	user.Any("/im/*any", HandleImProxy)
-	user.Any("/square/", HandleSquareProxy)
+	user.Any("/square/*any", HandleSquareProxy)
 }
 
-func HandleAccountProxy(c *gin.Context) {
-	proxy := httputil.NewSingleHostReverseProxy(config.Config.ParserAccountUrl)
+func HandleAccountUserProxy(c *gin.Context) {
+	proxy := httputil.NewSingleHostReverseProxy(config.Config.ParserUserUrl)
+	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func HandleAccountAdminProxy(c *gin.Context) {
+	proxy := httputil.NewSingleHostReverseProxy(config.Config.ParserAdminUrl)
+	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func HandleAccountRootProxy(c *gin.Context) {
+	proxy := httputil.NewSingleHostReverseProxy(config.Config.ParserRootUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 

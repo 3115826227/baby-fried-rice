@@ -94,12 +94,12 @@ where tutor.id like '%` + search + `%'`
 		sql += ` and salary.id = ` + salary
 		countSql += ` and salary.id = ` + salary
 	}
-	if err := db.DB.Raw(countSql).Scan(&count).Error; err != nil {
+	if err := db.DB.Debug().Raw(countSql).Scan(&count).Error; err != nil {
 		log.Logger.Warn(err.Error())
 	}
 	sql += ` order by create_time desc limit ` +
 		fmt.Sprintf("%v", pageInt-1) + `,` + fmt.Sprintf("%v", pageSizeInt)
-	if err := db.DB.Raw(sql).Scan(&tutors).Error; err != nil {
+	if err := db.DB.Debug().Raw(sql).Scan(&tutors).Error; err != nil {
 		log.Logger.Warn(err.Error())
 	}
 	var subjects = make([]model.Subject, 0)
@@ -137,6 +137,7 @@ where tutor.id like '%` + search + `%'`
 		Total:    count.Count,
 		Data:     result,
 	}
+	fmt.Println(rsp)
 
 	SuccessResp(c, "", rsp)
 }

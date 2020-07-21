@@ -6,10 +6,7 @@ import (
 )
 
 func GenerateUUID(c *gin.Context) {
-	u, err := uuid.NewV4()
-	if err != nil {
-		return
-	}
+	u := uuid.NewV4()
 	c.Request.Header.Set(HeaderUUID, u.String())
 	c.Set(HeaderUUID, u.String())
 	c.Next()

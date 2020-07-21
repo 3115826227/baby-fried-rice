@@ -4,6 +4,7 @@ import (
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/config"
 	"github.com/3115826227/baby-fried-rice/module/gateway/src/log"
 	"github.com/go-redis/redis"
+	"time"
 )
 
 var rds *redis.Client
@@ -19,6 +20,10 @@ func init() {
 		log.Logger.Warn(err.Error())
 		return
 	}
+}
+
+func Add(key string, value interface{}) {
+	rds.Set(key, value, 60*time.Minute)
 }
 
 func Get(key string) (string, error) {
