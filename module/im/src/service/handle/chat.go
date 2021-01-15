@@ -26,6 +26,7 @@ var (
 )
 
 func init() {
+
 }
 
 /*
@@ -43,29 +44,35 @@ func ChatHandle(c *gin.Context) {
 		log.Logger.Warn("connect failed")
 		return
 	}
-	defer conn.Close()
-	log.Logger.Info("connect success")
+	closeChan := make(chan bool, 1)
+	defer func() {
+		closeChan <- true
+		conn.Close()
+	}()
+	log.Logger.Info(userMeta.UserId + " connect success")
 	ConnectionMap[userMeta.UserId] = conn
 
 	for {
 		var messageSend model.ChatMessageSend
-		if err := conn.ReadJSON(&messageSend); err != nil {
+		if err = conn.ReadJSON(&messageSend); err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
-		if err := MessageStorage(messageSend); err != nil {
-			log.Logger.Warn(err.Error())
+		if err = MessageStorage(messageSend); err != nil {
+			log.Logger.Error(err.Error())
 			continue
 		}
 		var messageReceive = model.ChatMessageReceive{
 			MessageType: messageSend.MessageType,
 			Body:        messageSend.Body,
+			Image:       messageSend.Image,
+			MessageBody: messageSend.MessageBody,
 			Timestamp:   messageSend.Timestamp,
 			GroupID:     messageSend.GroupID,
 			Sender:      messageSend.Sender,
-			Receive:     userMeta.UserId,
+			Receive:     messageSend.Receive,
 		}
-		if err := conn.WriteJSON(&messageReceive); err != nil {
+		if err = conn.WriteJSON(&messageReceive); err != nil {
 			log.Logger.Error(err.Error())
 			conn.Close()
 			return

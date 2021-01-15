@@ -8,10 +8,10 @@ import (
 func init() {
 	//var id = handle.GenerateID()
 	//var root = model.AccountRoot{
-	//	LoginName:   "root",
-	//	Username:    "root",
-	//	Password:    handle.EncodePassword("root"),
-	//	EncodeType:  "md5",
+	//	LoginName:  "root",
+	//	Username:   "root",
+	//	Password:   handle.EncodePassword("root"),
+	//	EncodeType: "md5",
 	//}
 	//root.ID = id
 	//if err := db.DB.Debug().Create(&root).Error; err != nil {

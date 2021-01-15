@@ -19,7 +19,6 @@ func init() {
 		if _, err := os.Stat(logDir); os.IsNotExist(err) {
 			log.Fatal("ERROR 日志目录 ", logDir, " 不存在")
 		}
-
 		// 打印到文件，自动分裂
 		w := zapcore.AddSync(&lumberjack.Logger{
 			Filename:   logPath,

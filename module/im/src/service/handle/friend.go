@@ -37,31 +37,63 @@ func FriendAdd(c *gin.Context) {
 	//todo 对userId的验证
 	userMeta := GetUserMeta(c)
 
-	var permission = model.FriendAddPermission{}
-	if err := db.GetDB().Debug().Where("id = ?", userMeta.UserId).Find(&permission).Error; err != nil {
+	//var permission = model.FriendAddPermission{}
+	//if err := db.GetDB().Debug().Where("id = ?", userMeta.UserId).Find(&permission).Error; err != nil {
+	//	log.Logger.Error(err.Error())
+	//	c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
+	//	return
+	//}
+	//if permission.Permission != 0 {
+	//
+	//}
+
+	var userDetail model.UserDetail
+	if err := db.GetDB().Debug().Where("account_id = ?", req.AccountId).First(&userDetail).Error; err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
-	}
-	if permission.Permission != 0 {
-
 	}
 
 	var friend = model.FriendRelation{}
 	var relativeFriend = model.FriendRelation{}
 	friend.ID = GenerateID()
 	friend.Origin = userMeta.UserId
-	friend.Friend = req.AccountId
+	friend.Friend = userDetail.UserId
 	friend.FriendRemark = req.Remark
 
 	relativeFriend.ID = GenerateID()
-	relativeFriend.Origin = req.AccountId
+	relativeFriend.Origin = userDetail.UserId
 	relativeFriend.Friend = userMeta.UserId
 	relativeFriend.FriendRemark = userMeta.Username
 
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &friend)
 	beans = append(beans, &relativeFriend)
+
+	var count = 0
+	if err := db.GetDB().Debug().Model(&model.FriendCategoryMeta{}).Where("name = ?", req.Category).Count(&count).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
+		return
+	}
+	var category = model.FriendCategoryMeta{}
+	if count == 0 {
+		category.ID = GenerateID()
+		category.Name = req.Category
+		category.Origin = userMeta.UserId
+		beans = append(beans, &category)
+	} else {
+		if err := db.GetDB().Debug().Model(&model.FriendCategoryMeta{}).Where("name = ?", req.Category).First(&category).Error; err != nil {
+			log.Logger.Error(err.Error())
+			c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
+			return
+		}
+	}
+
+	var categoryRelation = model.FriendCategoryRelation{}
+	categoryRelation.CategoryId = category.ID
+	categoryRelation.FriendRelationId = relativeFriend.ID
+	beans = append(beans, &categoryRelation)
 
 	if err := db.CreateMulti(beans...); err != nil {
 		log.Logger.Error(err.Error())
@@ -87,7 +119,7 @@ func FriendRemarkUpdate(c *gin.Context) {
 		return
 	}
 	var updateMap = map[string]interface{}{"friend_remark": req.Remark}
-	if err := db.GetDB().Model(model.FriendRelation{}).Where("id = ?", req.Id).Update(updateMap).Error; err != nil {
+	if err = db.GetDB().Model(model.FriendRelation{}).Where("id = ?", req.Id).Update(updateMap).Error; err != nil {
 		log.Logger.Warn(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, sysErrResponse)
 		return
@@ -117,15 +149,16 @@ func Friends(c *gin.Context) {
 		}
 		friends := categoryMap[friend.CategoryName]
 		friends = append(friends, model.RspFriend{
-			Id:     friend.Id,
-			Friend: friend.Friend,
-			Remark: friend.FriendRemark,
+			Id:       friend.Id,
+			Friend:   friend.Friend,
+			Remark:   friend.FriendRemark,
+			Username: friend.Username,
 		})
 		categoryMap[friend.CategoryName] = friends
 	}
 	for category, friends := range categoryMap {
 		rsp = append(rsp, model.RspFriendCategory{
-			Name:    category,
+			Remark:  category,
 			Friends: friends,
 		})
 	}

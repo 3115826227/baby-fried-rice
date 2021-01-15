@@ -8,10 +8,11 @@ import (
 
 func Register(engine *gin.Engine) {
 
-	engine.GET("/api/user/chat", handle.ChatHandle)
+	engine.GET("/api/user/friend/chat", handle.ChatHandle)
 	engine.Use(middleware.MiddlewareSetUserMeta())
 	app := engine.Group("/api/im")
 
+	app.GET("/chat/message/list")
 	app.GET("/chat/message/unread", handle.GetUnreadMessageHandle)
 	app.GET("/chat/message/new")
 	app.GET("/chat/message/history", handle.GetHistoryMessageHandle)

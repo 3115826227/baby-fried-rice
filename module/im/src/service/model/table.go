@@ -15,11 +15,12 @@ func init() {
 		&FriendGroupLevelMeta{},
 		&FriendGroupRelation{},
 		&FriendGroupMessage{},
+		&FriendGroupMessageReceive{},
 		&FriendCategoryMeta{},
 		&FriendCategoryRelation{},
 		&FriendRelation{},
 		&FriendMessage{},
-		&UserDetail{},
+		//&UserDetail{},
 		&FriendAddMeta{},
 		&FriendAddPermission{},
 	).Error
@@ -46,6 +47,7 @@ type StringCommonField struct {
 type UserDetail struct {
 	UserId    string `gorm:"column:user_id;unique"`
 	AccountId string `gorm:"column:account_id;not null"`
+	Username  string `gorm:"column:username;not null"`
 }
 
 func (table *UserDetail) TableName() string {
@@ -116,10 +118,13 @@ func (table *FriendGroupRelation) TableName() string {
 type FriendGroupMessage struct {
 	IntCommonField
 
-	GroupId   string `gorm:"column:group_id"`
-	Content   string `gorm:"column:content"`
-	Timestamp int64  `gorm:"column:timestamp"`
-	Sender    string `gorm:"column:sender"`
+	GroupId      string `gorm:"column:group_id" json:"group_id"`
+	MessageType  int    `gorm:"column:message_type" json:"message_type"`
+	MessageBody  string `gorm:"column:message_body" json:"message_body"`
+	Body         []byte `gorm:"column:body"`
+	Timestamp    int64  `gorm:"column:timestamp" json:"timestamp"`
+	Sender       string `gorm:"column:sender" json:"sender"`
+	SenderRemark string `gorm:"column:sender_remark" json:"sender_remark"`
 }
 
 func (table *FriendGroupMessage) TableName() string {
@@ -136,7 +141,7 @@ type FriendGroupMessageReceive struct {
 
 //好友分类元信息表
 type FriendCategoryMeta struct {
-	IntCommonField
+	StringCommonField
 
 	Name   string `gorm:"column:name;unique_index:idx_friend_category_name_origin" json:"name"`
 	Origin string `gorm:"column:origin;unique_index:idx_friend_category_name_origin" json:"-"`
@@ -162,7 +167,7 @@ func (list FriendCategories) Less(i, j int) bool {
 
 //好友分类关系表
 type FriendCategoryRelation struct {
-	CategoryId       int    `gorm:"column:category_id;unique_index:idx_friend_category_ref_category_friend"`
+	CategoryId       string `gorm:"column:category_id;unique_index:idx_friend_category_ref_category_friend"`
 	FriendRelationId string `gorm:"column:friend_relation_id;unique_index:idx_friend_category_ref_category_friend"`
 }
 
@@ -186,11 +191,14 @@ func (table *FriendRelation) TableName() string {
 //好友消息表
 type FriendMessage struct {
 	IntCommonField
-	Content   string `gorm:"column:content" json:"content"`
-	Timestamp int64  `gorm:"column:timestamp" json:"timestamp"`
-	Receive   string `gorm:"column:receive" json:"receive"`
-	Sender    string `gorm:"column:sender" json:"sender"`
-	Read      bool   `gorm:"column:read" json:"read"`
+	MessageType int    `gorm:"column:message_type" json:"message_type"`
+	Body        []byte `gorm:"column:body" json:"body"`
+	Image       bool   `gorm:"column:image" json:"image"`
+	MessageBody string `gorm:"column:message_body" json:"message_body"`
+	Timestamp   int64  `gorm:"column:timestamp" json:"timestamp"`
+	Receive     string `gorm:"column:receive" json:"receive"`
+	Sender      string `gorm:"column:sender" json:"sender"`
+	Read        bool   `gorm:"column:read" json:"read"`
 }
 
 func (table *FriendMessage) ToString() string {

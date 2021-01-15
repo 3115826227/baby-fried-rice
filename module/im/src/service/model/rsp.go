@@ -17,7 +17,7 @@ type RespSuccessData struct {
 
 type RspFriendCategory struct {
 	Id      string      `json:"id"`
-	Name    string      `json:"name"`
+	Remark  string      `json:"remark"`
 	Friends []RspFriend `json:"friends"`
 }
 

@@ -50,9 +50,15 @@ func UserRegister(c *gin.Context) {
 	detail.CreatedAt = now
 	detail.UpdatedAt = now
 
+	var userDetail model.UserDetail
+	userDetail.UserId = detail.ID
+	userDetail.AccountId = detail.AccountID
+	userDetail.Username = detail.Username
+
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &user)
 	beans = append(beans, &detail)
+	beans = append(beans, &userDetail)
 	if err := db.CreateMulti(beans...); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, sysErrResponse)
 		return

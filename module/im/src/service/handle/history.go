@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"fmt"
 	"github.com/3115826227/baby-fried-rice/module/im/src/log"
 	"github.com/3115826227/baby-fried-rice/module/im/src/service/model"
 	"github.com/gin-gonic/gin"
@@ -16,20 +15,20 @@ func GetHistoryMessageHandle(c *gin.Context) {
 		log.Logger.Error(err.Error())
 		return
 	}
+	var messageReceives = make([]model.ChatMessageReceive, 0)
 	switch messageType {
 	case 1:
 		friend := c.Query("friend")
 		if friend == "" {
 			return
 		}
-		messageReceives := model.GetFriendHistoryMessage(userMeta.UserId, friend)
-		fmt.Println(messageReceives)
+		messageReceives = model.GetFriendHistoryMessage(userMeta.UserId, friend)
 	case 2:
 		group := c.Query("group")
 		if group == "" {
 			return
 		}
-		messageReceives := model.GetGroupHistoryMessage(userMeta.UserId, group)
-		fmt.Println(messageReceives)
+		messageReceives = model.GetGroupHistoryMessage(userMeta.UserId, group)
 	}
+	SuccessResp(c, "", messageReceives)
 }

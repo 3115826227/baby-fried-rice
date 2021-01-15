@@ -1,6 +1,9 @@
 package handle
 
-import "github.com/3115826227/baby-fried-rice/module/im/src/service/model"
+import (
+	"github.com/3115826227/baby-fried-rice/module/im/src/log"
+	"github.com/3115826227/baby-fried-rice/module/im/src/service/model"
+)
 
 /*
 	消息同步监听器
@@ -45,7 +48,9 @@ func (listener *MessageSyncListener) start() {
 			return
 		case messageReceive := <-listener.MessageSyncChan:
 			if _, exist := ConnectionMap[messageReceive.Receive]; exist {
-				ConnectionMap[messageReceive.Receive].WriteJSON(&messageReceive)
+				if err := ConnectionMap[messageReceive.Receive].WriteJSON(&messageReceive); err != nil {
+					log.Logger.Error(err.Error())
+				}
 			}
 		}
 	}

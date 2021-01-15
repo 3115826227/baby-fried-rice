@@ -3,8 +3,8 @@ package db
 import (
 	"github.com/3115826227/baby-fried-rice/module/im/src/config"
 	"github.com/3115826227/baby-fried-rice/module/im/src/log"
-	"github.com/jinzhu/gorm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 	"go.uber.org/zap"
 )
 
@@ -65,7 +65,7 @@ func CreateMulti(bean ...interface{}) error {
 	}
 
 	for k := range bean {
-		if err = tx.Create(bean[k]).Error; err != nil {
+		if err = tx.Debug().Create(bean[k]).Error; err != nil {
 			log.Logger.Warn("insert beans failed", zap.String("err", err.Error()))
 			return err
 		}

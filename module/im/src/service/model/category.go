@@ -19,7 +19,7 @@ func FindFriendCategoryRelationByRelationId(relationIds ...string) (category []F
 	return
 }
 
-func GetFriendCategoryRelation(categoryId int) (relations []FriendCategoryRelation, err error) {
+func GetFriendCategoryRelation(categoryId string) (relations []FriendCategoryRelation, err error) {
 	if err = db.GetDB().Debug().Where("category_id = ?", categoryId).Find(&relations).Error; err != nil {
 		log.Logger.Warn(err.Error())
 	}

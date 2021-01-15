@@ -16,7 +16,7 @@ import (
 func UploadHandle(c *gin.Context) {
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
-		log.Logger.Warn(err.Error())
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件上传失败"})
 		return
 	}
@@ -25,24 +25,24 @@ func UploadHandle(c *gin.Context) {
 	data, err = ioutil.ReadAll(file)
 	defer file.Close()
 	if err != nil {
-		log.Logger.Warn(err.Error())
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件读取失败"})
 		return
 	}
 	if err = ioutil.WriteFile(header.Filename, data, 0755); err != nil {
-		log.Logger.Warn(err.Error())
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件保存失败"})
 		return
 	}
 	defer func() {
 		if err = os.Remove(fmt.Sprintf("./%v", header.Filename)); err != nil {
-			log.Logger.Warn(err.Error())
+			log.Logger.Error(err.Error())
 		}
 	}()
 
 	var ossInfo model.OssInfo
 	if ossInfo, err = DataUpOss(header.Size, fmt.Sprintf("./%v", header.Filename), header.Filename); err != nil {
-		log.Logger.Warn(err.Error())
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件上传失败"})
 		return
 	}

@@ -35,6 +35,7 @@ func Sync(engine *gorm.DB) {
 		new(ClientSchoolRelation),
 		new(Area),
 		new(Ip),
+		new(UserDetail),
 	).Error
 	if err != nil {
 		log.Logger.Warn(err.Error())
@@ -325,4 +326,17 @@ type Ip struct {
 
 func (table *Ip) TableName() string {
 	return "account_ip"
+}
+
+/*
+	用户表
+*/
+type UserDetail struct {
+	UserId    string `gorm:"column:user_id;unique"`
+	AccountId string `gorm:"column:account_id;not null"`
+	Username  string `gorm:"column:username;not null"`
+}
+
+func (table *UserDetail) TableName() string {
+	return "im_user_detail"
 }

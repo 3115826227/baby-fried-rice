@@ -3,14 +3,16 @@ package model
 import "encoding/json"
 
 type ChatMessageSend struct {
-	Token       string   `json:"token"`        //用来校验消息是否真实
-	MessageType int      `json:"message_type"` //消息类型 1-个人消息，2-群组消息
-	BodyType    int      `json:"body_type"`    //消息内容类型
-	Body        []byte   `json:"body"`         //消息内容
-	Timestamp   int64    `json:"timestamp"`    //消息产生时间
-	GroupID     string   `json:"group_id"`     //消息群组id
-	Sender      string   `json:"sender"`       //消息发送者ID
-	Receive     []string `json:"receive"`      //消息接受者ID
+	Token       string `json:"token"`        //用来校验消息是否真实
+	MessageType int    `json:"message_type"` //消息类型 1-个人消息，2-群组消息
+	BodyType    int    `json:"body_type"`    //消息内容类型
+	MessageBody string `json:"message_body"` //文字类消息内容
+	Image       bool   `json:"image"`        //是否为图片
+	Body        []byte `json:"body"`         //其他类消息内容
+	Timestamp   int64  `json:"timestamp"`    //消息产生时间
+	GroupID     string `json:"group_id"`     //消息群组id
+	Sender      string `json:"sender"`       //消息发送者ID
+	Receive     string `json:"receive"`      //消息接受者ID
 }
 
 func (message *ChatMessageSend) ToString() string {
@@ -21,7 +23,9 @@ func (message *ChatMessageSend) ToString() string {
 type ChatMessageReceive struct {
 	MessageID    int    `json:"message_id"`
 	MessageType  int    `json:"message_type"`
+	Image        bool   `json:"image"`
 	Body         []byte `json:"body"`          //消息内容
+	MessageBody  string `json:"message_body"`  //文字类消息内容
 	Timestamp    int64  `json:"timestamp"`     //消息产生时间
 	GroupID      string `json:"group_id"`      //消息群组id
 	Sender       string `json:"sender"`        //消息发送者ID
@@ -63,6 +67,7 @@ type FriendCategoryUpdateReq struct {
 type FriendAddReq struct {
 	AccountId string `json:"account_id"`
 	Remark    string `json:"remark"`
+	Category  string `json:"category"`
 }
 
 type FriendRemarkUpdateReq struct {
@@ -72,8 +77,7 @@ type FriendRemarkUpdateReq struct {
 
 type GroupAddReq struct {
 	Friends []struct {
-		Id     string `json:"id"`
-		Remark string `json:"remark"`
+		Id string `json:"id"`
 	} `json:"friends"`
 	Name string `json:"name"`
 }

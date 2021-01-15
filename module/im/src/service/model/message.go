@@ -9,7 +9,7 @@ import (
 func GetFriendHistoryMessage(user, friend string) (messageReceives []ChatMessageReceive) {
 	messageReceives = make([]ChatMessageReceive, 0)
 	var messages = make([]FriendMessage, 0)
-	if err := db.GetDB().Debug().Where("sender in (?)", []string{user, friend}).Find(messages).Error; err != nil {
+	if err := db.GetDB().Debug().Where("sender = ? and receive = ? or sender = ? and receive = ?", user, friend, friend, user).Find(&messages).Error; err != nil {
 		log.Logger.Warn(err.Error())
 		return
 	}
@@ -17,11 +17,13 @@ func GetFriendHistoryMessage(user, friend string) (messageReceives []ChatMessage
 	for _, m := range messages {
 		messageReceives = append(messageReceives, ChatMessageReceive{
 			MessageID:   m.ID,
-			MessageType: 1,
-			Body:        []byte(m.Content),
+			MessageType: m.MessageType,
+			Body:        m.Body,
+			MessageBody: m.MessageBody,
 			Timestamp:   m.Timestamp,
 			Sender:      m.Sender,
 			Receive:     m.Receive,
+			Image:       m.Image,
 		})
 	}
 	return
@@ -56,13 +58,15 @@ func GetGroupHistoryMessage(user, group string) (messageReceives []ChatMessageRe
 	go GroupMessageReadSync(user, filterMessageIDs)
 	for _, m := range filterMessages {
 		messageReceives = append(messageReceives, ChatMessageReceive{
-			MessageID:   m.ID,
-			MessageType: 2,
-			Body:        []byte(m.Content),
-			Timestamp:   m.Timestamp,
-			GroupID:     m.GroupId,
-			Sender:      m.Sender,
-			Receive:     user,
+			MessageID:    m.ID,
+			MessageType:  2,
+			MessageBody:  m.MessageBody,
+			Body:         m.Body,
+			Timestamp:    m.Timestamp,
+			GroupID:      m.GroupId,
+			Sender:       m.Sender,
+			SenderRemark: m.SenderRemark,
+			Receive:      user,
 		})
 	}
 	return

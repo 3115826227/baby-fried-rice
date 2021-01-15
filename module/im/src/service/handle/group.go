@@ -68,11 +68,11 @@ func OfficialGroupAdd(c *gin.Context) {
 func GroupAdd(c *gin.Context) {
 	var req model.GroupAddReq
 	if err := c.BindJSON(&req); err != nil {
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, paramErrResponse)
 		return
 	}
 	userMeta := GetUserMeta(c)
-
 	var group = model.FriendGroupMeta{
 		Name:               req.Name,
 		Level:              "0",
@@ -86,13 +86,27 @@ func GroupAdd(c *gin.Context) {
 	group.CreatedAt = now
 	group.UpdatedAt = now
 
+	ids := make([]string, 0)
+	for _, friend := range req.Friends {
+		ids = append(ids, friend.Id)
+	}
+	var details = make([]model.UserDetail, 0)
+	if err := db.GetDB().Debug().Where("user_id in (?)", ids).Find(&details).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, sysErrResponse)
+		return
+	}
+	var detailMap = make(map[string]model.UserDetail)
+	for _, detail := range details {
+		detailMap[detail.UserId] = detail
+	}
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &group)
 	for _, friend := range req.Friends {
 		var relation = model.FriendGroupRelation{
 			GroupId:         id,
 			UserId:          friend.Id,
-			UserGroupRemark: friend.Remark,
+			UserGroupRemark: detailMap[friend.Id].Username,
 		}
 		beans = append(beans, &relation)
 	}
@@ -103,7 +117,7 @@ func GroupAdd(c *gin.Context) {
 	})
 
 	if err := db.CreateMulti(beans...); err != nil {
-		log.Logger.Warn(err.Error())
+		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, sysErrResponse)
 		return
 	}
