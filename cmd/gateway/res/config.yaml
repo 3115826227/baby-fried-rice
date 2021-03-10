@@ -1,0 +1,15 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  addr: "localhost"
+  port: 8070
+
+redis:
+  redisurl: "localhost:6379"
+  redispassword:
+  redisdb: 9
+
+connect:
+  userurl: "localhost:17071"
