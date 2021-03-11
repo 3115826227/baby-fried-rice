@@ -3,4 +3,4 @@
 etc/
 main
 /deploy/data
-/cmd/accountDao/res/config_dev.yaml
+/cmd/*/res/config_dev.yaml
