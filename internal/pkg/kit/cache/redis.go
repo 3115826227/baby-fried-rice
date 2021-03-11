@@ -1,13 +1,13 @@
-package redis
+package cache
 
 import (
 	"github.com/go-redis/redis"
 )
 
-func NewRedis(addr, pwd string, db int) (rds *redis.Client, err error) {
+func NewRedis(addr, passwd string, db int) (rds *redis.Client, err error) {
 	rds = redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: pwd,
+		Password: passwd,
 		PoolSize: 20,
 		DB:       db,
 	})

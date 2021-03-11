@@ -3,13 +3,14 @@ log:
   logpath:
 
 server:
+  name: "gateway"
   addr: "localhost"
-  port: 8070
+  port: 18070
 
 redis:
-  redisurl: "localhost:6379"
+  redisurl: "localhost:26379"
   redispassword:
   redisdb: 9
 
 connect:
-  userurl: "localhost:17071"
+  rooturl: "localhost:18073"

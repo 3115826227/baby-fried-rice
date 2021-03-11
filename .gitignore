@@ -1,4 +1,6 @@
-.idea/
+.idea/*
 .DS_Store
 etc/
 main
+/deploy/data
+/cmd/accountDao/res/config_dev.yaml

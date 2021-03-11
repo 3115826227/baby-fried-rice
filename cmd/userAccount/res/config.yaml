@@ -4,7 +4,12 @@ log:
 
 server:
   addr: "localhost"
-  port: 18073
+  port: 18071
+
+client:
+  accountdao:
+    addr: "localhost"
+    port: 18061
 
 redis:
   redisurl: "localhost:6379"

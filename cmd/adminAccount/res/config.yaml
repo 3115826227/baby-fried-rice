@@ -4,7 +4,7 @@ log:
 
 server:
   addr: "localhost"
-  port: 18073
+  port: 18072
 
 redis:
   redisurl: "localhost:6379"

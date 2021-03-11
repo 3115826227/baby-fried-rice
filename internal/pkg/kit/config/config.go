@@ -1,6 +1,10 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"errors"
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 func ReadConfig(conf interface{}) (err error) {
 	viper.SetConfigFile("./res/config.yaml") // 指定配置文件路径
