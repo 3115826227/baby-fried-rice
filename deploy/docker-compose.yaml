@@ -1,0 +1,24 @@
+version: "3"
+services:
+  redis:
+    image: cache:latest
+    container_name: baby-cache
+    restart: always
+    ports:
+      - "26379:6379"
+    volumes:
+      - "./config/redis.conf:/etc/redis/redis.conf:rw"
+      - "./data/cache:/data:rw"
+    command:
+      cache-server /etc/redis/redis.conf --appendonly yes
+  mysql:
+    image: mysql:5.7
+    container_name: baby-mysql
+    restart: always
+    ports:
+      - "23306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    volumes:
+      - "./data/db:/var/lib/mysql"
+      - "./init:/docker-entrypoint-initdb.d/"
