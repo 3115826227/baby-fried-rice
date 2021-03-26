@@ -1,5 +1,7 @@
 package interfaces
 
+import "gorm.io/gorm"
+
 type DB interface {
 	// 初始化建表操作
 	InitTables(dos ...DataObject) error
@@ -12,5 +14,7 @@ type DB interface {
 	// 更新数据
 	UpdateObject(do DataObject) error
 	// 查询单个数据
-	GetObject(do DataObject) error
+	GetObject(query map[string]interface{}, do DataObject) error
+	// 获取db
+	GetDB() *gorm.DB
 }

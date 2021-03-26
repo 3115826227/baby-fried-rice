@@ -9,8 +9,8 @@ server:
 
 redis:
   redisurl: "localhost:26379"
-  redispassword:
+  redispassword: "123456"
   redisdb: 9
 
 connect:
-  rooturl: "localhost:18073"
+  rooturl: "http://localhost:18073"

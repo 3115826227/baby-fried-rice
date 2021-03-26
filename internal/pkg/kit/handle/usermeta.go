@@ -2,6 +2,22 @@ package handle
 
 import (
 	"encoding/json"
+	"github.com/gin-gonic/gin"
+)
+
+const (
+	HeaderUUID  = "requestID"
+	HeaderToken = "token"
+	TokenPrefix = "token"
+
+	HeaderUserId   = "userId"
+	HeaderUsername = "username"
+	HeaderSchoolId = "schoolId"
+	HeaderPlatform = "platform"
+	HeaderReqId    = "reqId"
+	HeaderIsSuper  = "isSuper"
+
+	GinContextKeyUserMeta = "userMeta"
 )
 
 type UserMeta struct {
@@ -22,4 +38,8 @@ type UserMeta struct {
 func (meta *UserMeta) ToString() string {
 	data, _ := json.Marshal(meta)
 	return string(data)
+}
+
+func GetUserMeta(c *gin.Context) *UserMeta {
+	return c.MustGet(GinContextKeyUserMeta).(*UserMeta)
 }

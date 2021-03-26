@@ -10,3 +10,6 @@ redis:
   redisurl: "localhost:26379"
   redispassword: "123456"
   redisdb: 9
+
+connect:
+  accountdaourl: "http://localhost:18061"

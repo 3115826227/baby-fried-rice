@@ -27,12 +27,10 @@ type Conf struct {
 
 	TokenSecret string `json:"token_secret"`
 
-	AccountDaoUrl string `json:"account_dao_url"`
+	Connect struct {
+		AccountDaoUrl string `json:"account_dao_url"`
+	} `json:"connect"`
 }
-
-const (
-	SuccessCode = 0
-)
 
 var (
 	config Conf

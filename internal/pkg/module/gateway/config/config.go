@@ -8,7 +8,13 @@ import (
 )
 
 type Conf struct {
+	Log struct {
+		LogLevel string `json:"log_level"`
+		LogPath  string `json:"log_path"`
+	} `json:"log"`
+
 	Server struct {
+		Name string `json:"name"`
 		Addr string `json:"addr"`
 		Port int    `json:"port"`
 	} `json:"server"`

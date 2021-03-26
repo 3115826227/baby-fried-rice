@@ -1,8 +1,9 @@
 package service
 
 import (
-	"baby-fried-rice/internal/pkg/kit/middleware"
+	kitMiddleware "baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/gateway/config"
+	"baby-fried-rice/internal/pkg/module/gateway/middleware"
 	"github.com/gin-gonic/gin"
 	"net/http/httputil"
 )
@@ -19,7 +20,8 @@ func Register(engine *gin.Engine) {
 	api.GET("/user/friend/chat", HandleImProxy)
 
 	user := api.Group("")
-	user.Use(middleware.GenerateUUID)
+	user.Use(kitMiddleware.GenerateUUID)
+	user.Use(middleware.CheckToken)
 
 	user.Any("/account/user/*any", HandleAccountUserProxy)
 	user.Any("/account/admin/*any", HandleAccountAdminProxy)

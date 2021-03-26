@@ -23,6 +23,10 @@ func NewClientDB(mysqlUrl string, lc log.Logging) (client interfaces.DB, err err
 	return
 }
 
+func (client *ClientDB) GetDB() *gorm.DB {
+	return client.db
+}
+
 func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
 	var tables = make([]interface{}, 0)
 	for _, do := range dos {
@@ -42,8 +46,12 @@ func (client *ClientDB) DeleteObject(object interfaces.DataObject) (err error) {
 }
 
 // 获取结果
-func (client *ClientDB) GetObject(object interfaces.DataObject) (err error) {
-	return client.db.Table(object.TableName()).First(object).Error
+func (client *ClientDB) GetObject(query map[string]interface{}, object interfaces.DataObject) (err error) {
+	template := client.db.Table(object.TableName())
+	for key, value := range query {
+		template = template.Where(fmt.Sprintf("%v = ?", key), value)
+	}
+	return template.First(object).Error
 }
 
 // 更新数据

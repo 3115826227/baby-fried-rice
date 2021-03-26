@@ -29,6 +29,7 @@ func RootLogin(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
+	req.Password = handle.EncodePassword(req.Password)
 	req.Ip = c.GetHeader("IP")
 
 	payload, err := json.Marshal(req)
@@ -38,7 +39,7 @@ func RootLogin(c *gin.Context) {
 		return
 	}
 
-	data, err := handle.Post(config.GetConfig().AccountDaoUrl+"/dao/account/root/login", payload, c.Request.Header.Clone())
+	data, err := handle.Post(config.GetConfig().Connect.AccountDaoUrl+"/dao/account/root/login", payload, c.Request.Header.Clone())
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
@@ -51,7 +52,7 @@ func RootLogin(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
 		return
 	}
-	if resp.Code != config.SuccessCode {
+	if resp.Code != handle.SuccessCode {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
 		return
 	}
@@ -64,7 +65,7 @@ func RootLogin(c *gin.Context) {
 	}
 
 	var result = model.RspLogin{
-		RspSuccess: model.RspSuccess{Code: config.SuccessCode},
+		RspSuccess: handle.RspSuccess{Code: handle.SuccessCode},
 		Data: model.LoginResult{
 			UserInfo: model.RspUserData{
 				UserId:    resp.Data.ID,
@@ -85,4 +86,20 @@ func RootLogin(c *gin.Context) {
 	}()
 
 	c.JSON(http.StatusOK, result)
+}
+
+func RootLogout(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	token, err := cache.GetCache().Get(userMeta.UserId)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	go func() {
+		cache.GetCache().Del(token)
+		cache.GetCache().Del(userMeta.UserId)
+	}()
+
+	handle.SuccessResp(c, "", handle.RspOkResponse{})
 }

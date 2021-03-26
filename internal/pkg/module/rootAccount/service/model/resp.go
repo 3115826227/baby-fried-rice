@@ -1,5 +1,7 @@
 package model
 
+import "baby-fried-rice/internal/pkg/kit/handle"
+
 type RspDaoRootLogin struct {
 	Code int64 `json:"code"`
 	Data struct {
@@ -18,21 +20,6 @@ type RspDaoRootLogin struct {
 	Message string `json:"message"`
 }
 
-type RspSuccess struct {
-	Code int `json:"code"`
-}
-
-type RspOkResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-type RespSuccessData struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
 type RspUserData struct {
 	UserId    string `json:"user_id"`
 	Username  string `json:"username"`
@@ -40,7 +27,7 @@ type RspUserData struct {
 }
 
 type RspLogin struct {
-	RspSuccess
+	handle.RspSuccess
 	Data LoginResult `json:"data"`
 }
 
