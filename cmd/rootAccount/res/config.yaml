@@ -7,6 +7,6 @@ server:
   port: 18073
 
 redis:
-  redisurl: "localhost:6379"
-  redispassword:
+  redisurl: "localhost:26379"
+  redispassword: "123456"
   redisdb: 9

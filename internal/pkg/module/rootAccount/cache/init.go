@@ -7,10 +7,14 @@ import (
 )
 
 var (
-	Cache interfaces.Cache
+	c interfaces.Cache
 )
 
+func GetCache() interfaces.Cache {
+	return c
+}
+
 func InitCache(addr, passwd string, db int, lc log.Logging) (err error) {
-	Cache, err = cache.InitCache(addr, passwd, db, lc)
+	c, err = cache.InitCache(addr, passwd, db, lc)
 	return
 }

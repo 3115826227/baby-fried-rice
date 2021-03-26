@@ -26,7 +26,7 @@ func init() {
 		panic(err)
 	}
 	// 初始化缓存
-	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB); err != nil {
+	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB, log.Logger); err != nil {
 		panic(err)
 	}
 }

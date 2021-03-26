@@ -6,6 +6,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	SuccessCode = 0
+)
+
 func ReadConfig(conf interface{}) (err error) {
 	viper.SetConfigFile("./res/config.yaml") // 指定配置文件路径
 	viper.SetConfigName("config")            // 配置文件名称(无扩展名)

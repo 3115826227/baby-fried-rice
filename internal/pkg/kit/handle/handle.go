@@ -3,6 +3,7 @@ package handle
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 	"math/rand"
@@ -22,17 +23,17 @@ var ErrCodeM = map[int]string{
 	ErrCodeSystemError:  "请求出错",
 }
 
-var loginErrResponse = gin.H{
+var LoginErrResponse = gin.H{
 	"code":    ErrCodeLoginFailed,
 	"message": ErrCodeM[ErrCodeLoginFailed],
 }
 
-var paramErrResponse = gin.H{
+var ParamErrResponse = gin.H{
 	"code":    ErrCodeInvalidParam,
 	"message": ErrCodeM[ErrCodeInvalidParam],
 }
 
-var sysErrResponse = gin.H{
+var SysErrResponse = gin.H{
 	"code":    ErrCodeSystemError,
 	"message": ErrCodeM[ErrCodeSystemError],
 }
@@ -61,4 +62,16 @@ func GenerateID() string {
 //生成八位数字
 func GenerateSerialNumber() string {
 	return fmt.Sprintf("1%08v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
+}
+
+/*
+	根据用户id和创建时间生成jwt Token
+*/
+func GenerateToken(userID string, createTime time.Time, tokenSecret string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":     userID,
+		"create_time": createTime,
+	})
+
+	return token.SignedString([]byte(tokenSecret))
 }

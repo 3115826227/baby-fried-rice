@@ -8,7 +8,13 @@ import (
 )
 
 type Conf struct {
+	Log struct {
+		LogLevel string `json:"log_level"`
+		LogPath  string `json:"log_path"`
+	} `json:"log"`
+
 	Server struct {
+		Name string `json:"name"`
 		Addr string `json:"addr"`
 		Port int    `json:"port"`
 	} `json:"server"`
@@ -25,8 +31,6 @@ type Conf struct {
 }
 
 const (
-	TimeLayout  = "2006-01-02 15:04:05"
-	DateLayout  = "2006-01-02"
 	SuccessCode = 0
 )
 

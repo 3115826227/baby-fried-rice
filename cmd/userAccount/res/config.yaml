@@ -13,5 +13,5 @@ client:
 
 redis:
   redisurl: "localhost:6379"
-  redispassword:
+  redispassword: "123456"
   redisdb: 9
