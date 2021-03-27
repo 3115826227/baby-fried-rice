@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/gateway/cache"
 	"baby-fried-rice/internal/pkg/module/gateway/config"
 	"baby-fried-rice/internal/pkg/module/gateway/log"
+	"baby-fried-rice/internal/pkg/module/gateway/server"
 	"baby-fried-rice/internal/pkg/module/gateway/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -25,7 +26,9 @@ func init() {
 	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB, log.Logger); err != nil {
 		panic(err)
 	}
-
+	if err := server.InitRegisterClient(conf.Etcd); err != nil {
+		panic(err)
+	}
 }
 
 func Main() {

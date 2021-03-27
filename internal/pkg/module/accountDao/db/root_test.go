@@ -16,7 +16,7 @@ func TestAddRoot(t *testing.T) {
 			UpdatedAt: now,
 		},
 		LoginName: "root",
-		//Username:  "超级管理员",
+		Username:  "超级管理员",
 		Password:  handle.EncodePassword("root"),
 	}
 	if err := AddRoot(root); err != nil {

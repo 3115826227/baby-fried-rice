@@ -19,10 +19,14 @@ type Conf struct {
 	} `json:"redis"`
 
 	Server struct {
-		Name string `json:"name"`
-		Addr string `json:"addr"`
-		Port int    `json:"port"`
+		Name   string `json:"name"`
+		Serial int    `json:"serial"`
+		Addr   string `json:"addr"`
+		Port   int    `json:"port"`
 	} `json:"server"`
+
+	Etcd            []string `json:"etcd"`
+	HealthyRollTime int64    `json:"healthy_roll_time"`
 
 	MysqlUrl string `json:"mysql_url"`
 }

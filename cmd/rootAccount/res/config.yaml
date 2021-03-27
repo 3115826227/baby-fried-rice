@@ -3,6 +3,8 @@ log:
   logpath:
 
 server:
+  name: "root-account"
+  serial: 1
   addr: "localhost"
   port: 18073
 
@@ -11,5 +13,10 @@ redis:
   redispassword: "123456"
   redisdb: 9
 
-connect:
-  accountdaourl: "http://localhost:18061"
+etcd:
+  - "http://localhost:23791"
+
+healthyrolltime: 1000
+
+servers:
+  accountdaoserver: "account-dao"

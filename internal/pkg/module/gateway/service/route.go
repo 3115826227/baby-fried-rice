@@ -1,11 +1,16 @@
 package service
 
 import (
+	"baby-fried-rice/internal/pkg/kit/handle"
 	kitMiddleware "baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/gateway/config"
+	"baby-fried-rice/internal/pkg/module/gateway/log"
 	"baby-fried-rice/internal/pkg/module/gateway/middleware"
+	"baby-fried-rice/internal/pkg/module/gateway/server"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"net/http/httputil"
+	"net/url"
 )
 
 func Register(engine *gin.Engine) {
@@ -42,7 +47,19 @@ func HandleAccountAdminProxy(c *gin.Context) {
 }
 
 func HandleAccountRootProxy(c *gin.Context) {
-	proxy := httputil.NewSingleHostReverseProxy(config.GetConfig().ParserRootUrl)
+	adminUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.RootAccountServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	parserAdminUrl, err := url.Parse(adminUrl)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	proxy := httputil.NewSingleHostReverseProxy(parserAdminUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 

@@ -25,6 +25,8 @@ type Conf struct {
 		RedisDB       int    `json:"redis_db"`
 	} `json:"redis"`
 
+	Etcd []string `json:"etcd"`
+
 	Connect struct {
 		UserUrl   string `json:"user_url"`
 		AdminUrl  string `json:"admin_url"`
@@ -34,9 +36,12 @@ type Conf struct {
 		ImUrl     string `json:"im_url"`
 	} `json:"connect"`
 
+	Servers struct {
+		RootAccountServer string `json:"root_account_server"`
+	}
+
 	ParserUserUrl   *url.URL
 	ParserAdminUrl  *url.URL
-	ParserRootUrl   *url.URL
 	ParserPublicUrl *url.URL
 	ParserSquareUrl *url.URL
 	ParserImUrl     *url.URL
@@ -80,10 +85,6 @@ func init() {
 	config.ParserAdminUrl, err = url.Parse(config.Connect.AdminUrl)
 	if err != nil {
 		panic("error admin url")
-	}
-	config.ParserRootUrl, err = url.Parse(config.Connect.RootUrl)
-	if err != nil {
-		panic("error root url")
 	}
 	config.ParserPublicUrl, err = url.Parse(config.Connect.PublicUrl)
 	if err != nil {

@@ -12,5 +12,8 @@ redis:
   redispassword: "123456"
   redisdb: 9
 
-connect:
-  rooturl: "http://localhost:18073"
+etcd:
+  - "http://127.0.0.1:23791"
+
+servers:
+  rootaccountserver: "root-account"

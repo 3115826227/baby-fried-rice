@@ -23,7 +23,7 @@ func RootLogin(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Ip = c.GetHeader("IP")
+	req.Ip = c.GetHeader(handle.HeaderIP)
 	root, err := query.GetRootByLogin(req.LoginName, req.Password)
 	if err != nil {
 		log.Logger.Error(err.Error())

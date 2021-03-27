@@ -14,22 +14,26 @@ type Conf struct {
 	} `json:"log"`
 
 	Server struct {
-		Name string `json:"name"`
-		Addr string `json:"addr"`
-		Port int    `json:"port"`
+		Name   string `json:"name"`
+		Serial int    `json:"serial"`
+		Addr   string `json:"addr"`
+		Port   int    `json:"port"`
 	} `json:"server"`
 
 	Redis struct {
 		RedisUrl      string `json:"redis_url"`
 		RedisPassword string `json:"redis_password"`
 		RedisDB       int    `json:"redis_db"`
-	} `json:"cache"`
+	} `json:"redis"`
+
+	Etcd            []string `json:"etcd"`
+	HealthyRollTime int64    `json:"healthy_roll_time"`
+
+	Servers struct {
+		AccountDaoServer string `json:"account_dao_server"`
+	}
 
 	TokenSecret string `json:"token_secret"`
-
-	Connect struct {
-		AccountDaoUrl string `json:"account_dao_url"`
-	} `json:"connect"`
 }
 
 var (

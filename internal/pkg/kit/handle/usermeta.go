@@ -9,6 +9,7 @@ const (
 	HeaderUUID  = "requestID"
 	HeaderToken = "token"
 	TokenPrefix = "token"
+	HeaderIP    = "IP"
 
 	HeaderUserId   = "userId"
 	HeaderUsername = "username"

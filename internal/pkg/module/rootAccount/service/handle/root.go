@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/rootAccount/cache"
 	"baby-fried-rice/internal/pkg/module/rootAccount/config"
 	"baby-fried-rice/internal/pkg/module/rootAccount/log"
+	"baby-fried-rice/internal/pkg/module/rootAccount/server"
 	"baby-fried-rice/internal/pkg/module/rootAccount/service/model"
 	"encoding/json"
 	"fmt"
@@ -39,7 +40,13 @@ func RootLogin(c *gin.Context) {
 		return
 	}
 
-	data, err := handle.Post(config.GetConfig().Connect.AccountDaoUrl+"/dao/account/root/login", payload, c.Request.Header.Clone())
+	accountDaoUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
+		return
+	}
+	data, err := handle.Post(accountDaoUrl+"/dao/account/root/login", payload, c.Request.Header.Clone())
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
