@@ -1,0 +1,19 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  name: "gateway"
+  addr: "localhost"
+  port: 18070
+
+redis:
+  redisurl: "localhost:26379"
+  redispassword: "123456"
+  redisdb: 9
+
+etcd:
+  - "http://127.0.0.1:23791"
+
+servers:
+  rootaccountserver: "root-account"

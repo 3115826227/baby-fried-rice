@@ -1,0 +1,54 @@
+version: "3"
+services:
+  redis:
+    image: redis:latest
+    container_name: baby-redis
+    restart: always
+    ports:
+      - "26379:6379"
+    volumes:
+      - "./config/redis.conf:/etc/redis/redis.conf:rw"
+      - "./data/redis:/data:rw"
+    command:
+      redis-server /etc/redis/redis.conf --appendonly yes
+  mysql:
+    image: mysql:5.7
+    container_name: baby-mysql
+    restart: always
+    ports:
+      - "23306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    volumes:
+      - "./data/db:/var/lib/mysql"
+      - "./init:/docker-entrypoint-initdb.d/"
+  etcd:
+    image: quay.io/coreos/etcd:v3.3.12
+    container_name: etcd
+    ports:
+      - "23791:2379"
+      - "2380"
+    environment:
+      ETCDCTL_API: 3
+    volumes:
+      - "./data/etcd/etcd-data:/etcd-data"
+    command:
+      - "/usr/local/bin/etcd"
+      - "--name"
+      - "s1"
+      - "--data-dir"
+      - "/etcd-data"
+      - "--advertise-client-urls"
+      - "http://0.0.0.0:2379"
+      - --listen-client-urls
+      - "http://0.0.0.0:2379"
+      - "--initial-advertise-peer-urls"
+      - "http://0.0.0.0:2380"
+      - "--listen-peer-urls"
+      - "http://0.0.0.0:2380"
+      - "--initial-cluster-token"
+      - "tkn"
+      - "--initial-cluster"
+      - "s1=http://0.0.0.0:2380"
+      - "--initial-cluster-state"
+      - "new"

@@ -1,0 +1,15 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  name: "account-dao"
+  addr: "localhost"
+  port: 18061
+
+redis:
+  redisurl: "localhost:26379"
+  redispassword: "123456"
+  redisdb: 9
+
+mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"

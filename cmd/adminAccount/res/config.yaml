@@ -1,0 +1,20 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  name: "admin-account"
+  serial: 1
+  addr: "localhost"
+  port: 18072
+
+redis:
+  redisurl: "localhost:26379"
+  redispassword: "123456"
+  redisdb: 9
+
+etcd:
+  - "http://localhost:23791"
+
+servers:
+  accountdaoserver: "account-dao"
