@@ -76,3 +76,26 @@ func (client *ClientDB) ExistObject(query map[string]interface{}, do interfaces.
 	exist = true
 	return
 }
+
+func (client *ClientDB) CreateMulti(bean ...interface{}) error {
+	var err error
+	tx := client.db.Begin()
+	defer func() {
+		if err != nil {
+			client.lc.Error("insert beans failed")
+			tx.Rollback()
+		}
+	}()
+	if err = tx.Error; err != nil {
+		return err
+	}
+
+	for k := range bean {
+		if err = tx.Create(bean[k]).Error; err != nil {
+			client.lc.Error("insert beans failed")
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+}

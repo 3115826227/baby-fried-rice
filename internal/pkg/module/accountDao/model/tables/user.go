@@ -74,3 +74,36 @@ func (table *UserDetail) TableName() string {
 func (table *UserDetail) Get() interface{} {
 	return *table
 }
+
+// 好友关系表
+type UserFriendRelation struct {
+	CommonField
+
+	Friend       string `gorm:"column:friend;unique_index:idx_friend_ref_category_friend_origin"`
+	FriendRemark string `gorm:"column:friend_remark"`
+	Origin       string `gorm:"column:origin;unique_index:idx_friend_ref_category_friend_origin"`
+}
+
+func (table *UserFriendRelation) TableName() string {
+	return "baby_user_friend_relation"
+}
+
+func (table *UserFriendRelation) Get() interface{} {
+	return *table
+}
+
+// 通知
+type UserNotify struct {
+	CommonField
+	ReceiveUser string `gorm:"column:receive_user"`
+	Content     string `gorm:"column:content"`
+	ReadStatus  int    `gorm:"column:read_status"` // 通知读取状态： 0-未读 1-已读
+}
+
+func (table *UserNotify) TableName() string {
+	return "baby_user_notify"
+}
+
+func (table *UserNotify) Get() interface{} {
+	return *table
+}

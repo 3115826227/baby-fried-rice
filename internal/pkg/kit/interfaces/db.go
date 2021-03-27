@@ -17,4 +17,6 @@ type DB interface {
 	GetObject(query map[string]interface{}, do DataObject) error
 	// 获取db
 	GetDB() *gorm.DB
+	// 添加多条数据
+	CreateMulti(bean ...interface{}) error
 }
