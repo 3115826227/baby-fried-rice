@@ -32,7 +32,7 @@ func UserRegister(c *gin.Context) {
 	var user tables.AccountUser
 	user.ID = handle.GenerateID()
 	user.LoginName = req.LoginName
-	user.Password = handle.EncodePassword(req.Password)
+	user.Password = req.Password
 	user.EncodeType = config.DefaultUserEncryMd5
 	user.CreatedAt = now
 	user.UpdatedAt = now
@@ -49,6 +49,7 @@ func UserRegister(c *gin.Context) {
 	detail.AccountID = accountID
 	detail.Username = req.Username
 	detail.Gender = req.Gender
+	detail.Phone = req.Phone
 	detail.CreatedAt = now
 	detail.UpdatedAt = now
 
@@ -83,7 +84,7 @@ func UserLogin(c *gin.Context) {
 	req.Password = strings.TrimSpace(req.Password)
 	req.Ip = c.GetHeader("IP")
 
-	user, err := query.GetUserByLogin(req.LoginName, handle.EncodePassword(req.Password))
+	user, err := query.GetUserByLogin(req.LoginName, req.Password)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)

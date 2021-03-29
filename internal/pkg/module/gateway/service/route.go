@@ -37,7 +37,19 @@ func Register(engine *gin.Engine) {
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
-	proxy := httputil.NewSingleHostReverseProxy(config.GetConfig().ParserUserUrl)
+	userUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.UserAccountServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	parserUserUrl, err := url.Parse(userUrl)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	proxy := httputil.NewSingleHostReverseProxy(parserUserUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 

@@ -9,7 +9,7 @@ import (
 
 func IsDuplicateAccountID(accountID string) bool {
 	var count int64 = 0
-	if err := db.GetDB().GetDB().Where("account_id = ?", accountID).Count(&count).Error; err != nil {
+	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("id = ?", accountID).Count(&count).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return true
 	}
@@ -18,7 +18,7 @@ func IsDuplicateAccountID(accountID string) bool {
 
 func IsDuplicateLoginNameByUser(loginName string) bool {
 	var count int64 = 0
-	if err := db.GetDB().GetDB().Where("login_name = ?", loginName).Count(&count).Error; err != nil {
+	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return true
 	}

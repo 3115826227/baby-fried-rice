@@ -37,7 +37,7 @@ func (table *AccountUserLoginLog) Get() interface{} {
 type AccountUserDetail struct {
 	CommonField
 
-	AccountID string `gorm:"column:account_id" json:"account_id"`
+	AccountID string `gorm:"column:account_id;pk" json:"account_id"`
 	Username  string `gorm:"column:username" json:"username"`
 	SchoolId  string `gorm:"column:school_id" json:"school_id"`
 	Verify    bool   `gorm:"column:verify" json:"verify"`
@@ -63,7 +63,7 @@ func (table *AccountUserDetail) Get() interface{} {
 
 type UserDetail struct {
 	UserId    string `gorm:"column:user_id;unique"`
-	AccountId string `gorm:"column:account_id;not null"`
+	AccountId string `gorm:"column:account_id;pk"`
 	Username  string `gorm:"column:username;not null"`
 }
 

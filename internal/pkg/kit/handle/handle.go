@@ -2,6 +2,7 @@ package handle
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -74,4 +75,17 @@ func GenerateToken(userID string, createTime time.Time, tokenSecret string) (str
 	})
 
 	return token.SignedString([]byte(tokenSecret))
+}
+
+func ResponseHandle(data []byte) (ok bool, err error) {
+	var resp struct {
+		Code    int         `json:"code"`
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}
+	if err = json.Unmarshal(data, &resp); err != nil {
+		return
+	}
+	ok = resp.Code == SuccessCode
+	return
 }

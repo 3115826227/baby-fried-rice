@@ -10,4 +10,5 @@ type ReqUserRegister struct {
 	ReqPasswordLogin
 	Username string `json:"username" binding:"required"` //昵称
 	Gender   bool   `json:"gender" binding:"required"`   //性别
+	Phone    string `json:"phone" binding:"required"`    //手机号
 }

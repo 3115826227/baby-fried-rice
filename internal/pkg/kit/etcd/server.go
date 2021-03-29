@@ -11,7 +11,7 @@ import (
 
 const (
 	DefaultLeaseTTL        = 5
-	DefaultHealthyRollTime = time.Duration(1000)
+	DefaultHealthyRollTime = time.Duration(2000)
 )
 
 type ServerETCD struct {

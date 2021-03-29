@@ -37,6 +37,7 @@ type Conf struct {
 	} `json:"connect"`
 
 	Servers struct {
+		UserAccountServer string `json:"user_account_server"`
 		RootAccountServer string `json:"root_account_server"`
 	}
 
@@ -56,12 +57,12 @@ func GetConfig() Conf {
 }
 
 func readConfig() (err error) {
-	viper.SetConfigFile("./res/config.yaml") // 指定配置文件路径
-	viper.SetConfigName("config")            // 配置文件名称(无扩展名)
-	viper.SetConfigType("yaml")              // 如果配置文件的名称中没有扩展名，则需要配置此项
-	viper.AddConfigPath("./res/")            // 查找配置文件所在的路径
-	err = viper.ReadInConfig()               // 查找并读取配置文件
-	if err != nil {                          // 处理读取配置文件的错误
+	viper.SetConfigFile("./res/config_dev.yaml") // 指定配置文件路径
+	viper.SetConfigName("config_dev")            // 配置文件名称(无扩展名)
+	viper.SetConfigType("yaml")                  // 如果配置文件的名称中没有扩展名，则需要配置此项
+	viper.AddConfigPath("./res/")                // 查找配置文件所在的路径
+	err = viper.ReadInConfig()                   // 查找并读取配置文件
+	if err != nil {                              // 处理读取配置文件的错误
 		err = errors.New(fmt.Sprintf("Fatal error config file: %s \n", err))
 		return
 	}
