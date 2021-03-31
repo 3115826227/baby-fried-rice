@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func RootLogin(c *gin.Context) {
+func RootLoginHandle(c *gin.Context) {
 	var err error
 	var req model.ReqPasswordLogin
 	if err = c.ShouldBind(&req); err != nil {

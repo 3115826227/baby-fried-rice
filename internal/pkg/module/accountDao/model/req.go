@@ -12,3 +12,6 @@ type ReqUserRegister struct {
 	Gender   bool   `json:"gender" binding:"required"`   //性别
 	Phone    string `json:"phone" binding:"required"`    //手机号
 }
+
+type ReqUserSendPrivateMessage struct {
+}

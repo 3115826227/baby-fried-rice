@@ -1,6 +1,8 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/models/req"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -9,6 +11,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -65,6 +68,11 @@ func GenerateSerialNumber() string {
 	return fmt.Sprintf("1%08v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
 }
 
+//生成十二位数字
+func GenerateSerialNumberByLen(len int) string {
+	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(int32(10*len)))
+}
+
 /*
 	根据用户id和创建时间生成jwt Token
 */
@@ -87,5 +95,25 @@ func ResponseHandle(data []byte) (ok bool, err error) {
 		return
 	}
 	ok = resp.Code == SuccessCode
+	return
+}
+
+func PageHandle(c *gin.Context) (req req.PageCommonReq, err error) {
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		return
+	}
+	if page <= 0 {
+		page = constant.DefaultPage
+	}
+	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	if err != nil {
+		return
+	}
+	if pageSize <= 0 {
+		pageSize = constant.DefaultPageSize
+	}
+	req.Page = page
+	req.PageSize = pageSize
 	return
 }

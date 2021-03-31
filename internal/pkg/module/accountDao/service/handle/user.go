@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func UserRegister(c *gin.Context) {
+func UserRegisterHandle(c *gin.Context) {
 	var err error
 	var req model.ReqUserRegister
 	if err = c.ShouldBind(&req); err != nil {
@@ -72,7 +72,7 @@ func UserRegister(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
-func UserLogin(c *gin.Context) {
+func UserLoginHandle(c *gin.Context) {
 	var err error
 	var req model.ReqPasswordLogin
 	if err = c.ShouldBind(&req); err != nil {
@@ -105,4 +105,14 @@ func UserLogin(c *gin.Context) {
 		Detail: *detail,
 	}
 	handle.SuccessResp(c, "", resp)
+}
+
+func UsersHandle(c *gin.Context) {
+	var users = make([]tables.AccountUserDetail, 0)
+	if err := db.GetDB().GetDB().Find(&users).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", users)
 }
