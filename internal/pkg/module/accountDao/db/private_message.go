@@ -3,14 +3,14 @@ package db
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
-	"baby-fried-rice/internal/pkg/kit/models/req"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"encoding/json"
 	"errors"
 	"time"
 )
 
-func SendPrivateMessage(pm req.UserSendPrivateMessageReq) (err error) {
+func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
 	var pmID = handle.GenerateSerialNumberByLen(constant.PrivateMessageIDDefaultLength)
 	var mc []byte
 	var now = time.Now()
@@ -19,21 +19,20 @@ func SendPrivateMessage(pm req.UserSendPrivateMessageReq) (err error) {
 		return
 	}
 	var pmc = tables.UserPrivateMessageContent{
-		CommonField: tables.CommonField{
-			ID:        pmID,
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
 		Content:         string(mc),
 		MessageSendType: int(pm.SendMessageType),
 		MessageType:     pm.MessageType,
 		MessageTitle:    pm.MessageTitle,
 	}
+	pmc.ID = pmID
+	pmc.CreatedAt = now
+	pmc.UpdatedAt = now
 	var spm = tables.UserPrivateMessage{
 		MessageId:     pmID,
 		SendId:        pm.SendId,
 		ReceiveId:     "",
 		MessageStatus: 0,
+		ReceiveTime:   now,
 	}
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &pmc)
@@ -45,6 +44,7 @@ func SendPrivateMessage(pm req.UserSendPrivateMessageReq) (err error) {
 			SendId:        spm.ReceiveId,
 			ReceiveId:     spm.SendId,
 			MessageStatus: 0,
+			ReceiveTime:   now,
 		}
 		beans = append(beans, &rpm)
 	case constant.SendGroup:
@@ -53,4 +53,10 @@ func SendPrivateMessage(pm req.UserSendPrivateMessageReq) (err error) {
 		return errors.New("send private message type is invalid")
 	}
 	return GetDB().CreateMulti(beans...)
+}
+
+func UpdatePrivateMessagesStatus(receiveId string, messageId []string) (err error) {
+	return GetDB().GetDB().Model(&tables.UserPrivateMessage{}).
+		Where("receive_id = ? and message_id in (?)", receiveId, messageId).
+		Updates(map[string]interface{}{"status": 1}).Error
 }

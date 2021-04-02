@@ -2,7 +2,8 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
-	"baby-fried-rice/internal/pkg/kit/models/req"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
+	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -44,6 +45,18 @@ var SysErrResponse = gin.H{
 
 func SuccessResp(c *gin.Context, message string, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": data})
+}
+
+func SuccessListResp(c *gin.Context, message string, list []interface{}, total int64, req requests.PageCommonReq) {
+	if list == nil {
+		list = make([]interface{}, 0)
+	}
+	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": rsp.CommonListResp{
+		List:     list,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Total:    total,
+	}})
 }
 
 func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
@@ -98,15 +111,23 @@ func ResponseHandle(data []byte) (ok bool, err error) {
 	return
 }
 
-func PageHandle(c *gin.Context) (req req.PageCommonReq, err error) {
-	page, err := strconv.Atoi(c.Query("page"))
+func PageHandle(c *gin.Context) (req requests.PageCommonReq, err error) {
+	pageStr := c.Query("page")
+	if pageStr == "" {
+		pageStr = fmt.Sprintf("%v", constant.DefaultPage)
+	}
+	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		return
 	}
 	if page <= 0 {
 		page = constant.DefaultPage
 	}
-	pageSize, err := strconv.Atoi(c.Query("page_size"))
+	pageSizeStr := c.Query("page_size")
+	if pageSizeStr == "" {
+		pageSizeStr = fmt.Sprintf("%v", constant.DefaultPageSize)
+	}
+	pageSize, err := strconv.Atoi(pageSizeStr)
 	if err != nil {
 		return
 	}

@@ -1,4 +1,4 @@
-package req
+package requests
 
 import "baby-fried-rice/internal/pkg/kit/constant"
 

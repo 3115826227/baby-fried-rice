@@ -47,7 +47,7 @@ func newRedis(addr, passwd string, db int) (rds *redis.Client, err error) {
 	return
 }
 
-func (c *RedisCache) Add(key string, value interface{}) error {
+func (c *RedisCache) Add(key string, value string) error {
 	return c.rds.Set(key, value, DefaultExpiration).Err()
 }
 

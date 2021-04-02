@@ -3,9 +3,9 @@ package db
 import (
 	"baby-fried-rice/internal/pkg/kit/db"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/module/accountDao/config"
-	"baby-fried-rice/internal/pkg/module/accountDao/log"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
+	"baby-fried-rice/internal/pkg/module/file/config"
+	"baby-fried-rice/internal/pkg/module/file/log"
+	"baby-fried-rice/internal/pkg/module/file/model/tables"
 )
 
 var (
@@ -27,14 +27,9 @@ func InitDB(mysqlUrl string) (err error) {
 		return
 	}
 	return client.InitTables(
-		&tables.AccountUser{},
-		&tables.AccountUserDetail{},
-		&tables.AccountUserLoginLog{},
-		&tables.UserDetail{},
-		&tables.AccountRoot{},
-		&tables.AccountRootLoginLog{},
-		&tables.Area{},
-		&tables.UserPrivateMessage{},
-		&tables.UserPrivateMessageContent{},
+		&tables.OssMeta{},
+		&tables.File{},
+		&tables.FileGroup{},
+		&tables.FileGroupUserRelation{},
 	)
 }

@@ -10,15 +10,13 @@ import (
 func TestAddRoot(t *testing.T) {
 	now := time.Now()
 	root := tables.AccountRoot{
-		CommonField: tables.CommonField{
-			ID:        handle.GenerateID(),
-			CreatedAt: now,
-			UpdatedAt: now,
-		},
 		LoginName: "root",
 		Username:  "超级管理员",
 		Password:  handle.EncodePassword("root"),
 	}
+	root.ID = handle.GenerateID()
+	root.CreatedAt = now
+	root.UpdatedAt = now
 	if err := AddRoot(root); err != nil {
 		panic(err)
 	}

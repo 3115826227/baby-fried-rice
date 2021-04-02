@@ -1,9 +1,12 @@
 package tables
 
-import "time"
+import (
+	"baby-fried-rice/internal/pkg/kit/models/tables"
+	"time"
+)
 
 type AccountUser struct {
-	CommonField
+	tables.CommonField
 
 	LoginName  string `gorm:"column:login_name;type:varchar(255);" json:"login_name"`
 	Password   string `gorm:"column:password;type:varchar(255);" json:"password"`
@@ -35,7 +38,7 @@ func (table *AccountUserLoginLog) Get() interface{} {
 }
 
 type AccountUserDetail struct {
-	CommonField
+	tables.CommonField
 
 	AccountID string `gorm:"column:account_id;pk" json:"account_id"`
 	Username  string `gorm:"column:username" json:"username"`
@@ -77,7 +80,7 @@ func (table *UserDetail) Get() interface{} {
 
 // 好友关系表
 type UserFriendRelation struct {
-	CommonField
+	tables.CommonField
 
 	Friend       string `gorm:"column:friend;unique_index:idx_friend_ref_category_friend_origin"`
 	FriendRemark string `gorm:"column:friend_remark"`

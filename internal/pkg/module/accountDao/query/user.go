@@ -34,9 +34,9 @@ func GetUserByLogin(loginName, password string) (root tables.AccountUser, err er
 	return
 }
 
-func GetUser(userID string) (user tables.AccountUser, err error) {
-	if user, err = cache.GetUser(userID); err != nil {
-		return db.GetUser(userID)
+func GetUserDetail(userID string) (user tables.AccountUserDetail, err error) {
+	if user, err = cache.GetUserDetail(userID); err != nil {
+		err = db.GetDB().GetObject(map[string]interface{}{"account_id": userID}, &user)
 	}
 	return
 }

@@ -2,11 +2,11 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
-	"baby-fried-rice/internal/pkg/module/accountDao/service/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -15,7 +15,7 @@ import (
 
 func RootLoginHandle(c *gin.Context) {
 	var err error
-	var req model.ReqPasswordLogin
+	var req requests.PasswordLoginReq
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)

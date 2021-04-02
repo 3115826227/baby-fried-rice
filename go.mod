@@ -11,6 +11,7 @@ require (
 	github.com/onsi/ginkgo v1.15.1 // indirect
 	github.com/onsi/gomega v1.11.0 // indirect
 	github.com/pkg/errors v0.8.1
+	github.com/qiniu/api.v7/v7 v7.8.2
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0

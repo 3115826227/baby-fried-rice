@@ -1,9 +1,12 @@
 package tables
 
-import "time"
+import (
+	"baby-fried-rice/internal/pkg/kit/models/tables"
+	"time"
+)
 
 type AccountRoot struct {
-	CommonField
+	tables.CommonField
 
 	LoginName  string `gorm:"column:login_name;type:varchar(255);" json:"login_name"`
 	Username   string `json:"username"`

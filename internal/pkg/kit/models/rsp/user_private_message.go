@@ -6,4 +6,5 @@ type UserPrivateMessagesResp struct {
 	SendName      string `json:"send_name"`
 	ReceiveId     string `json:"receive_id"`
 	MessageStatus int    `json:"message_status"`
+	ReceiveTime   string `json:"receive_time"`
 }

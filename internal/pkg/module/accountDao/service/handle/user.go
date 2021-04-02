@@ -2,12 +2,14 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/model"
 	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -16,14 +18,14 @@ import (
 
 func UserRegisterHandle(c *gin.Context) {
 	var err error
-	var req model.ReqUserRegister
+	var req requests.UserRegisterReq
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
 	if query.IsDuplicateLoginNameByUser(req.LoginName) {
-		log.Logger.Error("login name is duplication")
+		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.LoginName))
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
@@ -74,7 +76,7 @@ func UserRegisterHandle(c *gin.Context) {
 
 func UserLoginHandle(c *gin.Context) {
 	var err error
-	var req model.ReqPasswordLogin
+	var req requests.PasswordLoginReq
 	if err = c.ShouldBind(&req); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
@@ -97,9 +99,6 @@ func UserLoginHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-
-	//go UserLoginLogAdd(user.ID, req.Ip, time.Now())
-
 	var resp = model.RespUserLogin{
 		User:   user,
 		Detail: *detail,
@@ -108,11 +107,26 @@ func UserLoginHandle(c *gin.Context) {
 }
 
 func UsersHandle(c *gin.Context) {
-	var users = make([]tables.AccountUserDetail, 0)
-	if err := db.GetDB().GetDB().Find(&users).Error; err != nil {
+	pageInfo, err := handle.PageHandle(c)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var (
+		offset = (pageInfo.Page - 1) * pageInfo.PageSize
+		limit  = pageInfo.PageSize
+		users  = make([]tables.AccountUserDetail, 0)
+		total  int64
+	)
+	if err = db.GetDB().GetDB().Model(&tables.AccountUserDetail{}).Count(&total).Order("update_time").Offset(offset).Limit(limit).Find(&users).Error; err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	handle.SuccessResp(c, "", users)
+	list := make([]interface{}, 0)
+	for _, user := range users {
+		list = append(list, user)
+	}
+	handle.SuccessListResp(c, "", list, total, pageInfo)
 }

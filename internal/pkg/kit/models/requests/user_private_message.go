@@ -1,4 +1,4 @@
-package req
+package requests
 
 import "baby-fried-rice/internal/pkg/kit/constant"
 
@@ -14,4 +14,9 @@ type UserSendPrivateMessageReq struct {
 type UserPrivateMessagesReq struct {
 	UserId string `json:"user_id"`
 	PageCommonReq
+}
+
+type UpdatePrivateMessageStatusReq struct {
+	ReceiveId  string   `json:"receive_id"`
+	MessageIds []string `json:"message_ids"`
 }

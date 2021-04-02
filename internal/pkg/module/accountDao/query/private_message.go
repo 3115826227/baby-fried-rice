@@ -1,13 +1,17 @@
 package query
 
 import (
-	"baby-fried-rice/internal/pkg/kit/models/req"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 )
 
-func GetUserPrivateMessages(pms req.UserPrivateMessagesReq) (messages []tables.UserPrivateMessage, err error) {
+func GetUserPrivateMessages(pms requests.UserPrivateMessagesReq) (messages []tables.UserPrivateMessage, err error) {
 	pms.PageCommonReq.Validate()
-	err = db.GetDB().GetDB().Where("receive_id = ?", pms.UserId).Find(&messages).Error
+	var (
+		offset = (pms.Page - 1) * pms.PageSize
+		limit  = pms.PageSize
+	)
+	err = db.GetDB().GetDB().Where("receive_id = ?", pms.UserId).Order("receive_time").Offset(offset).Limit(limit).Find(&messages).Error
 	return
 }

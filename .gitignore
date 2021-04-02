@@ -4,3 +4,4 @@ etc/
 main
 /deploy/data
 /cmd/*/res/config_dev.yaml
+/internal/pkg/module/file/db/oss_test.go
