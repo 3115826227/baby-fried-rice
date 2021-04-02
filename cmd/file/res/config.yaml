@@ -1,0 +1,21 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  name: "file"
+  serial: 1
+  addr: "localhost"
+  port: 18050
+
+redis:
+  redisurl: "localhost:26379"
+  redispassword: "123456"
+  redisdb: 9
+
+etcd:
+  - "http://127.0.0.1:23791"
+
+healthyrolltime: 1000
+
+mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
