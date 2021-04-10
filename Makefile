@@ -7,6 +7,8 @@ MICROSERVICES= \
 	cmd/adminAccount/adminAccount \
 	cmd/rootAccount/rootAccount \
 	cmd/accountDao/accountDao \
+	cmd/spaceDao/spaceDao \
+	cmd/space/space
 
 build: $(MICROSERVICES)
 
@@ -24,6 +26,12 @@ cmd/rootAccount/rootAccount:
 
 cmd/accountDao/accountDao:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/accountDao
+
+cmd/spaceDao/spaceDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/spaceDao
+
+cmd/space/space:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/space
 
 clean:
 	rm -f $(MICROSERVICES)

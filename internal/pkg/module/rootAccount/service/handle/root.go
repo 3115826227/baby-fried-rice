@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/module/rootAccount/cache"
 	"baby-fried-rice/internal/pkg/module/rootAccount/config"
@@ -13,10 +14,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-)
-
-const (
-	TokenPrefix = "token"
 )
 
 // 超级用户账号登录
@@ -88,8 +85,8 @@ func RootLogin(c *gin.Context) {
 			UserId:   resp.Data.ID,
 			Platform: "pc",
 		}
-		cache.GetCache().Add(fmt.Sprintf("%v:%v", TokenPrefix, token), userMeta.ToString())
-		cache.GetCache().Add(userMeta.UserId, fmt.Sprintf("%v:%v", TokenPrefix, token))
+		cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString())
+		cache.GetCache().Add(userMeta.UserId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token))
 	}()
 
 	c.JSON(http.StatusOK, result)

@@ -14,8 +14,6 @@ func Register(engine *gin.Engine) {
 		log.Logger.Debug("pong")
 		c.JSON(http.StatusOK, "pong")
 	})
-	app.POST("/user/register", handle.UserRegisterHandle)
-	app.POST("/user/login", handle.UserLoginHandle)
 	app.POST("/private_message", handle.SendPrivateMessageHandle)
 	app.GET("/private_message", handle.PrivateMessageDetailHandle)
 	app.GET("/private_messages", handle.PrivateMessagesHandle)

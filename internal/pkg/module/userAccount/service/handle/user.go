@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
@@ -8,19 +9,13 @@ import (
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
-	"baby-fried-rice/internal/pkg/module/userAccount/server"
 	"baby-fried-rice/internal/pkg/module/userAccount/service/model"
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 	"time"
-)
-
-const (
-	TokenPrefix = "token"
 )
 
 func UserLoginHandle(c *gin.Context) {
@@ -33,7 +28,7 @@ func UserLoginHandle(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Ip = c.GetHeader("IP")
+	req.Ip = c.GetHeader(handle.HeaderIP)
 
 	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
 	if err != nil {
@@ -44,6 +39,7 @@ func UserLoginHandle(c *gin.Context) {
 	var reqLogin = &user.ReqPasswordLogin{
 		LoginName: req.LoginName,
 		Password:  req.Password,
+		Ip:        req.Ip,
 	}
 	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
 		UserDaoLogin(context.Background(), reqLogin)
@@ -77,8 +73,8 @@ func UserLoginHandle(c *gin.Context) {
 			UserId:   resp.User.AccountId,
 			Platform: "pc",
 		}
-		cache.GetCache().Add(fmt.Sprintf("%v:%v", TokenPrefix, token), userMeta.ToString())
-		cache.GetCache().Add(userMeta.UserId, fmt.Sprintf("%v:%v", TokenPrefix, token))
+		cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString())
+		cache.GetCache().Add(userMeta.UserId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token))
 	}()
 
 	c.JSON(http.StatusOK, result)
@@ -96,33 +92,32 @@ func UserRegisterHandle(c *gin.Context) {
 	req.Password = strings.TrimSpace(req.Password)
 	req.Phone = strings.TrimSpace(req.Phone)
 
-	payload, err := json.Marshal(req)
+	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-
-	accountDaoUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.AccountDaoServer)
+	var reqRegister = &user.ReqUserRegister{
+		Login: &user.ReqPasswordLogin{
+			LoginName: req.LoginName,
+			Password:  req.Password,
+			Ip:        c.GetHeader(handle.HeaderIP),
+		},
+		Username: req.Username,
+		Gender:   req.Gender,
+		Phone:    req.Phone,
+	}
+	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
+		UserDaoRegister(context.Background(), reqRegister)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	data, err := handle.Post(accountDaoUrl+"/dao/account/user/register", payload, c.Request.Header.Clone())
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-	ok, err := handle.ResponseHandle(data)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
+	if resp.Code != handle.SuccessCode {
+		log.Logger.Error(resp.Message)
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)

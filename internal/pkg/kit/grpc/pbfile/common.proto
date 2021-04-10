@@ -1,10 +1,32 @@
 // proto 文件版本
 syntax = "proto3";
+// 引入外部的proto对象
+import "google/protobuf/any.proto";
 // 生成文件的包名
 package common;
 option go_package = "baby-fried-rice/internal/pkg/kit/grpc/pbservices/common";  // 声明生成的 go 文件所属的包
 
+message CommonSearchRequest {
+  int64 page = 1;
+  int64 pageSize = 2;
+  string likeName = 3;
+}
+
+message CommonListResponse {
+  int64 code = 1;
+  string message = 2;
+  List list = 3;
+}
+
+message List {
+  int64 page = 1;
+  int64 pageSize = 2;
+  int64 total = 3;
+  repeated google.protobuf.Any data = 4;
+}
+
 message CommonResponse {
   int64 code = 1;
   string message = 2;
+  google.protobuf.Any data = 3;
 }

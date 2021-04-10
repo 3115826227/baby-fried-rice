@@ -28,6 +28,14 @@ cd $CMD/accountDao
 exec -a baby-account-dao ./accountDao &
 cd $DIR
 
+cd $CMD/spaceDao
+exec -a baby-space-dao ./spaceDao &
+cd $DIR
+
+cd $CMD/space
+exec -a baby-space ./space &
+cd $DIR
+
 trap cleanup EXIT
 
 while : ; do sleep 1 ; done
