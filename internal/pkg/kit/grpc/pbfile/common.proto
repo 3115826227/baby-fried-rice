@@ -1,0 +1,10 @@
+// proto 文件版本
+syntax = "proto3";
+// 生成文件的包名
+package common;
+option go_package = "baby-fried-rice/internal/pkg/kit/grpc/pbservices/common";  // 声明生成的 go 文件所属的包
+
+message CommonResponse {
+  int64 code = 1;
+  string message = 2;
+}

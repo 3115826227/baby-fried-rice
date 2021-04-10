@@ -29,6 +29,12 @@ type Conf struct {
 	Etcd            []string `json:"etcd"`
 	HealthyRollTime int64    `json:"healthy_roll_time"`
 
+	Rpc struct {
+		Client struct {
+			CertFile string `json:"cert_file"`
+		} `json:"client"`
+	} `json:"rpc"`
+
 	Servers struct {
 		AccountDaoServer string `json:"account_dao_server"`
 	}

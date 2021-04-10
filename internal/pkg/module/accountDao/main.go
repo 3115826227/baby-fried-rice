@@ -1,16 +1,17 @@
 package accountDao
 
 import (
+	"baby-fried-rice/internal/pkg/kit/grpc"
+	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/server"
-	"baby-fried-rice/internal/pkg/module/accountDao/service"
+	"baby-fried-rice/internal/pkg/module/accountDao/service/application"
+	"crypto/tls"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -50,13 +51,16 @@ func init() {
 }
 
 func ServerRun() {
-	engine := gin.Default()
-
-	gin.SetMode(gin.ReleaseMode)
-	engine.Use(middleware.Cors())
-	service.Register(engine)
-
-	engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port))
+	cert, err := tls.LoadX509KeyPair(conf.Rpc.Server.CertFile, conf.Rpc.Server.KeyFile)
+	if err != nil {
+		panic(err)
+	}
+	svr := grpc.NewServerGRPC(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port),
+		log.Logger, &cert)
+	user.RegisterDaoUserServer(svr.GetRpcServer(), &application.UserService{})
+	if err = svr.Run(); err != nil {
+		panic(err)
+	}
 }
 
 func Main() {

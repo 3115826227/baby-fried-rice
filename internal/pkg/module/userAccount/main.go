@@ -32,7 +32,7 @@ func init() {
 	}
 	log.Logger.Info("cache init successful")
 	// 初始化注册中心
-	if err := server.InitRegisterServer(conf.Etcd); err != nil {
+	if err := server.InitRegisterServer(conf.Etcd, log.Logger); err != nil {
 		panic(err)
 	}
 	log.Logger.Info("register server init successful")

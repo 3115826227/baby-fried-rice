@@ -3,8 +3,7 @@ package server
 import (
 	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/module/userAccount/config"
-	"baby-fried-rice/internal/pkg/module/userAccount/log"
+	"baby-fried-rice/internal/pkg/kit/log"
 )
 
 var (
@@ -12,15 +11,10 @@ var (
 )
 
 func GetRegisterServer() interfaces.RegisterServer {
-	if server == nil {
-		if err := InitRegisterServer(config.GetConfig().Etcd); err != nil {
-			panic(err)
-		}
-	}
 	return server
 }
 
-func InitRegisterServer(addrs []string) (err error) {
-	server = etcd.NewServerETCD(addrs, log.Logger)
+func InitRegisterServer(addrs []string, lc log.Logging) (err error) {
+	server = etcd.NewServerETCD(addrs, lc)
 	return server.Connect()
 }

@@ -25,6 +25,13 @@ type Conf struct {
 		Port   int    `json:"port"`
 	} `json:"server"`
 
+	Rpc struct {
+		Server struct {
+			CertFile string `json:"cert_file"`
+			KeyFile  string `json:"key_file"`
+		} `json:"server"`
+	} `json:"rpc"`
+
 	Etcd            []string `json:"etcd"`
 	HealthyRollTime int64    `json:"healthy_roll_time"`
 

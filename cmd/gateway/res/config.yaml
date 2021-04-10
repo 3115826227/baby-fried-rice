@@ -4,6 +4,7 @@ log:
 
 server:
   name: "gateway"
+  serial: 1
   addr: "localhost"
   port: 18070
 
@@ -16,4 +17,5 @@ etcd:
   - "http://127.0.0.1:23791"
 
 servers:
+  useraccountserver: "user-account"
   rootaccountserver: "root-account"

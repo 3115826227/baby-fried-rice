@@ -69,6 +69,10 @@ func (client *ClientETCD) GetServer(serverName string) (string, error) {
 	return servers[genRand(len(servers))], nil
 }
 
+func (client *ClientETCD) GetServers(serverName string) ([]string, error) {
+	return client.list(serverName)
+}
+
 func (client *ClientETCD) Close() (err error) {
 	return client.client.Close()
 }

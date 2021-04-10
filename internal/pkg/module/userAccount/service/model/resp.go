@@ -1,21 +1,39 @@
 package model
 
-import "baby-fried-rice/internal/pkg/kit/handle"
+import (
+	"baby-fried-rice/internal/pkg/kit/handle"
+	"time"
+)
 
 type RspDaoUserLogin struct {
-	Code int64 `json:"code"`
+	Code int `json:"code"`
 	Data struct {
-		CreatedAt  string `json:"created_at"`
-		EncodeType string `json:"encode_type"`
-		ID         string `json:"id"`
-		LoginName  string `json:"login_name"`
-		Name       string `json:"name"`
-		Password   string `json:"password"`
-		ReqID      string `json:"req_id"`
-		SchoolID   string `json:"school_id"`
-		Super      bool   `json:"super"`
-		UpdatedAt  string `json:"updated_at"`
-		Username   string `json:"username"`
+		User struct {
+			ID         string    `json:"id"`
+			CreatedAt  time.Time `json:"created_at"`
+			UpdatedAt  time.Time `json:"updated_at"`
+			LoginName  string    `json:"login_name"`
+			Password   string    `json:"password"`
+			EncodeType string    `json:"encode_type"`
+		} `json:"user"`
+		Detail struct {
+			ID        string    `json:"id"`
+			CreatedAt time.Time `json:"created_at"`
+			UpdatedAt time.Time `json:"updated_at"`
+			AccountID string    `json:"account_id"`
+			Username  string    `json:"username"`
+			SchoolID  string    `json:"school_id"`
+			Verify    bool      `json:"verify"`
+			Biry      string    `json:"biry"`
+			Gender    bool      `json:"gender"`
+			Age       int       `json:"age"`
+			Phone     string    `json:"phone"`
+			Wx        string    `json:"wx"`
+			Qq        string    `json:"qq"`
+			Addr      string    `json:"addr"`
+			Hometown  string    `json:"hometown"`
+			Ethnic    string    `json:"ethnic"`
+		} `json:"detail"`
 	} `json:"data"`
 	Message string `json:"message"`
 }

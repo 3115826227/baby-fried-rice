@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/gateway/cache"
 	"baby-fried-rice/internal/pkg/module/gateway/config"
 	"baby-fried-rice/internal/pkg/module/gateway/log"
@@ -34,7 +33,7 @@ func init() {
 func Main() {
 	engine := gin.Default()
 
-	engine.Use(middleware.Cors())
+	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port))

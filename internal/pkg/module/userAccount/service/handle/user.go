@@ -1,12 +1,16 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/userAccount/cache"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
+	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"baby-fried-rice/internal/pkg/module/userAccount/server"
 	"baby-fried-rice/internal/pkg/module/userAccount/service/model"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -21,7 +25,7 @@ const (
 
 func UserLoginHandle(c *gin.Context) {
 	var err error
-	var req model.ReqLogin
+	var req requests.PasswordLoginReq
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
@@ -29,41 +33,27 @@ func UserLoginHandle(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Password = handle.EncodePassword(req.Password)
 	req.Ip = c.GetHeader("IP")
 
-	payload, err := json.Marshal(req)
+	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var reqLogin = &user.ReqPasswordLogin{
+		LoginName: req.LoginName,
+		Password:  req.Password,
+	}
+	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
+		UserDaoLogin(context.Background(), reqLogin)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 
-	accountDaoUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.AccountDaoServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-	data, err := handle.Post(accountDaoUrl+"/dao/account/user/login", payload, c.Request.Header.Clone())
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-	var resp model.RspDaoUserLogin
-	err = json.Unmarshal(data, &resp)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-	if resp.Code != handle.SuccessCode {
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.SysErrResponse)
-		return
-	}
-
-	token, err := handle.GenerateToken(resp.Data.ID, time.Now(), config.GetConfig().TokenSecret)
+	token, err := handle.GenerateToken(resp.User.AccountId, time.Now(), config.GetConfig().TokenSecret)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -74,9 +64,9 @@ func UserLoginHandle(c *gin.Context) {
 		RspSuccess: handle.RspSuccess{Code: handle.SuccessCode},
 		Data: model.LoginResult{
 			UserInfo: model.RspUserData{
-				UserId:    resp.Data.ID,
-				LoginName: resp.Data.LoginName,
-				Username:  resp.Data.Username,
+				UserId:    resp.User.AccountId,
+				LoginName: resp.User.LoginName,
+				Username:  resp.User.Username,
 			},
 			Token: token,
 		},
@@ -84,7 +74,7 @@ func UserLoginHandle(c *gin.Context) {
 
 	go func() {
 		var userMeta = &handle.UserMeta{
-			UserId:   resp.Data.ID,
+			UserId:   resp.User.AccountId,
 			Platform: "pc",
 		}
 		cache.GetCache().Add(fmt.Sprintf("%v:%v", TokenPrefix, token), userMeta.ToString())
@@ -96,7 +86,7 @@ func UserLoginHandle(c *gin.Context) {
 
 func UserRegisterHandle(c *gin.Context) {
 	var err error
-	var req model.ReqUserRegister
+	var req requests.UserRegisterReq
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
@@ -104,7 +94,6 @@ func UserRegisterHandle(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Password = handle.EncodePassword(req.Password)
 	req.Phone = strings.TrimSpace(req.Phone)
 
 	payload, err := json.Marshal(req)

@@ -5,6 +5,7 @@ import "time"
 type RegisterClient interface {
 	Connect() error
 	GetServer(severName string) (addr string, err error)
+	GetServers(serverName string) ([]string, error)
 	Close() error
 }
 

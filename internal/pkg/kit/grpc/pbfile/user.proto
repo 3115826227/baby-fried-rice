@@ -1,0 +1,47 @@
+// proto 文件版本
+syntax = "proto3";
+import "common.proto";
+// 生成文件的包名
+package user;
+option go_package = "baby-fried-rice/internal/pkg/kit/grpc/pbservices/user";  // 声明生成的 go 文件所属的包
+// 定义用户接口
+service DaoUser {
+  // 用户注册函数
+  rpc UserDaoRegister(ReqUserRegister) returns (common.CommonResponse);
+  //用户登录函数
+  rpc UserDaoLogin(ReqPasswordLogin) returns (RspDaoUserLogin);
+}
+
+message ReqUserRegister  {
+  ReqPasswordLogin login = 1;
+  string username = 2;
+  bool gender = 3;
+  string phone = 4;
+}
+
+message ReqPasswordLogin {
+  string loginName = 1;
+  string password = 2;
+  string ip = 3;
+}
+
+// 定义登录函数输入参数
+message ReqUserLogin {
+  string Username = 1;
+  string Password = 2;
+}
+
+message RspDaoUser {
+  string accountId = 1;
+  string loginName = 2;
+  string username = 3;
+  string schoolId = 4;
+  bool gender = 5;
+  int64  age = 6;
+  string phone = 7;
+}
+
+// 定义登录函数返回参数
+message RspDaoUserLogin {
+  RspDaoUser user = 1;
+}
