@@ -52,3 +52,30 @@ services:
       - "s1=http://0.0.0.0:2380"
       - "--initial-cluster-state"
       - "new"
+  baby-gateway:
+    image: baby-gateway
+    container_name: baby-gateway
+    ports:
+      - "18070:8080"
+    volumes:
+      - "./cmd/gateway/res:/go/src/baby-fried-rice/module/gateway/res"
+      - "./cmd/gateway/logs:/baby/logs"
+    restart: always
+  baby-account-dao:
+    image: baby-account-dao
+    container_name: baby-account-dao
+    ports:
+      - "18061:8080"
+    volumes:
+      - "./cmd/accountDao/res:/go/src/baby-fried-rice/module/accountDao/res"
+      - "./cmd/accountDao/logs:/baby/logs"
+    restart: always
+  baby-user-account:
+    image: baby-user-account
+    container_name: baby-user-account
+    ports:
+      - "18071:8080"
+    volumes:
+      - "./cmd/userAccount/res:/go/src/baby-fried-rice/module/userAccount/res"
+      - "./cmd/userAccount/logs:/baby/logs"
+    restart: always

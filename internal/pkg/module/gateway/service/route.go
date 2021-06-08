@@ -7,6 +7,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/gateway/log"
 	"baby-fried-rice/internal/pkg/module/gateway/middleware"
 	"baby-fried-rice/internal/pkg/module/gateway/server"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httputil"
@@ -43,12 +44,14 @@ func HandleAccountUserProxy(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	fmt.Println(userUrl)
 	parserUserUrl, err := url.Parse(userUrl)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	fmt.Println(parserUserUrl)
 	proxy := httputil.NewSingleHostReverseProxy(parserUserUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }

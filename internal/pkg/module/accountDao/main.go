@@ -39,7 +39,7 @@ func init() {
 		panic(err)
 	}
 	var serverInfo = interfaces.RegisterServerInfo{
-		Addr:         fmt.Sprintf("http://%v:%v", conf.Server.Addr, conf.Server.Port),
+		Addr:         conf.Server.Register,
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}

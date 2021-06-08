@@ -1,0 +1,27 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/account_dao.log"
+
+server:
+  name: "account-dao"
+  serial: 1
+  addr: "0.0.0.0"
+  port: 8080
+  register: "http://172.16.30.153:18061"
+
+redis:
+  redisurl: "redis:6379"
+  redispassword: "123456"
+  redisdb: 9
+
+etcd:
+  - "http://etcd:2379"
+
+rpc:
+  server:
+    certfile: "cert/server.pem"
+    keyfile: "cert/server.key"
+
+healthyrolltime: 1000
+
+mysqlurl: "root:123456@tcp(baby-mysql:3306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
