@@ -1,0 +1,87 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package user;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/user";  // 声明生成的 go 文件所属的包
+// 定义用户接口
+service DaoUser {
+  // 用户注册函数
+  rpc UserDaoRegister(ReqUserRegister) returns (google.protobuf.Empty);
+  // 用户登录函数
+  rpc UserDaoLogin(ReqPasswordLogin) returns (RspDaoUserLogin);
+  // 用户详细信息获取函数
+  rpc UserDaoDetail(ReqDaoUserDetail) returns (RspDaoUserDetail);
+  // 用户详细信息修改函数
+  rpc UserDaoDetailUpdate(ReqDaoUserDetailUpdate) returns (google.protobuf.Empty);
+  // 用户修改密码
+  rpc UserDaoPwdUpdate(ReqDaoUserPwdUpdate) returns (google.protobuf.Empty);
+}
+
+message ReqUserRegister  {
+  ReqPasswordLogin login = 1;
+  string username = 2;
+  bool gender = 3;
+  string phone = 4;
+}
+
+message ReqPasswordLogin {
+  string loginName = 1;
+  string password = 2;
+  string ip = 3;
+}
+
+// 定义登录函数输入参数
+message ReqUserLogin {
+  string Username = 1;
+  string Password = 2;
+}
+
+message RspDaoUser {
+  string accountId = 1;
+  string loginName = 2;
+  string username = 3;
+  string schoolId = 4;
+  bool gender = 5;
+  int64  age = 6;
+  string phone = 7;
+}
+
+// 定义登录函数返回参数
+message RspDaoUserLogin {
+  RspDaoUser user = 1;
+}
+
+message DaoUserDetail {
+  string accountId = 1;
+  string headImgUrl = 2;
+  string username = 3;
+  string schoolId = 4;
+  bool gender = 5;
+  int64  age = 6;
+  string phone = 7;
+  string describe = 8;
+  int64 coin = 9;
+}
+
+// 定义用户详细信息请求参数
+message ReqDaoUserDetail {
+  string AccountId = 1;
+}
+
+// 定义用户详细信息返回参数
+message RspDaoUserDetail {
+  DaoUserDetail detail = 1;
+}
+
+// 定义用户详细信息修改请求
+message ReqDaoUserDetailUpdate {
+  DaoUserDetail detail = 2;
+}
+
+// 定义用户密码修改请求
+message ReqDaoUserPwdUpdate {
+  string AccountId = 1;
+  string password = 2;
+  string newPassword = 3;
+}

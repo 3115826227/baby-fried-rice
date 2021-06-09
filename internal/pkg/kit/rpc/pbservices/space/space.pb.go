@@ -11,7 +11,7 @@
 package space
 
 import (
-	common "baby-fried-rice/internal/pkg/kit/grpc/pbservices/common"
+	common "baby-fried-rice/internal/pkg/kit/rpc/pbservices/common"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -431,7 +431,7 @@ var _ context.Context
 var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
+// is compatible with the rpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
 // DaoSpaceClient is the client API for DaoSpace service.

@@ -1,8 +1,8 @@
 package spaceDao
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc"
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/space"
+	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/spaceDao/cache"
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
@@ -55,7 +55,7 @@ func ServerRun() {
 	if err != nil {
 		panic(err)
 	}
-	svr := grpc.NewServerGRPC(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port),
+	svr := rpc.NewServerGRPC(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port),
 		log.Logger, &cert)
 	space.RegisterDaoSpaceServer(svr.GetRpcServer(), &application.SpaceService{})
 	if err = svr.Run(); err != nil {

@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc"
 	"baby-fried-rice/internal/pkg/kit/log"
+	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/server"
 	"crypto/x509"
@@ -17,10 +17,10 @@ var (
 )
 
 type Client struct {
-	c *grpc.ClientGRPC
+	c *rpc.ClientGRPC
 }
 
-func GetClientGRPC(serverName string) (*grpc.ClientGRPC, error) {
+func GetClientGRPC(serverName string) (*rpc.ClientGRPC, error) {
 	if _, ok := clientMp[serverName]; !ok {
 		clientMp[serverName] = make(map[string]*Client)
 	}
@@ -31,7 +31,7 @@ func GetClientGRPC(serverName string) (*grpc.ClientGRPC, error) {
 	}
 	addr = strings.Split(addr, "//")[1]
 	if err = initClient(serverName, addr); err != nil {
-		err = errors.Wrap(err, fmt.Sprintf("failed to init grpc client %v %v", serverName, addr))
+		err = errors.Wrap(err, fmt.Sprintf("failed to init rpc client %v %v", serverName, addr))
 		return nil, err
 	}
 	return clientMp[serverName][addr].c, nil
@@ -49,7 +49,7 @@ func initClient(serverName, addr string) (err error) {
 	if !cp.AppendCertsFromPEM(b) {
 		return
 	}
-	c, err := grpc.NewClientGRPC(addr, log.Logger, cp)
+	c, err := rpc.NewClientGRPC(addr, log.Logger, cp)
 	if err != nil {
 		return
 	}

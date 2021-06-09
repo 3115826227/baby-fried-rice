@@ -1,7 +1,7 @@
-package grpc
+package rpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/user"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/log"
 	"context"
 	"crypto/x509"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestNewClientGRPC(t *testing.T) {
-	lc, err := log.NewLoggerClient("grpc-server", log.DebugLog, "")
+	lc, err := log.NewLoggerClient("rpc-server", log.DebugLog, "")
 	if err != nil {
 		panic(err)
 	}

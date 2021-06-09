@@ -3,7 +3,7 @@ syntax = "proto3";
 import "common.proto";
 // 生成文件的包名
 package user;
-option go_package = "baby-fried-rice/internal/pkg/kit/grpc/pbservices/spaceDao";  // 声明生成的 go 文件所属的包
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/spaceDao";  // 声明生成的 go 文件所属的包
 // 定义用户接口
 service DaoSpace {
   // 空间动态添加

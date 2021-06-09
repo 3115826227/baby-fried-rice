@@ -1,7 +1,7 @@
 package handle
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/space"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/space/config"

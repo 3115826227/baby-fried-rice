@@ -1,8 +1,8 @@
 package application
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/common"
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/space"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/common"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"context"
 )
 

@@ -1,8 +1,8 @@
-package grpc
+package rpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/common"
-	"baby-fried-rice/internal/pkg/kit/grpc/pbservices/user"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/common"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/log"
 	"context"
 	"crypto/tls"
@@ -40,7 +40,7 @@ func (service *UserService) UserDaoLogin(context context.Context, request *user.
 }
 
 func TestNewServerGRPC(t *testing.T) {
-	lc, err := log.NewLoggerClient("grpc-server", log.DebugLog, "")
+	lc, err := log.NewLoggerClient("rpc-server", log.DebugLog, "")
 	if err != nil {
 		panic(err)
 	}

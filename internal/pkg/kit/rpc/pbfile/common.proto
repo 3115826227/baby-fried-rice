@@ -4,7 +4,7 @@ syntax = "proto3";
 import "google/protobuf/any.proto";
 // 生成文件的包名
 package common;
-option go_package = "baby-fried-rice/internal/pkg/kit/grpc/pbservices/common";  // 声明生成的 go 文件所属的包
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/common";  // 声明生成的 go 文件所属的包
 
 message CommonSearchRequest {
   int64 page = 1;

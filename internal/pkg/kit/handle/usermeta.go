@@ -11,19 +11,19 @@ const (
 	TokenPrefix = "token"
 	HeaderIP    = "IP"
 
-	HeaderUserId   = "userId"
-	HeaderUsername = "username"
-	HeaderSchoolId = "schoolId"
-	HeaderPlatform = "platform"
-	HeaderReqId    = "reqId"
-	HeaderIsSuper  = "isSuper"
+	HeaderAccountId = "accountId"
+	HeaderUsername  = "username"
+	HeaderSchoolId  = "schoolId"
+	HeaderPlatform  = "platform"
+	HeaderReqId     = "reqId"
+	HeaderIsSuper   = "isSuper"
 
 	GinContextKeyUserMeta = "userMeta"
 )
 
 type UserMeta struct {
 	//用户ID
-	UserId string `json:"userId"`
+	AccountId string `json:"accountId"`
 	//用户名
 	Username string `json:"username"`
 	//学校ID

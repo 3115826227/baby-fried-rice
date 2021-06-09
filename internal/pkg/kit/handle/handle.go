@@ -44,6 +44,9 @@ var SysErrResponse = gin.H{
 }
 
 func SuccessResp(c *gin.Context, message string, data interface{}) {
+	if data == nil {
+		data = make(map[string]interface{})
+	}
 	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": data})
 }
 

@@ -9,8 +9,10 @@ import (
 func Register(engine *gin.Engine) {
 	engine.POST("/api/user/register", handle.UserRegisterHandle)
 	engine.POST("/api/user/login", handle.UserLoginHandle)
-	root := engine.Group("/api/account/user", middleware.SetUserMeta())
+	user := engine.Group("/api/account/user", middleware.SetUserMeta())
 
-	root.GET("/logout", handle.UserLogout)
-
+	user.GET("/logout", handle.UserLogoutHandle)
+	user.GET("/detail", handle.UserDetailHandle)
+	user.PATCH("/detail", handle.UserDetailUpdateHandle)
+	user.PATCH("/pwd", handle.UserPwdUpdateHandle)
 }

@@ -1,4 +1,4 @@
-package grpc
+package rpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/log"
