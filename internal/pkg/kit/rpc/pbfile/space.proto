@@ -1,17 +1,18 @@
 // proto 文件版本
 syntax = "proto3";
 import "common.proto";
+import "google/protobuf/empty.proto";
 // 生成文件的包名
 package user;
-option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/spaceDao";  // 声明生成的 go 文件所属的包
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/space";  // 声明生成的 go 文件所属的包
 // 定义用户接口
 service DaoSpace {
   // 空间动态添加
-  rpc SpaceAddDao(ReqSpaceAddDao) returns (common.CommonResponse);
+  rpc SpaceAddDao(ReqSpaceAddDao) returns (google.protobuf.Empty);
   // 空间动态删除
-  rpc SpaceDeleteDao(ReqSpaceDeleteDao) returns (common.CommonResponse);
+  rpc SpaceDeleteDao(ReqSpaceDeleteDao) returns (google.protobuf.Empty);
   // 空间动态查询
-  rpc SpacesQueryDao(ReqSpacesQueryDao) returns (common.CommonListResponse);
+  rpc SpacesQueryDao(ReqSpacesQueryDao) returns (RspSpacesQueryDao);
 }
 
 message ReqSpaceAddDao {
@@ -28,10 +29,21 @@ message ReqSpacesQueryDao {
   common.CommonSearchRequest commonSearchReq = 1;
 }
 
-message SpaceResponse {
+message RspSpacesQueryDao {
+  repeated SpaceQueryDao list = 1;
+}
+
+message SpaceQueryDao {
   string id = 1;
   string origin = 2;
   string content = 3;
   int32 visitorType = 4;
   string createTime = 5;
+  SpaceQueryDao other = 6;
+}
+
+// 空间其他信息
+message SpaceOtherDao {
+  string id = 1;
+  int64 visited = 2;
 }

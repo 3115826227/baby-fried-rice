@@ -1,9 +1,9 @@
 package handle
 
 import (
-	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/module/space/config"
 	"baby-fried-rice/internal/pkg/module/space/grpc"
 	"baby-fried-rice/internal/pkg/module/space/log"
@@ -29,19 +29,14 @@ func AddSpaceHandle(c *gin.Context) {
 	}
 	userMeta := handle.GetUserMeta(c)
 	var reqSpace = &space.ReqSpaceAddDao{
-		Origin:      userMeta.UserId,
+		Origin:      userMeta.AccountId,
 		Content:     req.Content,
 		VisitorType: int32(req.VisitorType),
 	}
-	resp, err := space.NewDaoSpaceClient(client.GetRpcClient()).
+	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
 		SpaceAddDao(context.Background(), reqSpace)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	if resp.Code != handle.SuccessCode {
-		log.Logger.Error(resp.Message)
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
@@ -53,5 +48,19 @@ func QuerySpacesHandle(c *gin.Context) {
 }
 
 func DeleteSpaceHandle(c *gin.Context) {
-
+	id := c.Query("id")
+	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
+		SpaceDeleteDao(context.Background(), &space.ReqSpaceDeleteDao{Id: id})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
 }

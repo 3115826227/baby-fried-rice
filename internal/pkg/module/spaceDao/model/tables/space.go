@@ -11,7 +11,7 @@ type Space struct {
 	// 空间动态内容 动态内容不可编辑，存储html格式
 	Content string `gorm:"column:content"`
 	// 空间动态类型 1-公开 2-仅好友可见 3-仅好友可见且部分人不可见 4-指定人可见 5-私有仅自己可见
-	VisitorType int `gorm:"column:visitor_type"`
+	VisitorType int32 `gorm:"column:visitor_type"`
 }
 
 func (table *Space) TableName() string {
