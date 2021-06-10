@@ -137,7 +137,7 @@ func PageHandle(c *gin.Context) (req requests.PageCommonReq, err error) {
 	if pageSize <= 0 {
 		pageSize = constant.DefaultPageSize
 	}
-	req.Page = page
-	req.PageSize = pageSize
+	req.Page = int64(page)
+	req.PageSize = int64(pageSize)
 	return
 }

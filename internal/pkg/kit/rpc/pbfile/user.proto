@@ -16,6 +16,21 @@ service DaoUser {
   rpc UserDaoDetailUpdate(ReqDaoUserDetailUpdate) returns (google.protobuf.Empty);
   // 用户修改密码
   rpc UserDaoPwdUpdate(ReqDaoUserPwdUpdate) returns (google.protobuf.Empty);
+  // 根据id查询用户信息
+  rpc UserDaoById(ReqUserDaoById) returns (RspUserDaoById);
+}
+
+message ReqUserDaoById {
+  repeated string ids = 1;
+}
+
+message RspUserDaoById {
+  repeated  UserDao users = 1;
+}
+
+message UserDao {
+  string id = 1;
+  string username = 2;
 }
 
 message ReqUserRegister  {

@@ -34,6 +34,7 @@ func Register(engine *gin.Engine) {
 	user.Any("/public/*any", HandlePublicProxy)
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/square/*any", HandleSquareProxy)
+	user.Any("/space/*any", HandleSpaceProxy)
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
@@ -87,5 +88,22 @@ func HandleImProxy(c *gin.Context) {
 
 func HandleSquareProxy(c *gin.Context) {
 	proxy := httputil.NewSingleHostReverseProxy(config.GetConfig().ParserSquareUrl)
+	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func HandleSpaceProxy(c *gin.Context) {
+	spaceUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.SpaceServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	parserSpaceUrl, err := url.Parse(spaceUrl)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	proxy := httputil.NewSingleHostReverseProxy(parserSpaceUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }

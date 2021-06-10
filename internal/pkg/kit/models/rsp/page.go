@@ -2,7 +2,7 @@ package rsp
 
 type CommonListResp struct {
 	List     []interface{} `json:"list"`
-	Page     int           `json:"page"`
-	PageSize int           `json:"page_size"`
-	Total    int64           `json:"total"`
+	Page     int64         `json:"page"`
+	PageSize int64         `json:"page_size"`
+	Total    int64         `json:"total"`
 }

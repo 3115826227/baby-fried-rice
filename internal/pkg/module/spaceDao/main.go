@@ -1,9 +1,9 @@
 package spaceDao
 
 import (
+	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
-	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/spaceDao/cache"
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
@@ -39,7 +39,7 @@ func init() {
 		panic(err)
 	}
 	var serverInfo = interfaces.RegisterServerInfo{
-		Addr:         fmt.Sprintf("http://%v:%v", conf.Server.Addr, conf.Server.Port),
+		Addr:         conf.Server.Register,
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}

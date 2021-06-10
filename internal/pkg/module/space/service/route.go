@@ -7,8 +7,13 @@ import (
 )
 
 func Register(engine *gin.Engine) {
-	root := engine.Group("/api/space", middleware.SetUserMeta())
-	root.GET("", handle.QuerySpacesHandle)
-	root.POST("", handle.AddSpaceHandle)
-	root.DELETE("", handle.DeleteSpaceHandle)
+	app := engine.Group("/api/space", middleware.SetUserMeta())
+	app.GET("/space", handle.SpacesQueryHandle)
+	app.POST("/space", handle.SpaceAddHandle)
+	app.DELETE("/space", handle.SpaceDeleteHandle)
+
+	app.POST("/operator", handle.SpaceOptAddHandle)
+	app.DELETE("/operator", handle.SpaceOptCancelHandle)
+	app.POST("/comment", handle.SpaceCommentAddHandle)
+	app.DELETE("/comment", handle.SpaceCommentDeleteHandle)
 }

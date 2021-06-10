@@ -8,7 +8,7 @@ type UserSendPrivateMessageReq struct {
 	SendMessageType constant.SendPrivateMessageType `json:"send_message_type"`
 	MessageType     int                             `json:"message_type"`
 	MessageTitle    string                          `json:"message_title"`
-	MessageContent  interface{}                     `json:"message_content"`
+	MessageContent  string                          `json:"message_content"`
 }
 
 type UserPrivateMessagesReq struct {

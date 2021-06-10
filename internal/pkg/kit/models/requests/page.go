@@ -3,8 +3,8 @@ package requests
 import "baby-fried-rice/internal/pkg/kit/constant"
 
 type PageCommonReq struct {
-	PageSize int `json:"page_size"`
-	Page     int `json:"page"`
+	PageSize int64 `json:"page_size"`
+	Page     int64 `json:"page"`
 }
 
 func (req *PageCommonReq) Validate() {

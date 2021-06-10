@@ -13,6 +13,7 @@ func Register(engine *gin.Engine) {
 
 	user.GET("/logout", handle.UserLogoutHandle)
 	user.GET("/detail", handle.UserDetailHandle)
+	user.GET("/query", handle.UserQueryHandle)
 	user.PATCH("/detail", handle.UserDetailUpdateHandle)
 	user.PATCH("/pwd", handle.UserPwdUpdateHandle)
 }

@@ -5,21 +5,15 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
-	"encoding/json"
 	"errors"
 	"time"
 )
 
 func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
 	var pmID = handle.GenerateSerialNumberByLen(constant.PrivateMessageIDDefaultLength)
-	var mc []byte
 	var now = time.Now()
-	mc, err = json.Marshal(pm.MessageContent)
-	if err != nil {
-		return
-	}
 	var pmc = tables.UserPrivateMessageContent{
-		Content:         string(mc),
+		Content:         pm.MessageContent,
 		MessageSendType: int(pm.SendMessageType),
 		MessageType:     pm.MessageType,
 		MessageTitle:    pm.MessageTitle,

@@ -40,3 +40,17 @@ func GetUserDetail(accountId string) (detail tables.AccountUserDetail, err error
 	}
 	return
 }
+
+func GetUsers(ids []string) (details []tables.AccountUserDetail, err error) {
+	details = make([]tables.AccountUserDetail, 0)
+	for _, id := range ids {
+		var detail tables.AccountUserDetail
+		if detail, err = cache.GetUserDetail(id); err != nil {
+			if err = db.GetDB().GetObject(map[string]interface{}{"account_id": id}, &detail); err != nil {
+				return
+			}
+		}
+		details = append(details, detail)
+	}
+	return
+}

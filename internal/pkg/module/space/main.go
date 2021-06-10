@@ -37,7 +37,7 @@ func init() {
 	log.Logger.Info("register server init successful")
 	// 注册本地服务到注册中心
 	var serverInfo = interfaces.RegisterServerInfo{
-		Addr:         fmt.Sprintf("http://%v:%v", conf.Server.Addr, conf.Server.Port),
+		Addr:         conf.Server.Register,
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}

@@ -19,10 +19,11 @@ type Conf struct {
 	} `json:"redis"`
 
 	Server struct {
-		Name   string `json:"name"`
-		Serial int    `json:"serial"`
-		Addr   string `json:"addr"`
-		Port   int    `json:"port"`
+		Name     string `json:"name"`
+		Serial   int    `json:"serial"`
+		Addr     string `json:"addr"`
+		Port     int    `json:"port"`
+		Register string `json:"register"`
 	} `json:"server"`
 
 	Rpc struct {

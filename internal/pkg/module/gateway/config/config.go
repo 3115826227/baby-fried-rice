@@ -39,6 +39,7 @@ type Conf struct {
 	Servers struct {
 		UserAccountServer string `json:"user_account_server"`
 		RootAccountServer string `json:"root_account_server"`
+		SpaceServer       string `json:"space_server"`
 	}
 
 	ParserUserUrl   *url.URL
@@ -46,6 +47,7 @@ type Conf struct {
 	ParserPublicUrl *url.URL
 	ParserSquareUrl *url.URL
 	ParserImUrl     *url.URL
+	ParserSpaceUrl  *url.URL
 }
 
 var (

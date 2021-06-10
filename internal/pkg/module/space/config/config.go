@@ -13,10 +13,11 @@ type Conf struct {
 	} `json:"log"`
 
 	Server struct {
-		Name   string `json:"name"`
-		Serial int    `json:"serial"`
-		Addr   string `json:"addr"`
-		Port   int    `json:"port"`
+		Name     string `json:"name"`
+		Serial   int    `json:"serial"`
+		Addr     string `json:"addr"`
+		Port     int    `json:"port"`
+		Register string `json:"register"`
 	} `json:"server"`
 
 	Redis struct {
@@ -35,7 +36,8 @@ type Conf struct {
 	} `json:"rpc"`
 
 	Servers struct {
-		SpaceDaoServer string `json:"space_dao_server"`
+		AccountDaoServer string `json:"account_dao_server"`
+		SpaceDaoServer   string `json:"space_dao_server"`
 	}
 }
 

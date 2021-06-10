@@ -9,8 +9,8 @@ import (
 func GetUserPrivateMessages(pms requests.UserPrivateMessagesReq) (messages []tables.UserPrivateMessage, err error) {
 	pms.PageCommonReq.Validate()
 	var (
-		offset = (pms.Page - 1) * pms.PageSize
-		limit  = pms.PageSize
+		offset = int((pms.Page - 1) * pms.PageSize)
+		limit  = int(pms.PageSize)
 	)
 	err = db.GetDB().GetDB().Where("receive_id = ?", pms.UserId).Order("receive_time").Offset(offset).Limit(limit).Find(&messages).Error
 	return

@@ -18,6 +18,24 @@ import (
 type UserService struct {
 }
 
+func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDaoById) (resp *user.RspUserDaoById, err error) {
+	var details []tables.AccountUserDetail
+	details, err = query.GetUsers(req.Ids)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var users = make([]*user.UserDao, 0)
+	for _, detail := range details {
+		users = append(users, &user.UserDao{
+			Id:       detail.AccountID,
+			Username: detail.Username,
+		})
+	}
+	resp = &user.RspUserDaoById{Users: users}
+	return
+}
+
 func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUserRegister) (empty *emptypb.Empty, err error) {
 	if query.IsDuplicateLoginNameByUser(req.Login.LoginName) {
 		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.Login.LoginName))

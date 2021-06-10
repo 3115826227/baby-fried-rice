@@ -134,6 +134,7 @@ func UserLogoutHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// 查看用户自己信息
 func UserDetailHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
@@ -226,4 +227,32 @@ func UserPwdUpdateHandle(c *gin.Context) {
 		return
 	}
 	handle.SuccessResp(c, "", nil)
+}
+
+// 查看他人用户信息
+func UserQueryHandle(c *gin.Context) {
+	accountId := c.Query("account_id")
+	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
+		UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: accountId})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var detailRsp = model.RspUserDetail{
+		AccountId:  resp.Detail.AccountId,
+		Describe:   resp.Detail.Describe,
+		HeadImgUrl: resp.Detail.HeadImgUrl,
+		Username:   resp.Detail.Username,
+		SchoolId:   resp.Detail.SchoolId,
+		Gender:     resp.Detail.Gender,
+		Age:        resp.Detail.Age,
+	}
+	handle.SuccessResp(c, "", detailRsp)
 }
