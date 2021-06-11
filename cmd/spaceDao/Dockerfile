@@ -9,6 +9,7 @@ ENV TZ=Asia/Shanghai LANG=C.UTF-8 TERM=xterm
 WORKDIR /go/src/baby-fried-rice/module/spaceDao
 RUN mkdir res && mkdir -p /baby/logs/
 COPY --from=build /baby-fried-rice/cmd/spaceDao/res/config.yaml res/
+COPY --from=build /baby-fried-rice/cmd/spaceDao/cert cert/
 COPY --from=build /baby-fried-rice/space_dao .
 EXPOSE 8080
 VOLUME ["/baby/logs"]

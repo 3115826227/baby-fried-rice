@@ -9,6 +9,7 @@ ENV TZ=Asia/Shanghai LANG=C.UTF-8 TERM=xterm
 WORKDIR /go/src/baby-fried-rice/module/space
 RUN mkdir res && mkdir -p /baby/logs/
 COPY --from=build /baby-fried-rice/cmd/space/res/config.yaml res/
+COPY --from=build /baby-fried-rice/cmd/space/cert cert/
 COPY --from=build /baby-fried-rice/space .
 EXPOSE 8080
 VOLUME ["/baby/logs"]
