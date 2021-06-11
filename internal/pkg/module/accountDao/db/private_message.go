@@ -13,32 +13,23 @@ func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
 	var pmID = handle.GenerateSerialNumberByLen(constant.PrivateMessageIDDefaultLength)
 	var now = time.Now()
 	var pmc = tables.UserPrivateMessageContent{
-		Content:         pm.MessageContent,
-		MessageSendType: int(pm.SendMessageType),
-		MessageType:     pm.MessageType,
-		MessageTitle:    pm.MessageTitle,
+		Content: pm.MessageContent,
 	}
 	pmc.ID = pmID
-	pmc.CreatedAt = now
-	pmc.UpdatedAt = now
-	var spm = tables.UserPrivateMessage{
-		MessageId:     pmID,
-		SendId:        pm.SendId,
-		ReceiveId:     "",
-		MessageStatus: 0,
-		ReceiveTime:   now,
-	}
+	pmc.CreatedAt, pmc.UpdatedAt = now, now
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &pmc)
-	beans = append(beans, &spm)
-	switch pm.SendMessageType {
+	switch pm.MessageSendType {
 	case constant.SendPerson:
 		var rpm = tables.UserPrivateMessage{
-			MessageId:     spm.MessageId,
-			SendId:        spm.ReceiveId,
-			ReceiveId:     spm.SendId,
-			MessageStatus: 0,
-			ReceiveTime:   now,
+			MessageId:       pmID,
+			SendId:          pm.SendId,
+			ReceiveId:       pm.ReceiveId,
+			MessageStatus:   0,
+			ReceiveTime:     now,
+			MessageType:     pm.MessageType,
+			MessageSendType: int32(pm.MessageSendType),
+			MessageTitle:    pm.MessageTitle,
 		}
 		beans = append(beans, &rpm)
 	case constant.SendGroup:

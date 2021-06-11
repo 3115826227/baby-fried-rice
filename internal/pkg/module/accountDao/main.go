@@ -1,9 +1,10 @@
 package accountDao
 
 import (
-	"baby-fried-rice/internal/pkg/kit/rpc"
-	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
+	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
@@ -58,6 +59,7 @@ func ServerRun() {
 	svr := rpc.NewServerGRPC(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port),
 		log.Logger, &cert)
 	user.RegisterDaoUserServer(svr.GetRpcServer(), &application.UserService{})
+	privatemessage.RegisterDaoPrivateMessageServer(svr.GetRpcServer(), &application.PrivateMessageService{})
 	if err = svr.Run(); err != nil {
 		panic(err)
 	}

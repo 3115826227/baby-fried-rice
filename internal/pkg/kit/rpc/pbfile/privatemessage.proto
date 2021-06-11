@@ -1,0 +1,79 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package privatemessage;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage";  // 声明生成的 go 文件所属的包
+
+service DaoPrivateMessage {
+  // 发送私信
+  rpc PrivateMessageAddDao(ReqPrivateMessageAddDao) returns (google.protobuf.Empty);
+  // 更新私信阅读状态
+  rpc PrivateMessageStatusUpdateDao(ReqPrivateMessageStatusUpdateDao) returns (google.protobuf.Empty);
+  // 查询私信列表
+  rpc PrivateMessageQueryDao(ReqPrivateMessageQueryDao) returns (RspPrivateMessageQueryDao);
+  // 查询私信详情
+  rpc PrivateMessageDetailDao(ReqPrivateMessageDetailDao) returns (RspPrivateMessageDetailDao);
+}
+
+message ReqPrivateMessageAddDao {
+  // 发送者
+  string sendId = 1;
+  // 接受者
+  string receiveId = 2;
+  // 消息类型
+  int32 messageType = 3;
+  // 消息发送类型
+  int32 messageSendType = 4;
+  // 标题
+  string title = 5;
+  // 内容
+  string content = 6;
+}
+
+message ReqPrivateMessageDeleteDao {
+  string accountId = 1;
+  repeated string ids = 2;
+}
+
+message ReqPrivateMessageStatusUpdateDao {
+  string accountId = 1;
+  repeated string ids = 2;
+}
+
+message ReqPrivateMessageQueryDao {
+  int64 page = 1;
+  int64 pageSize = 2;
+  int32 messageType = 3;
+  int32 messageSendType = 4;
+  string sendId = 5;
+  uint32 status = 6;
+}
+
+message RspPrivateMessageQueryDao {
+  repeated PrivateMessageQueryDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+message PrivateMessageQueryDao {
+  string id = 1;
+  string sendId = 2;
+  string receiveId = 3;
+  int32 messageType = 4;
+  int32 messageSendType = 5;
+  string title = 6;
+  string createTime = 7;
+  uint32 status = 8;
+}
+
+message ReqPrivateMessageDetailDao {
+  string accountId = 1;
+  string id = 2;
+}
+
+message RspPrivateMessageDetailDao {
+  PrivateMessageQueryDao privateMessage = 1;
+  string content = 2;
+}

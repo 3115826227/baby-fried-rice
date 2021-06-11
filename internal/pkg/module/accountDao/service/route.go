@@ -14,11 +14,6 @@ func Register(engine *gin.Engine) {
 		log.Logger.Debug("pong")
 		c.JSON(http.StatusOK, "pong")
 	})
-	app.POST("/private_message", handle.SendPrivateMessageHandle)
-	app.GET("/private_message", handle.PrivateMessageDetailHandle)
-	app.GET("/private_messages", handle.PrivateMessagesHandle)
-	app.DELETE("/private_message", handle.DeletePrivateMessageHandle)
-	app.PATCH("/private_message/status", handle.UpdatePrivateMessageStatusHandle)
 	app.POST("/root/login", handle.RootLoginHandle)
 
 	app.GET("/root/users", handle.UsersHandle)

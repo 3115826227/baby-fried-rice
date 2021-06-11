@@ -16,4 +16,10 @@ func Register(engine *gin.Engine) {
 	user.GET("/query", handle.UserQueryHandle)
 	user.PATCH("/detail", handle.UserDetailUpdateHandle)
 	user.PATCH("/pwd", handle.UserPwdUpdateHandle)
+
+	user.POST("/private_message", handle.SendPrivateMessageHandle)
+	user.GET("/private_message", handle.PrivateMessagesHandle)
+	user.GET("/private_message/detail", handle.PrivateMessageDetailHandle)
+	user.PATCH("/private_message/status", handle.UpdatePrivateMessageStatusHandle)
+	user.DELETE("/private_message", handle.DeletePrivateMessageHandle)
 }
