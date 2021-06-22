@@ -12,7 +12,8 @@ type UserSendPrivateMessageReq struct {
 }
 
 type UserPrivateMessagesReq struct {
-	SendId string `json:"send_id"`
+	AccountId string `json:"account_id"`
+	SendId    string `json:"send_id"`
 	PageCommonReq
 }
 

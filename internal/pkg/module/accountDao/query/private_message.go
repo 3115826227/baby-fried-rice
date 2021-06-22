@@ -12,7 +12,7 @@ func GetUserPrivateMessages(pms requests.UserPrivateMessagesReq) (messages []tab
 		offset = int((pms.Page - 1) * pms.PageSize)
 		limit  = int(pms.PageSize)
 	)
-	template := db.GetDB().GetDB().Model(&tables.UserPrivateMessage{})
+	template := db.GetDB().GetDB().Model(&tables.UserPrivateMessage{}).Where("receive_id = ?", pms.AccountId)
 	if pms.SendId != "" {
 		template = template.Where("send_id = ?", pms.SendId)
 	}

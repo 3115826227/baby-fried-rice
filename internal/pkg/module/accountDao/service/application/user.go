@@ -178,3 +178,12 @@ func (service *UserService) UserDaoPwdUpdate(ctx context.Context, req *user.ReqD
 	empty = new(emptypb.Empty)
 	return
 }
+
+func (service *UserService) UserDaoAll(ctx context.Context, empty *emptypb.Empty) (resp *user.RspUserDaoAll, err error) {
+	var ids []string
+	if ids, err = query.GetAll(); err != nil {
+		return
+	}
+	resp = &user.RspUserDaoAll{AccountIds: ids}
+	return
+}

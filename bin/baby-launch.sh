@@ -36,6 +36,18 @@ cd $CMD/space
 exec -a baby-space ./space &
 cd $DIR
 
+cd $CMD/imDao
+exec -a baby-im-dao ./imDao &
+cd $DIR
+
+cd $CMD/im
+exec -a baby-im ./im &
+cd $DIR
+
+cd $CMD/connect
+exec -a baby-connect ./connect &
+cd $DIR
+
 trap cleanup EXIT
 
 while : ; do sleep 1 ; done

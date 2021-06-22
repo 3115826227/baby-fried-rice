@@ -12,13 +12,13 @@ const (
 	DefaultExpiration = 3 * time.Hour
 )
 
-type RedisCache struct {
+type redisCache struct {
 	lc  log.Logging
 	rds *redis.Client
 }
 
 var (
-	rc *RedisCache
+	rc *redisCache
 )
 
 func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, error) {
@@ -27,7 +27,7 @@ func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, e
 		err = errors.Wrap(err, "failed to new redis")
 		return nil, err
 	}
-	rc = &RedisCache{
+	rc = &redisCache{
 		lc:  lc,
 		rds: rds,
 	}
@@ -47,26 +47,26 @@ func newRedis(addr, passwd string, db int) (rds *redis.Client, err error) {
 	return
 }
 
-func (c *RedisCache) Add(key string, value string) error {
+func (c *redisCache) Add(key string, value string) error {
 	return c.rds.Set(key, value, DefaultExpiration).Err()
 }
 
-func (c *RedisCache) Get(key string) (string, error) {
+func (c *redisCache) Get(key string) (string, error) {
 	return c.rds.Get(key).Result()
 }
 
-func (c *RedisCache) Del(key string) error {
+func (c *redisCache) Del(key string) error {
 	return c.rds.Del(key).Err()
 }
 
-func (c *RedisCache) HSet(key, field string, value interface{}) error {
+func (c *redisCache) HSet(key, field string, value interface{}) error {
 	return c.rds.HSet(key, field, value).Err()
 }
 
-func (c *RedisCache) HGet(key, field string) (string, error) {
+func (c *redisCache) HGet(key, field string) (string, error) {
 	return c.rds.HGet(key, field).Result()
 }
 
-func (c *RedisCache) HGetAll(key string) (map[string]string, error) {
+func (c *redisCache) HGetAll(key string) (map[string]string, error) {
 	return c.rds.HGetAll(key).Result()
 }

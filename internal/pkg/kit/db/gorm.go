@@ -24,7 +24,7 @@ func NewClientDB(mysqlUrl string, lc log.Logging) (client interfaces.DB, err err
 }
 
 func (client *ClientDB) GetDB() *gorm.DB {
-	return client.db
+	return client.db.Debug()
 }
 
 func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
@@ -37,7 +37,7 @@ func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
 
 // 添加
 func (client *ClientDB) CreateObject(object interfaces.DataObject) (err error) {
-	return client.db.Create(object).Error
+	return client.db.Debug().Create(object).Error
 }
 
 // 删除
@@ -47,7 +47,7 @@ func (client *ClientDB) DeleteObject(object interfaces.DataObject) (err error) {
 
 // 获取结果
 func (client *ClientDB) GetObject(query map[string]interface{}, object interfaces.DataObject) (err error) {
-	template := client.db.Table(object.TableName())
+	template := client.db.Debug().Table(object.TableName())
 	for key, value := range query {
 		template = template.Where(fmt.Sprintf("%v = ?", key), value)
 	}
@@ -79,7 +79,7 @@ func (client *ClientDB) ExistObject(query map[string]interface{}, do interfaces.
 
 func (client *ClientDB) CreateMulti(bean ...interface{}) error {
 	var err error
-	tx := client.db.Begin()
+	tx := client.db.Debug().Begin()
 	defer func() {
 		if err != nil {
 			client.lc.Error("insert beans failed")

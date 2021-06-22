@@ -18,5 +18,3 @@ func (table *OssMeta) TableName() string {
 func (table *OssMeta) Get() interface{} {
 	return *table
 }
-
-

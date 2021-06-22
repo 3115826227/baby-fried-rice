@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
+	"baby-fried-rice/internal/pkg/module/spaceDao/log"
 	"baby-fried-rice/internal/pkg/module/spaceDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/spaceDao/query"
 	"context"
@@ -24,6 +25,7 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 	s.CreatedAt, s.UpdatedAt = now, now
 	s.ID = handle.GenerateSerialNumberByLen(10)
 	if err = db.GetDB().CreateObject(&s); err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
@@ -33,13 +35,14 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 func (service *SpaceService) SpaceDeleteDao(ctx context.Context, req *space.ReqSpaceDeleteDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Where("id = ? and origin = ?",
 		req.Id, req.Origin).Delete(&tables.Space{}).Error; err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
 	return
 }
 
-func SpaceCommentConvert(relations []tables.SpaceCommentRelation, parentId string) (comments []*space.SpaceCommentDao) {
+func SpaceCommentConvert(commentLikedMap map[string]int64, relations []tables.SpaceCommentRelation, parentId string) (comments []*space.SpaceCommentDao) {
 	comments = make([]*space.SpaceCommentDao, 0)
 	for _, rel := range relations {
 		if rel.ParentId != parentId {
@@ -52,7 +55,8 @@ func SpaceCommentConvert(relations []tables.SpaceCommentRelation, parentId strin
 			CommentType: rel.CommentType,
 			Origin:      rel.Origin,
 			CreateTime:  rel.CreatedAt.String(),
-			ReplyList:   SpaceCommentConvert(relations, rel.ID),
+			Liked:       commentLikedMap[rel.ID],
+			ReplyList:   SpaceCommentConvert(commentLikedMap, relations, rel.ID),
 		}
 		comments = append(comments, comment)
 	}
@@ -67,15 +71,25 @@ func (service *SpaceService) SpacesQueryDao(ctx context.Context, req *space.ReqS
 	var querySpaces []*space.SpaceQueryDao
 	for _, s := range spaces {
 		var optRelations []tables.SpaceOperatorRelation
-		var likes = make([]string, 0)
+		var spaceLikes = make([]string, 0)
 		if optRelations, err = query.SpaceOptQuery(s.ID); err != nil {
+			log.Logger.Error(err.Error())
 			return
 		}
+		var commentLikedMap = make(map[string]int64, 0)
 		for _, rel := range optRelations {
-			likes = append(likes, rel.Origin)
+			if rel.OperatorObject == 1 {
+				spaceLikes = append(spaceLikes, rel.Origin)
+			} else {
+				if _, exist := commentLikedMap[rel.OperatorId]; !exist {
+					commentLikedMap[rel.OperatorId] = 0
+				}
+				commentLikedMap[rel.OperatorId]++
+			}
 		}
 		var commentRelations []tables.SpaceCommentRelation
 		if commentRelations, err = query.SpaceCommentQuery(s.ID); err != nil {
+			log.Logger.Error(err.Error())
 			return
 		}
 		var querySpace = &space.SpaceQueryDao{
@@ -87,9 +101,9 @@ func (service *SpaceService) SpacesQueryDao(ctx context.Context, req *space.ReqS
 			Other: &space.SpaceOtherDao{
 				Id:        s.ID,
 				Liked:     int64(len(optRelations)),
-				Likes:     likes,
+				Likes:     spaceLikes,
 				Commented: int64(len(commentRelations)),
-				Comments:  SpaceCommentConvert(commentRelations, ""),
+				Comments:  SpaceCommentConvert(commentLikedMap, commentRelations, ""),
 			},
 		}
 		querySpaces = append(querySpaces, querySpace)
@@ -103,16 +117,29 @@ func (service *SpaceService) SpacesQueryDao(ctx context.Context, req *space.ReqS
 }
 
 func (service *SpaceService) SpaceOptAddDao(ctx context.Context, req *space.ReqSpaceOptAddDao) (empty *emptypb.Empty, err error) {
-	var s = tables.SpaceOperatorRelation{
-		Origin:         req.Origin,
-		OperatorObject: req.OperatorObject,
-		OperatorType:   req.OperatorType,
-		SpaceId:        req.SpaceId,
-	}
-	s.CreatedAt = time.Now()
-	s.OperatorId = handle.GenerateSerialNumberByLen(10)
-	if err = db.GetDB().CreateObject(&s); err != nil {
+	var exist bool
+	if exist, err = db.GetDB().ExistObject(map[string]interface{}{
+		"operator_id":   req.OperatorId,
+		"origin":        req.Origin,
+		"operator_type": req.OperatorType,
+	}, &tables.SpaceOperatorRelation{}); err != nil {
+		log.Logger.Error(err.Error())
 		return
+	}
+	if !exist {
+		var s = tables.SpaceOperatorRelation{
+			OperatorId:     req.OperatorId,
+			Origin:         req.Origin,
+			OperatorObject: req.OperatorObject,
+			OperatorType:   req.OperatorType,
+			SpaceId:        req.SpaceId,
+		}
+		s.CreatedAt = time.Now()
+		s.OperatorId = handle.GenerateSerialNumberByLen(10)
+		if err = db.GetDB().CreateObject(&s); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	empty = new(emptypb.Empty)
 	return
@@ -121,6 +148,7 @@ func (service *SpaceService) SpaceOptAddDao(ctx context.Context, req *space.ReqS
 func (service *SpaceService) SpaceOptCancelDao(ctx context.Context, req *space.ReqSpaceOptCancelDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Where("operator_id = ? and space_id = ? and origin = ?",
 		req.OperatorId, req.SpaceId, req.Origin).Delete(&tables.SpaceOperatorRelation{}).Error; err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
@@ -138,6 +166,7 @@ func (service *SpaceService) SpaceCommentAddDao(ctx context.Context, req *space.
 	s.CreatedAt = time.Now()
 	s.ID = handle.GenerateSerialNumberByLen(10)
 	if err = db.GetDB().CreateObject(&s); err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
@@ -147,6 +176,7 @@ func (service *SpaceService) SpaceCommentAddDao(ctx context.Context, req *space.
 func (service *SpaceService) SpaceCommentDeleteDao(ctx context.Context, req *space.ReqSpaceCommentDeleteDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Where("id = ? and space_id = ? and origin = ?",
 		req.Id, req.SpaceId, req.Origin).Delete(&tables.SpaceCommentRelation{}).Error; err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)

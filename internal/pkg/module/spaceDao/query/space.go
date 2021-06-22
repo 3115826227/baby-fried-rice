@@ -23,7 +23,7 @@ func SpaceOptQuery(spaceId string) (relations []tables.SpaceOperatorRelation, er
 	return
 }
 
-func SpaceCommentQuery(spaceId string) (relations []tables.SpaceCommentRelation, err error)  {
+func SpaceCommentQuery(spaceId string) (relations []tables.SpaceCommentRelation, err error) {
 	if err = db.GetDB().GetDB().Where("space_id = ?", spaceId).Find(&relations).Error; err != nil {
 		return
 	}

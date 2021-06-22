@@ -54,3 +54,14 @@ func GetUsers(ids []string) (details []tables.AccountUserDetail, err error) {
 	}
 	return
 }
+
+func GetAll() (ids []string, err error) {
+	var users []tables.AccountUserDetail
+	if err = db.GetDB().GetDB().Select("account_id").Find(&users).Error; err != nil {
+		return
+	}
+	for _, user := range users {
+		ids = append(ids, user.AccountID)
+	}
+	return
+}

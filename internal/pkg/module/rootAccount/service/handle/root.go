@@ -82,11 +82,11 @@ func RootLogin(c *gin.Context) {
 
 	go func() {
 		var userMeta = &handle.UserMeta{
-			UserId:   resp.Data.ID,
-			Platform: "pc",
+			AccountId: resp.Data.ID,
+			Platform:  "pc",
 		}
 		cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString())
-		cache.GetCache().Add(userMeta.UserId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token))
+		cache.GetCache().Add(userMeta.AccountId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token))
 	}()
 
 	c.JSON(http.StatusOK, result)
@@ -94,7 +94,7 @@ func RootLogin(c *gin.Context) {
 
 func RootLogout(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	token, err := cache.GetCache().Get(userMeta.UserId)
+	token, err := cache.GetCache().Get(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -102,7 +102,7 @@ func RootLogout(c *gin.Context) {
 	}
 	go func() {
 		cache.GetCache().Del(token)
-		cache.GetCache().Del(userMeta.UserId)
+		cache.GetCache().Del(userMeta.AccountId)
 	}()
 
 	handle.SuccessResp(c, "", handle.RspOkResponse{})

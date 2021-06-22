@@ -8,18 +8,18 @@ import (
 )
 
 func AddUserDetail(detail tables.AccountUserDetail) (err error) {
-	key := fmt.Sprintf("%v:%v", constant.AccountUserIDPrefix, detail.AccountID)
-	detailBytes, err := json.Marshal(detail)
-	if err != nil {
+	var key = fmt.Sprintf("%v:%v", constant.AccountUserIDPrefix, detail.AccountID)
+	var detailBytes []byte
+	if detailBytes, err = json.Marshal(detail); err != nil {
 		return
 	}
 	return GetCache().Add(key, string(detailBytes))
 }
 
 func GetUserDetail(accountId string) (detail tables.AccountUserDetail, err error) {
-	key := fmt.Sprintf("%v:%v", constant.AccountUserIDPrefix, accountId)
-	detailStr, err := GetCache().Get(key)
-	if err != nil {
+	var key = fmt.Sprintf("%v:%v", constant.AccountUserIDPrefix, accountId)
+	var detailStr string
+	if detailStr, err = GetCache().Get(key); err != nil {
 		return
 	}
 	err = json.Unmarshal([]byte(detailStr), &detail)

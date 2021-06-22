@@ -12,6 +12,7 @@ type ReqQuerySpaces struct {
 }
 
 type ReqAddSpaceOpt struct {
+	OperatorId     string `json:"operator_id"`
 	SpaceId        string `json:"space_id"`
 	OperatorObject int32  `json:"operator_object"`
 	OperatorType   int32  `json:"operator_type"`

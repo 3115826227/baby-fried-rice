@@ -10,19 +10,19 @@ import (
 )
 
 func CheckToken(c *gin.Context) {
-	token := c.GetHeader(handle.HeaderToken)
+	var token = c.GetHeader(handle.HeaderToken)
 
 	if token == "" {
 		token = c.Query(handle.HeaderToken)
-		if token == "" {
-			handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
-			c.Abort()
-			return
-		}
+	}
+	if token == "" {
+		handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
+		c.Abort()
+		return
 	}
 
-	tokenKey := fmt.Sprintf("%v:%v", handle.TokenPrefix, token)
-	str, err := cache.GetCache().Get(tokenKey)
+	var tokenKey = fmt.Sprintf("%v:%v", handle.TokenPrefix, token)
+	var str, err = cache.GetCache().Get(tokenKey)
 	if err != nil {
 		handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
 		c.Abort()
@@ -35,7 +35,7 @@ func CheckToken(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	header := c.Request.Header
+	var header = c.Request.Header
 	header.Set(handle.HeaderAccountId, userMeta.AccountId)
 	header.Set(handle.HeaderUsername, userMeta.Username)
 	header.Set(handle.HeaderSchoolId, userMeta.SchoolId)

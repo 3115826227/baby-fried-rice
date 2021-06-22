@@ -1,8 +1,10 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/log"
+	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/space/config"
 	"baby-fried-rice/internal/pkg/module/space/server"
 	"crypto/x509"
@@ -56,4 +58,22 @@ func initClient(serverName, addr string) (err error) {
 	client := &Client{c: c}
 	clientMp[serverName][addr] = client
 	return nil
+}
+
+func GetSpaceClient() (space.DaoSpaceClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return space.NewDaoSpaceClient(cli.GetRpcClient()), nil
+}
+
+func GetUserClient() (user.DaoUserClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return user.NewDaoUserClient(cli.GetRpcClient()), nil
 }

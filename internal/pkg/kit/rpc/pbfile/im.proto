@@ -1,0 +1,234 @@
+// proto 文件版本
+syntax = "proto3";
+import "common.proto";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package im;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/im";  // 声明生成的 go 文件所属的包
+
+service DaoIm {
+  // 创建会话
+  rpc SessionAddDao (ReqSessionAddDao) returns (google.protobuf.Empty);
+  // 更新会话信息
+  rpc SessionUpdateDao (ReqSessionUpdateDao) returns (google.protobuf.Empty);
+  // 查询会话列表
+  rpc SessionQueryDao (ReqSessionQueryDao) returns (RspSessionQueryDao);
+  // 查询会话详细信息
+  rpc SessionDetailQueryDao (ReqSessionDetailQueryDao) returns (RspSessionDetailQueryDao);
+  // 加入会话
+  rpc SessionJoinDao (ReqSessionJoinDao) returns (google.protobuf.Empty);
+  // 离开会话
+  rpc SessionLeaveDao (ReqSessionLeaveDao) returns (google.protobuf.Empty);
+  // 删除会话
+  rpc SessionDeleteDao (ReqSessionDeleteDao) returns (google.protobuf.Empty);
+  // 会话消息添加
+  rpc SessionMessageAddDao (ReqSessionMessageAddDao) returns (google.protobuf.Empty);
+  // 会话消息查询
+  rpc SessionMessageQueryDao (ReqSessionMessageQueryDao) returns (RspSessionMessageQueryDao);
+  // 会话消息读取状态更新
+  rpc SessionMessageReadStatusUpdateDao (ReqSessionMessageReadStatusUpdateDao) returns (google.protobuf.Empty);
+  // 会话消息删除
+  rpc SessionMessageDeleteDao (ReqSessionMessageDeleteDao) returns (google.protobuf.Empty);
+  // 会话消息清空
+  rpc SessionMessageFlushDao (ReqSessionMessageFlushDao) returns (google.protobuf.Empty);
+}
+
+//会话类型
+enum SessionType
+{
+  // 双人会话
+  DoubleSession = 0;
+  // 多人讨论组会话
+  MultiSession = 1;
+  // 群会话
+  GroupSession = 2;
+  // 官方群会话
+  OfficialSession = 3;
+}
+
+// 会话创建
+message ReqSessionAddDao {
+  // 会话类型
+  SessionType sessionType = 1;
+  // 会话加入限制
+  SessionJoinPermissionType joinPermissionType = 2;
+  // 会话名称
+  string name = 3;
+  // 会话创建者
+  string origin = 4;
+  // 会话加入人员
+  repeated string joins = 5;
+}
+
+message ReqSessionUpdateDao {
+  int64 sessionId = 1;
+  // 会话类型
+  SessionType sessionType = 2;
+  // 会话加入限制
+  SessionJoinPermissionType joinPermissionType = 3;
+  // 会话名称
+  string name = 4;
+  // 操作者
+  string accountId = 5;
+}
+
+// 会话查询
+message ReqSessionQueryDao {
+  common.CommonSearchRequest commonSearchReq = 1;
+  // 会话id
+  int64 sessionId = 2;
+  // 会话类型
+  SessionType sessionType = 3;
+  // 创建者
+  string origin = 4;
+  // 查询者
+  string accountId = 5;
+  // 按照最新消息时间排序
+  bool latestMessageTimeOrderBy = 6;
+}
+
+message RspSessionQueryDao {
+  repeated SessionQueryDao sessions = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+// 会话信息
+message SessionQueryDao {
+  // 会话id
+  int64 sessionId = 1;
+  // 会话类型
+  SessionType sessionType = 2;
+  // 会话创建者
+  string origin = 3;
+  // 会话名
+  string name = 4;
+  // 未读消息数
+  int64 unread = 5;
+  // 最近一条消息内容
+  SessionMessageDao latest = 6;
+  // 会话创建时间
+  string createTime = 7;
+  // 会话加入人员
+  repeated string joins = 8;
+}
+
+// 查询会话详情
+message ReqSessionDetailQueryDao {
+  int64 sessionId = 1;
+  string account_id = 2;
+}
+
+// 会话加入权限
+enum SessionJoinPermissionType
+{
+  // 无限制
+  NoneLimit = 0;
+  // 邀请加入
+  InviteJoin = 1;
+  // 创建者审核
+  OriginAudit = 2;
+  // 管理员审核
+  AdminAudit = 3;
+}
+
+message RspSessionDetailQueryDao {
+  SessionQueryDao session = 1;
+  // 会话加入权限
+  SessionJoinPermissionType joinPermissionType = 3;
+}
+
+// 加入会话
+message ReqSessionJoinDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+}
+
+// 离开会话
+message ReqSessionLeaveDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+}
+
+// 删除会话(解散会话)
+message ReqSessionDeleteDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+}
+
+// 会话消息类型
+enum  SessionMessageType
+{
+  TextMessage = 0;
+  FileMessage = 1;
+  ImgMessage = 2;
+}
+
+// 会话消息
+message SessionMessageDao {
+  // 会话id
+  int64 sessionId = 1;
+  // 消息id
+  int64 messageId = 2;
+  // 消息类型
+  SessionMessageType messageType = 3;
+  // 消息发送者
+  string send = 4;
+  // 消息接收者
+  string receive = 5;
+  // 消息内容
+  bytes Content = 6;
+  // 创建时间
+  int64 sendTimestamp = 7;
+  // 读取状态 0-未读 1-已读
+  bool readStatus = 8;
+}
+
+// 会话消息添加
+message ReqSessionMessageAddDao {
+  // 消息类型
+  SessionMessageType messageType = 2;
+  // 消息发送者
+  string send = 3;
+  // 会话id
+  int64 sessionId = 4;
+  // 消息内容
+  bytes Content = 5;
+  // 发送时间
+  int64 sendTimestamp = 6;
+}
+
+// 会话消息查询
+message ReqSessionMessageQueryDao {
+  int64 page = 1;
+  int64 pageSize = 2;
+  int64 sessionId = 3;
+  string date = 4;
+  string accountId = 5;
+}
+
+message RspSessionMessageQueryDao {
+  repeated SessionMessageDao messages = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+// 会话消息读取状态更新
+message ReqSessionMessageReadStatusUpdateDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+  repeated int64 messageIds = 3;
+}
+
+// 会话消息删除
+message ReqSessionMessageDeleteDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+  repeated int64 messageIds = 3;
+}
+
+// 清空会话消息
+message ReqSessionMessageFlushDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+}

@@ -3,9 +3,11 @@ package handle
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/interfaces"
+	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
-	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/mq/nsq"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/common"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
@@ -14,19 +16,34 @@ import (
 	"baby-fried-rice/internal/pkg/module/space/log"
 	"context"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
+	"time"
 )
 
+var (
+	mq    interfaces.MQ
+	topic string
+)
+
+func Init() {
+	conf := config.GetConfig()
+	topic = conf.NSQ.Topic
+	mq = nsq.InitNSQMQ(conf.NSQ.Addr)
+	if err := mq.NewProducer(); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+}
+
 func SpaceAddHandle(c *gin.Context) {
-	var err error
 	var req requests.ReqAddSpace
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	client, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -38,28 +55,60 @@ func SpaceAddHandle(c *gin.Context) {
 		Content:     req.Content,
 		VisitorType: int32(req.VisitorType),
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceAddDao(context.Background(), reqSpace)
+	_, err = client.SpaceAddDao(context.Background(), reqSpace)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	go func() {
+		var userClient user.DaoUserClient
+		userClient, err = grpc.GetUserClient()
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		var detailResp *user.RspDaoUserDetail
+		detailResp, err = userClient.UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: userMeta.AccountId})
+		var userResp *user.RspUserDaoAll
+		userResp, err = userClient.UserDaoAll(context.Background(), &emptypb.Empty{})
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		for _, id := range userResp.AccountIds {
+			var notify = models.WSMessageNotify{
+				WSMessageNotifyType: constant.SpaceMessageNotify,
+				Receive:             id,
+				WSMessage: models.WSMessage{
+					Send: models.UserBaseInfo{
+						AccountId:  detailResp.Detail.AccountId,
+						Username:   detailResp.Detail.Username,
+						HeadImgUrl: detailResp.Detail.HeadImgUrl,
+					},
+				},
+				Timestamp: time.Now().Unix(),
+			}
+			if err = mq.Send(topic, notify.ToString()); err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
+		}
+	}()
 	handle.SuccessResp(c, "", nil)
 }
 
-func SpaceCommentConvert(comment *space.SpaceCommentDao, accountClient *rpc.ClientGRPC) (resp rsp.SpaceCommentResp, err error) {
+func SpaceCommentConvert(comment *space.SpaceCommentDao, userClient user.DaoUserClient) (resp rsp.SpaceCommentResp, err error) {
 	var comments = make([]rsp.SpaceCommentResp, 0)
 	for _, reply := range comment.ReplyList {
 		var cmt rsp.SpaceCommentResp
-		if cmt, err = SpaceCommentConvert(reply, accountClient); err != nil {
+		if cmt, err = SpaceCommentConvert(reply, userClient); err != nil {
 			return
 		}
 		comments = append(comments, cmt)
 	}
 	var userResp *user.RspUserDaoById
-	userResp, err = user.NewDaoUserClient(accountClient.GetRpcClient()).
-		UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{comment.Origin}})
+	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{comment.Origin}})
 	if err != nil {
 		return
 	}
@@ -69,6 +118,7 @@ func SpaceCommentConvert(comment *space.SpaceCommentDao, accountClient *rpc.Clie
 		Comment:     comment.Content,
 		CommentType: comment.CommentType,
 		CreateTime:  comment.CreateTime,
+		Liked:       comment.Liked,
 		Reply:       comments,
 	}
 	if len(userResp.Users) == 1 {
@@ -90,9 +140,8 @@ func SpacesQueryHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	var client *rpc.ClientGRPC
-	var accountClient *rpc.ClientGRPC
-	client, err = grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	var spaceClient space.DaoSpaceClient
+	spaceClient, err = grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -103,35 +152,50 @@ func SpacesQueryHandle(c *gin.Context) {
 		PageSize: req.PageSize,
 	}
 	var resp *space.RspSpacesQueryDao
-	resp, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpacesQueryDao(context.Background(), &space.ReqSpacesQueryDao{CommonSearchReq: searchReq})
+	resp, err = spaceClient.SpacesQueryDao(context.Background(),
+		&space.ReqSpacesQueryDao{CommonSearchReq: searchReq})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	if accountClient, err = grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer); err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
+
 	list := make([]rsp.SpaceResp, 0)
 	for _, s := range resp.Spaces {
-		var sp = rsp.SpaceResp{
-			Id:          s.Id,
-			Content:     s.Content,
-			VisitorType: constant.SpaceVisitorType(s.VisitorType),
-			Origin:      s.Origin,
-			CreateTime:  s.CreateTime,
-		}
 		var userResp *user.RspUserDaoById
-		userResp, err = user.NewDaoUserClient(accountClient.GetRpcClient()).
-			UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: s.Other.Likes})
+		var ids = append(s.Other.Likes, s.Origin)
+		var userClient user.DaoUserClient
+		userClient, err = grpc.GetUserClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
 			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 			return
 		}
+		userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
+		if err != nil {
+			log.Logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			return
+		}
+		// 获取发布者用户名信息
+		var originUser rsp.User
+		for _, u := range userResp.Users {
+			if s.Origin == u.Id {
+				originUser = rsp.User{
+					AccountID: u.Id,
+					Username:  u.Username,
+				}
+				break
+			}
+		}
+		var sp = rsp.SpaceResp{
+			Id:          s.Id,
+			Content:     s.Content,
+			VisitorType: constant.SpaceVisitorType(s.VisitorType),
+			Origin:      originUser,
+			CreateTime:  s.CreateTime,
+		}
+
 		var likes = make([]rsp.User, 0)
 		for _, u := range userResp.Users {
 			likes = append(likes, rsp.User{
@@ -148,7 +212,7 @@ func SpacesQueryHandle(c *gin.Context) {
 		var comments = make([]rsp.SpaceCommentResp, 0)
 		for _, cmt := range s.Other.Comments {
 			var comment rsp.SpaceCommentResp
-			if comment, err = SpaceCommentConvert(cmt, accountClient); err != nil {
+			if comment, err = SpaceCommentConvert(cmt, userClient); err != nil {
 				log.Logger.Error(err.Error())
 				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 				return
@@ -168,14 +232,13 @@ func SpacesQueryHandle(c *gin.Context) {
 
 func SpaceDeleteHandle(c *gin.Context) {
 	id := c.Query("id")
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	spaceClient, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceDeleteDao(context.Background(), &space.ReqSpaceDeleteDao{Id: id})
+	_, err = spaceClient.SpaceDeleteDao(context.Background(), &space.ReqSpaceDeleteDao{Id: id})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -185,15 +248,13 @@ func SpaceDeleteHandle(c *gin.Context) {
 }
 
 func SpaceOptAddHandle(c *gin.Context) {
-	var err error
 	var req requests.ReqAddSpaceOpt
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	spaceClient, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -201,13 +262,13 @@ func SpaceOptAddHandle(c *gin.Context) {
 	}
 	userMeta := handle.GetUserMeta(c)
 	var reqSpaceOpt = &space.ReqSpaceOptAddDao{
+		OperatorId:     req.OperatorId,
 		SpaceId:        req.SpaceId,
 		OperatorObject: req.OperatorObject,
 		OperatorType:   req.OperatorType,
 		Origin:         userMeta.AccountId,
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceOptAddDao(context.Background(), reqSpaceOpt)
+	_, err = spaceClient.SpaceOptAddDao(context.Background(), reqSpaceOpt)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -216,15 +277,11 @@ func SpaceOptAddHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
-func SpaceOptQueryHandle(c *gin.Context) {
-
-}
-
 func SpaceOptCancelHandle(c *gin.Context) {
 	spaceId := c.Query("space_id")
 	operatorId := c.Query("operator_id")
 	userMeta := handle.GetUserMeta(c)
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	spaceClient, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -235,8 +292,7 @@ func SpaceOptCancelHandle(c *gin.Context) {
 		OperatorId: operatorId,
 		Origin:     userMeta.AccountId,
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceOptCancelDao(context.Background(), reqSpaceOpt)
+	_, err = spaceClient.SpaceOptCancelDao(context.Background(), reqSpaceOpt)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -246,15 +302,13 @@ func SpaceOptCancelHandle(c *gin.Context) {
 }
 
 func SpaceCommentAddHandle(c *gin.Context) {
-	var err error
 	var req requests.ReqAddSpaceComment
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	spaceClient, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -268,8 +322,7 @@ func SpaceCommentAddHandle(c *gin.Context) {
 		CommentType: req.CommentType,
 		Origin:      userMeta.AccountId,
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceCommentAddDao(context.Background(), reqSpaceComment)
+	_, err = spaceClient.SpaceCommentAddDao(context.Background(), reqSpaceComment)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -282,7 +335,7 @@ func SpaceCommentDeleteHandle(c *gin.Context) {
 	id := c.Query("id")
 	spaceId := c.Query("space_id")
 	userMeta := handle.GetUserMeta(c)
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	spaceClient, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -293,8 +346,7 @@ func SpaceCommentDeleteHandle(c *gin.Context) {
 		SpaceId: spaceId,
 		Origin:  userMeta.AccountId,
 	}
-	_, err = space.NewDaoSpaceClient(client.GetRpcClient()).
-		SpaceCommentDeleteDao(context.Background(), req)
+	_, err = spaceClient.SpaceCommentDeleteDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)

@@ -7,6 +7,7 @@ import (
 )
 
 func Register(engine *gin.Engine) {
+	handle.Init()
 	app := engine.Group("/api/space", middleware.SetUserMeta())
 	app.GET("/space", handle.SpacesQueryHandle)
 	app.POST("/space", handle.SpaceAddHandle)

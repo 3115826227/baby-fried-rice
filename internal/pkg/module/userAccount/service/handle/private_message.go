@@ -48,6 +48,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 }
 
 func PrivateMessagesHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
 	sendId := c.Query("send_id")
 	pageReq, err := handle.PageHandle(c)
 	if err != nil {
@@ -62,9 +63,10 @@ func PrivateMessagesHandle(c *gin.Context) {
 		return
 	}
 	reqQuery := privatemessage.ReqPrivateMessageQueryDao{
-		Page:     pageReq.Page,
-		PageSize: pageReq.PageSize,
-		SendId:   sendId,
+		Page:      pageReq.Page,
+		PageSize:  pageReq.PageSize,
+		SendId:    sendId,
+		AccountId: userMeta.AccountId,
 	}
 	var resp *privatemessage.RspPrivateMessageQueryDao
 	resp, err = privatemessage.NewDaoPrivateMessageClient(client.GetRpcClient()).

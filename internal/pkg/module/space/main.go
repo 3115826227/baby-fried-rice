@@ -1,6 +1,7 @@
 package space
 
 import (
+	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/space/config"
@@ -31,7 +32,8 @@ func init() {
 	//}
 	//log.Logger.Info("cache init successful")
 	// 初始化注册中心
-	if err := server.InitRegisterServer(conf.Etcd, log.Logger); err != nil {
+	srv := etcd.NewServerETCD(conf.Etcd, log.Logger)
+	if err := srv.Connect(); err != nil {
 		panic(err)
 	}
 	log.Logger.Info("register server init successful")
@@ -41,13 +43,13 @@ func init() {
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}
-	if err := server.GetRegisterServer().Register(serverInfo); err != nil {
+	if err := srv.Register(serverInfo); err != nil {
 		panic(err)
 	}
 	log.Logger.Info("server register successful")
 	errChan = make(chan error, 1)
 	// 开启后台协程向注册中心发送心跳机制
-	go server.GetRegisterServer().HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
+	go srv.HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
 	if err := server.InitRegisterClient(conf.Etcd); err != nil {
 		panic(err)
 	}

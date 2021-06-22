@@ -13,7 +13,9 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/gorilla/websocket v1.4.2
 	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/nsqio/go-nsq v1.0.8
 	github.com/onsi/ginkgo v1.15.1 // indirect
 	github.com/onsi/gomega v1.11.0 // indirect
 	github.com/pkg/errors v0.8.1
@@ -24,6 +26,7 @@ require (
 	google.golang.org/grpc v1.27.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/gorm v1.21.3
 )

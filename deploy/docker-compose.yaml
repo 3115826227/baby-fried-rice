@@ -52,6 +52,31 @@ services:
       - "s1=http://0.0.0.0:2380"
       - "--initial-cluster-state"
       - "new"
+  nsqlookupd:
+    image: nsqio/nsq
+    container_name: nsqlookupd
+    restart: always
+    ports:
+      - 4160:4160
+      - 4161:4161
+    command: /nsqlookupd
+  nsqadmin:
+    image: nsqio/nsq
+    container_name: nsqadmin
+    restart: always
+    ports:
+      - 4171:4171
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+  nsqd:
+    image: nsqio/nsq
+    container_name: nsqd
+    restart: always
+    ports:
+      - 4150:4150
+      - 4151:4151
+    volumes:
+      - "./data/nsq:/usr/local/nsq/bin/data"
+    command: /nsqd --broadcast-address=172.16.29.129 --lookupd-tcp-address=nsqlookupd:4160
   baby-gateway:
     image: baby-gateway
     container_name: baby-gateway
@@ -78,4 +103,31 @@ services:
     volumes:
       - "./cmd/userAccount/res:/go/src/baby-fried-rice/module/userAccount/res"
       - "./cmd/userAccount/logs:/baby/logs"
+    restart: always
+  baby-space-dao:
+    image: baby-space-dao
+    container_name: baby-space-dao
+    ports:
+      - "18062:8080"
+    volumes:
+      - "./cmd/spaceDao/res:/go/src/baby-fried-rice/module/spaceDao/res"
+      - "./cmd/spaceDao/logs:/baby/logs"
+    restart: always
+  baby-space:
+    image: baby-space
+    container_name: baby-space
+    ports:
+      - "18074:8080"
+    volumes:
+      - "./cmd/space/res:/go/src/baby-fried-rice/module/space/res"
+      - "./cmd/space/logs:/baby/logs"
+    restart: always
+  baby-connect:
+    image: baby-connect
+    container_name: baby-connect
+    ports:
+      - "18075:8080"
+    volumes:
+      - "./cmd/connect/res:/go/src/baby-fried-rice/module/connect/res"
+      - "./cmd/connect/logs:/baby/logs"
     restart: always

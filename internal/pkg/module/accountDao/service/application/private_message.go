@@ -40,6 +40,7 @@ func (service *PrivateMessageService) PrivateMessageStatusUpdateDao(ctx context.
 
 func (service *PrivateMessageService) PrivateMessageQueryDao(ctx context.Context, req *privatemessage.ReqPrivateMessageQueryDao) (resp *privatemessage.RspPrivateMessageQueryDao, err error) {
 	var pms = requests.UserPrivateMessagesReq{
+		AccountId:     req.AccountId,
 		SendId:        req.SendId,
 		PageCommonReq: requests.PageCommonReq{},
 	}

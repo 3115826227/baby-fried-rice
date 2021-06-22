@@ -82,21 +82,23 @@ message SpaceOtherDao {
 
 // 空间动态操作添加
 message ReqSpaceOptAddDao {
+  // 空间动态或者评论操作id
+  string operatorId = 1;
   // 空间动态id
-  string spaceId = 1;
+  string spaceId = 2;
   // 空间动态操作对象
-  int32 operatorObject = 2;
+  int32 operatorObject = 3;
   // 空间动态操作类型
-  int32 operatorType = 3;
+  int32 operatorType = 4;
   // 操作者
-  string origin = 4;
+  string origin = 5;
 }
 
 // 空间动态操作取消
 message ReqSpaceOptCancelDao {
   // 空间动态id
   string spaceId = 1;
-  // 空间动态操作id
+  // 空间动态或者评论操作id
   string operatorId = 2;
   // 操作者
   string origin = 3;
@@ -129,7 +131,9 @@ message SpaceCommentDao {
   // 评论者
   string origin = 5;
   // 评论时间
-  string createTime = 7;
+  string createTime = 6;
+  // 点赞人数
+  int64 liked = 7;
   // 回复列表
   repeated SpaceCommentDao replyList = 8;
 }

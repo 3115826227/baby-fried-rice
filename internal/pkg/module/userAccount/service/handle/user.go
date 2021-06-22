@@ -4,12 +4,12 @@ import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
+	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/cache"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
-	"baby-fried-rice/internal/pkg/module/userAccount/service/model"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -18,10 +18,10 @@ import (
 	"time"
 )
 
+// 用户登录
 func UserLoginHandle(c *gin.Context) {
-	var err error
 	var req requests.PasswordLoginReq
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
@@ -29,43 +29,40 @@ func UserLoginHandle(c *gin.Context) {
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
 	req.Ip = c.GetHeader(handle.HeaderIP)
-
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
 	var reqLogin = &user.ReqPasswordLogin{
 		LoginName: req.LoginName,
 		Password:  req.Password,
 		Ip:        req.Ip,
 	}
-	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoLogin(context.Background(), reqLogin)
+	userClient, err := grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var resp *user.RspDaoUserLogin
+	resp, err = userClient.UserDaoLogin(context.Background(), reqLogin)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 
-	token, err := handle.GenerateToken(resp.User.AccountId, time.Now(), config.GetConfig().TokenSecret)
+	var token string
+	token, err = handle.GenerateToken(resp.User.AccountId, time.Now(), config.GetConfig().TokenSecret)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 
-	var result = model.RspLogin{
-		RspSuccess: handle.RspSuccess{Code: handle.SuccessCode},
-		Data: model.LoginResult{
-			UserInfo: model.RspUserData{
-				UserId:    resp.User.AccountId,
-				LoginName: resp.User.LoginName,
-				Username:  resp.User.Username,
-			},
-			Token: token,
+	var loginResult = rsp.LoginResult{
+		UserInfo: rsp.UserDataResp{
+			UserId:    resp.User.AccountId,
+			LoginName: resp.User.LoginName,
+			Username:  resp.User.Username,
 		},
+		Token: token,
 	}
 
 	go func() {
@@ -73,17 +70,21 @@ func UserLoginHandle(c *gin.Context) {
 			AccountId: resp.User.AccountId,
 			Platform:  "pc",
 		}
-		cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString())
-		cache.GetCache().Add(userMeta.AccountId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token))
+		if err = cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString()); err != nil {
+			log.Logger.Error(err.Error())
+		}
+		if err = cache.GetCache().Add(userMeta.AccountId, fmt.Sprintf("%v:%v", constant.TokenPrefix, token)); err != nil {
+			log.Logger.Error(err.Error())
+		}
 	}()
 
-	c.JSON(http.StatusOK, result)
+	handle.SuccessResp(c, "", loginResult)
 }
 
+// 用户注册
 func UserRegisterHandle(c *gin.Context) {
-	var err error
 	var req requests.UserRegisterReq
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
@@ -92,7 +93,7 @@ func UserRegisterHandle(c *gin.Context) {
 	req.Password = strings.TrimSpace(req.Password)
 	req.Phone = strings.TrimSpace(req.Phone)
 
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -108,8 +109,7 @@ func UserRegisterHandle(c *gin.Context) {
 		Gender:   req.Gender,
 		Phone:    req.Phone,
 	}
-	_, err = user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoRegister(context.Background(), reqRegister)
+	_, err = userClient.UserDaoRegister(context.Background(), reqRegister)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -118,6 +118,7 @@ func UserRegisterHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// 用户退出登录
 func UserLogoutHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	token, err := cache.GetCache().Get(userMeta.AccountId)
@@ -127,8 +128,12 @@ func UserLogoutHandle(c *gin.Context) {
 		return
 	}
 	go func() {
-		cache.GetCache().Del(token)
-		cache.GetCache().Del(userMeta.AccountId)
+		if err = cache.GetCache().Del(token); err != nil {
+			log.Logger.Error(err.Error())
+		}
+		if err = cache.GetCache().Del(userMeta.AccountId); err != nil {
+			log.Logger.Error(err.Error())
+		}
 	}()
 
 	handle.SuccessResp(c, "", nil)
@@ -137,20 +142,21 @@ func UserLogoutHandle(c *gin.Context) {
 // 查看用户自己信息
 func UserDetailHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: userMeta.AccountId})
+	var resp *user.RspDaoUserDetail
+	resp, err = userClient.UserDaoDetail(context.Background(),
+		&user.ReqDaoUserDetail{AccountId: userMeta.AccountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var detailRsp = model.RspUserDetail{
+	var detailRsp = rsp.UserDetailResp{
 		AccountId:  resp.Detail.AccountId,
 		Describe:   resp.Detail.Describe,
 		HeadImgUrl: resp.Detail.HeadImgUrl,
@@ -163,11 +169,11 @@ func UserDetailHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", detailRsp)
 }
 
+// 用户更新自己信息
 func UserDetailUpdateHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	var err error
 	var req requests.UserDetailUpdateReq
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
@@ -183,14 +189,13 @@ func UserDetailUpdateHandle(c *gin.Context) {
 			Phone:      req.Phone,
 		},
 	}
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	_, err = user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoDetailUpdate(context.Background(), updateReq)
+	_, err = userClient.UserDaoDetailUpdate(context.Background(), updateReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -199,16 +204,16 @@ func UserDetailUpdateHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// 用户更新密码
 func UserPwdUpdateHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	var err error
 	var req requests.UserPwdUpdateReq
-	if err = c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -219,8 +224,7 @@ func UserPwdUpdateHandle(c *gin.Context) {
 		Password:    req.Password,
 		NewPassword: req.NewPassword,
 	}
-	_, err = user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoPwdUpdate(context.Background(), updateReq)
+	_, err = userClient.UserDaoPwdUpdate(context.Background(), updateReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -232,20 +236,21 @@ func UserPwdUpdateHandle(c *gin.Context) {
 // 查看他人用户信息
 func UserQueryHandle(c *gin.Context) {
 	accountId := c.Query("account_id")
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	resp, err := user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: accountId})
+	var resp *user.RspDaoUserDetail
+	resp, err = userClient.UserDaoDetail(context.Background(),
+		&user.ReqDaoUserDetail{AccountId: accountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var detailRsp = model.RspUserDetail{
+	var detailRsp = rsp.UserDetailResp{
 		AccountId:  resp.Detail.AccountId,
 		Describe:   resp.Detail.Describe,
 		HeadImgUrl: resp.Detail.HeadImgUrl,

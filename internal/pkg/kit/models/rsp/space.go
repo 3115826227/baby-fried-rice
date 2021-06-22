@@ -6,7 +6,7 @@ type SpaceResp struct {
 	Id          string                    `json:"id"`
 	Content     string                    `json:"content"`
 	VisitorType constant.SpaceVisitorType `json:"visitor_type"`
-	Origin      string                    `json:"origin"`
+	Origin      User                      `json:"origin"`
 	CreateTime  string                    `json:"create_time"`
 	Other       SpaceOtherResp            `json:"other"`
 }
@@ -32,5 +32,6 @@ type SpaceCommentResp struct {
 	Comment     string             `json:"comment"`
 	CommentType int32              `json:"comment_type"`
 	CreateTime  string             `json:"create_time"`
+	Liked       int64              `json:"liked"`
 	Reply       []SpaceCommentResp `json:"reply"`
 }

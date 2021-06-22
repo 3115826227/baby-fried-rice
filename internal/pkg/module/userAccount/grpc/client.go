@@ -3,6 +3,7 @@ package grpc
 import (
 	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/server"
 	"crypto/x509"
@@ -56,4 +57,13 @@ func initClient(serverName, addr string) (err error) {
 	client := &Client{c: c}
 	clientMp[serverName][addr] = client
 	return nil
+}
+
+func GetUserClient() (user.DaoUserClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return user.NewDaoUserClient(cli.GetRpcClient()), nil
 }

@@ -8,7 +8,10 @@ MICROSERVICES= \
 	cmd/rootAccount/rootAccount \
 	cmd/accountDao/accountDao \
 	cmd/spaceDao/spaceDao \
-	cmd/space/space
+	cmd/space/space \
+	cmd/imDao/imDao \
+	cmd/im/im \
+	cmd/connect/connect
 
 build: $(MICROSERVICES)
 
@@ -32,6 +35,16 @@ cmd/spaceDao/spaceDao:
 
 cmd/space/space:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/space
+
+cmd/imDao/imDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/imDao
+
+cmd/im/im:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/im
+
+cmd/connect/connect:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/connect
+
 
 clean:
 	rm -f $(MICROSERVICES)

@@ -48,6 +48,7 @@ message ReqPrivateMessageQueryDao {
   int32 messageSendType = 4;
   string sendId = 5;
   uint32 status = 6;
+  string accountId = 7;
 }
 
 message RspPrivateMessageQueryDao {

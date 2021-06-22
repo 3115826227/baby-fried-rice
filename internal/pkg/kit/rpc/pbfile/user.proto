@@ -18,6 +18,8 @@ service DaoUser {
   rpc UserDaoPwdUpdate(ReqDaoUserPwdUpdate) returns (google.protobuf.Empty);
   // 根据id查询用户信息
   rpc UserDaoById(ReqUserDaoById) returns (RspUserDaoById);
+  // 获取所有用户id
+  rpc UserDaoAll(google.protobuf.Empty) returns (RspUserDaoAll);
 }
 
 message ReqUserDaoById {
@@ -99,4 +101,9 @@ message ReqDaoUserPwdUpdate {
   string AccountId = 1;
   string password = 2;
   string newPassword = 3;
+}
+
+// 获取所有用户AccountId
+message RspUserDaoAll {
+  repeated string accountIds = 1;
 }
