@@ -1,7 +1,7 @@
 FROM golang:1.15 AS build
 WORKDIR /baby-fried-rice
 COPY . .
-RUN go env -w GOPROXY=https://goproxy.io
+RUN go env -w GO111MODULE=off
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags=jsoniter -o account_dao cmd/accountDao/account_dao.go
 
 FROM alpine:3.8
