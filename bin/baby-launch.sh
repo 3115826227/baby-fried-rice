@@ -48,6 +48,10 @@ cd $CMD/connect
 exec -a baby-connect ./connect &
 cd $DIR
 
+cd $CMD/file
+exec -a baby-file ./file &
+cd $DIR
+
 trap cleanup EXIT
 
 while : ; do sleep 1 ; done

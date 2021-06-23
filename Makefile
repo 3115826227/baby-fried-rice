@@ -11,7 +11,8 @@ MICROSERVICES= \
 	cmd/space/space \
 	cmd/imDao/imDao \
 	cmd/im/im \
-	cmd/connect/connect
+	cmd/connect/connect \
+	cmd/file/file
 
 build: $(MICROSERVICES)
 
@@ -44,6 +45,9 @@ cmd/im/im:
 
 cmd/connect/connect:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/connect
+
+cmd/file/file:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/file
 
 
 clean:
