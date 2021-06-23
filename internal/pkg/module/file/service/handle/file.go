@@ -1,39 +1,45 @@
 package handle
 
 import (
-	"baby-fried-rice/internal/pkg/module/file/config"
+	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models/rsp"
+	"baby-fried-rice/internal/pkg/module/file/db"
 	"baby-fried-rice/internal/pkg/module/file/log"
 	"baby-fried-rice/internal/pkg/module/file/model/tables"
-	"baby-fried-rice/internal/pkg/module/file/query"
-	"context"
+	"baby-fried-rice/internal/pkg/module/file/service/application"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/qiniu/api.v7/v7/auth/qbox"
-	"github.com/qiniu/api.v7/v7/storage"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
+)
+
+const (
+	DefaultFileStorageDay = 3
 )
 
 func FileUploadHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件上传失败"})
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
 
 	var data []byte
 	data, err = ioutil.ReadAll(file)
-	defer file.Close()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件读取失败"})
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	defer file.Close()
+
 	if err = ioutil.WriteFile(header.Filename, data, 0755); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件保存失败"})
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 	defer func() {
@@ -42,56 +48,97 @@ func FileUploadHandle(c *gin.Context) {
 		}
 	}()
 
+	now := time.Now()
+	var localPath = header.Filename
 	var ossMeta tables.OssMeta
-	if ossMeta, err = DataUpOss(header.Size, fmt.Sprintf("./%v", header.Filename), header.Filename); err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "文件上传失败"})
-		return
-	}
-
-	downUrl := fmt.Sprintf("%v/%v", ossMeta.Domain, header.Filename)
-
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "上传成功",
-		"data": gin.H{
-			"name":        header.Filename,
-			"down_url":    downUrl,
-			"size":        header.Size,
-			"upload_time": ossMeta.UpdatedAt,
-			"storage_day": 3,
-		},
-	})
-}
-
-func FileDownHandle(c *gin.Context) {
-
-}
-
-func DataUpOss(size int64, filePath, key string) (ossMeta tables.OssMeta, err error) {
-	ossMeta, err = query.GetOssMeta(config.DefaultOssMetaID)
+	ossMeta, err = application.GetOssManager().UploadFile(header.Filename, localPath)
 	if err != nil {
 		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var putPolicy storage.PutPolicy
-	putPolicy.Scope = ossMeta.Bucket
 
-	mac := qbox.NewMac(ossMeta.AccessKey, ossMeta.SecretKey)
-	upToken := putPolicy.UploadToken(mac)
+	downUrl := fmt.Sprintf("http://%v/%v", ossMeta.Domain, header.Filename)
 
-	cfg := storage.Config{}
-	cfg.UseHTTPS = false
-	cfg.Zone = &storage.ZoneHuadong
-	cfg.UseCdnDomains = false
-
-	formUploader := storage.NewFormUploader(&cfg)
-	ret := storage.PutRet{}
-	putExtra := storage.PutExtra{}
-
-	if err = formUploader.PutFile(context.Background(), &ret, upToken, key, filePath, &putExtra); err != nil {
+	var f = tables.File{
+		Origin:         userMeta.AccountId,
+		PermissionType: 1,
+		FileName:       header.Filename,
+		FileType:       1,
+		FileSize:       header.Size,
+		DownUrl:        downUrl,
+		StorageDay:     DefaultFileStorageDay,
+		Bucket:         ossMeta.Bucket,
+	}
+	f.ID = handle.GenerateSerialNumberByLen(10)
+	f.CreatedAt = now
+	if err = db.GetDB().CreateObject(&f); err != nil {
 		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	return
+
+	var resp = rsp.FileUploadResp{
+		File: rsp.File{
+			ID:         f.ID,
+			Origin:     userMeta.AccountId,
+			Name:       header.Filename,
+			DownUrl:    downUrl,
+			Size:       header.Size,
+			UploadTime: now.Unix(),
+			StorageDay: DefaultFileStorageDay,
+		},
+	}
+	handle.SuccessResp(c, "", resp)
+}
+
+func FileQueryHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	var files = make([]tables.File, 0)
+	if err := db.GetDB().GetDB().Where("origin = ?", userMeta.AccountId).Find(&files).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var list = make([]rsp.File, 0)
+	for _, f := range files {
+		var file = rsp.File{
+			ID:         f.ID,
+			Origin:     f.Origin,
+			Name:       f.FileName,
+			DownUrl:    f.DownUrl,
+			Size:       f.FileSize,
+			UploadTime: f.UpdatedAt.Unix(),
+			StorageDay: f.StorageDay,
+		}
+		list = append(list, file)
+	}
+	var resp = rsp.FileQueryResp{List: list}
+	handle.SuccessResp(c, "", resp)
+}
+
+func FileDeleteHandle(c *gin.Context) {
+	id := c.Query("id")
+	userMeta := handle.GetUserMeta(c)
+	var file tables.File
+	if err := db.GetDB().GetDB().Where("id = ? and origin = ?",
+		id, userMeta.AccountId).First(&file).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	tx := db.GetDB().GetDB().Begin()
+	if err := tx.Where("id = ? and origin = ?", id, userMeta.AccountId).Delete(&tables.File{}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	if err := application.GetOssManager().DeleteFile(file.Bucket, file.FileName); err != nil {
+		tx.Rollback()
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	tx.Commit()
+	handle.SuccessResp(c, "", nil)
 }

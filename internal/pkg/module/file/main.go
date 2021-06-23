@@ -1,14 +1,13 @@
 package file
 
 import (
+	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/kit/middleware"
-	"baby-fried-rice/internal/pkg/module/file/cache"
 	"baby-fried-rice/internal/pkg/module/file/config"
 	"baby-fried-rice/internal/pkg/module/file/db"
 	"baby-fried-rice/internal/pkg/module/file/log"
-	"baby-fried-rice/internal/pkg/module/file/server"
 	"baby-fried-rice/internal/pkg/module/file/service"
+	"baby-fried-rice/internal/pkg/module/file/service/application"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -27,8 +26,8 @@ func init() {
 		panic(err)
 	}
 	log.Logger.Info("log init successful")
-	// 初始化缓存
-	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB, log.Logger); err != nil {
+	// 初始化oss管理
+	if err := application.InitOssManager(); err != nil {
 		panic(err)
 	}
 	// 初始化数据库
@@ -37,30 +36,30 @@ func init() {
 	}
 	log.Logger.Info("cache init successful")
 	// 初始化注册中心
-	if err := server.InitRegisterServer(conf.Etcd); err != nil {
+	srv := etcd.NewServerETCD(conf.Etcd, log.Logger)
+	if err := srv.Connect(); err != nil {
 		panic(err)
 	}
 	log.Logger.Info("register server init successful")
 	// 注册本地服务到注册中心
 	var serverInfo = interfaces.RegisterServerInfo{
-		Addr:         fmt.Sprintf("http://%v:%v", conf.Server.Addr, conf.Server.Port),
+		Addr:         conf.Server.Register,
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}
-	if err := server.GetRegisterServer().Register(serverInfo); err != nil {
+	if err := srv.Register(serverInfo); err != nil {
 		panic(err)
 	}
 	log.Logger.Info("server register successful")
 	errChan = make(chan error, 1)
 	// 开启后台协程向注册中心发送心跳机制
-	go server.GetRegisterServer().HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
+	go srv.HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
 }
 
 func ServerRun() {
 	engine := gin.Default()
 
 	gin.SetMode(gin.ReleaseMode)
-	engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port))

@@ -29,6 +29,7 @@ func Register(engine *gin.Engine) {
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/space/*any", HandleSpaceProxy)
 	user.Any("/connect/*any", HandleConnectProxy)
+	user.Any("/file/*any", HandleFileProxy)
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
@@ -113,5 +114,22 @@ func HandleConnectProxy(c *gin.Context) {
 		return
 	}
 	proxy := httputil.NewSingleHostReverseProxy(parserConnectUrl)
+	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func HandleFileProxy(c *gin.Context) {
+	fileUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.FileServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var parserFileUrl *url.URL
+	if parserFileUrl, err = url.Parse(fileUrl); err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	proxy := httputil.NewSingleHostReverseProxy(parserFileUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }

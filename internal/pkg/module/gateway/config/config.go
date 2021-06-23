@@ -33,6 +33,7 @@ type Conf struct {
 		SpaceServer       string `json:"space_server"`
 		ConnectServer     string `json:"connect_server"`
 		ImServer          string `json:"im_server"`
+		FileServer        string `json:"file_server"`
 	}
 }
 

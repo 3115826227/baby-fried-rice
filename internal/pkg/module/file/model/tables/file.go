@@ -16,7 +16,11 @@ type File struct {
 	// 文件大小
 	FileSize int64 `gorm:"column:file_size" json:"file_size"`
 	// 文件存储地址
-	Path string `gorm:"column:path" json:"path"`
+	DownUrl string `gorm:"column:down_url" json:"down_url"`
+	// 保存日期
+	StorageDay int `gorm:"column:storage_day" json:"storage_day"`
+	// bucket
+	Bucket string `gorm:"column:bucket" json:"bucket"`
 }
 
 func (table *File) TableName() string {

@@ -3,7 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 type Conf struct {
@@ -13,17 +14,12 @@ type Conf struct {
 	} `json:"log"`
 
 	Server struct {
-		Name   string `json:"name"`
-		Serial int    `json:"serial"`
-		Addr   string `json:"addr"`
-		Port   int    `json:"port"`
+		Name     string `json:"name"`
+		Serial   int    `json:"serial"`
+		Addr     string `json:"addr"`
+		Port     int    `json:"port"`
+		Register string `json:"register"`
 	} `json:"server"`
-
-	Redis struct {
-		RedisUrl      string `json:"redis_url"`
-		RedisPassword string `json:"redis_password"`
-		RedisDB       int    `json:"redis_db"`
-	} `json:"redis"`
 
 	Etcd            []string `json:"etcd"`
 	HealthyRollTime int64    `json:"healthy_roll_time"`
@@ -32,8 +28,8 @@ type Conf struct {
 }
 
 var (
-	config           Conf
-	DefaultOssMetaID = 2
+	config     Conf
+	OssMetaNum = 2
 )
 
 func GetConfig() Conf {
@@ -41,26 +37,19 @@ func GetConfig() Conf {
 }
 
 func readConfig() (err error) {
-	viper.SetConfigFile("./res/config_dev.yaml") // 指定配置文件路径
-	viper.SetConfigName("config_dev")            // 配置文件名称(无扩展名)
-	viper.SetConfigType("yaml")                  // 如果配置文件的名称中没有扩展名，则需要配置此项
-	viper.AddConfigPath("./res/")                // 查找配置文件所在的路径
-	err = viper.ReadInConfig()                   // 查找并读取配置文件
-	if err != nil {                              // 处理读取配置文件的错误
-		err = errors.New(fmt.Sprintf("Fatal error config file: %s \n", err))
+	var data []byte
+	if data, err = ioutil.ReadFile("res/config_dev.yaml"); err != nil {
+		err = errors.New(fmt.Sprintf("failed read config file: %s \n", err))
 		return
 	}
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		err = errors.New(fmt.Sprintf("Fatal error config file: %s \n", err))
-		return
+	if err = yaml.Unmarshal(data, &config); err != nil {
+		err = errors.New(fmt.Sprintf("failed unmarshal config file: %s \n", err))
 	}
 	return
 }
 
 func init() {
-	var err error
-	if err = readConfig(); err != nil {
+	if err := readConfig(); err != nil {
 		panic(err)
 	}
 }
