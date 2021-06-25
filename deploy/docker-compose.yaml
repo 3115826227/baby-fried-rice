@@ -86,6 +86,9 @@ services:
       - "./cmd/gateway/res:/go/src/baby-fried-rice/module/gateway/res"
       - "./cmd/gateway/logs:/baby/logs"
     restart: always
+    depends_on:
+      - redis
+      - etcd
   baby-account-dao:
     image: baby-account-dao
     container_name: baby-account-dao
@@ -95,6 +98,10 @@ services:
       - "./cmd/accountDao/res:/go/src/baby-fried-rice/module/accountDao/res"
       - "./cmd/accountDao/logs:/baby/logs"
     restart: always
+    depends_on:
+      - mysql
+      - redis
+      - etcd
   baby-user-account:
     image: baby-user-account
     container_name: baby-user-account
@@ -104,6 +111,9 @@ services:
       - "./cmd/userAccount/res:/go/src/baby-fried-rice/module/userAccount/res"
       - "./cmd/userAccount/logs:/baby/logs"
     restart: always
+    depends_on:
+      - baby-account-dao
+      - etcd
   baby-space-dao:
     image: baby-space-dao
     container_name: baby-space-dao
@@ -113,6 +123,9 @@ services:
       - "./cmd/spaceDao/res:/go/src/baby-fried-rice/module/spaceDao/res"
       - "./cmd/spaceDao/logs:/baby/logs"
     restart: always
+    depends_on:
+      - mysql
+      - etcd
   baby-space:
     image: baby-space
     container_name: baby-space
@@ -122,6 +135,34 @@ services:
       - "./cmd/space/res:/go/src/baby-fried-rice/module/space/res"
       - "./cmd/space/logs:/baby/logs"
     restart: always
+    depends_on:
+      - baby-space-dao
+      - etcd
+      - nsqd
+  baby-im-dao:
+    image: baby-im-dao
+    container_name: baby-im-dao
+    ports:
+      - "18063:8080"
+    volumes:
+      - "./cmd/imDao/res:/go/src/baby-fried-rice/module/imDao/res"
+      - "./cmd/imDao/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd
+  baby-im:
+    image: baby-im
+    container_name: baby-im
+    ports:
+      - "18076:8080"
+    volumes:
+      - "./cmd/im/res:/go/src/baby-fried-rice/module/im/res"
+      - "./cmd/im/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - baby-im-dao
+      - etcd
   baby-connect:
     image: baby-connect
     container_name: baby-connect
@@ -131,3 +172,18 @@ services:
       - "./cmd/connect/res:/go/src/baby-fried-rice/module/connect/res"
       - "./cmd/connect/logs:/baby/logs"
     restart: always
+    depends_on:
+      - nsqd
+      - etcd
+  baby-file:
+    image: baby-file
+    container_name: baby-file
+    ports:
+      - "18050:8080"
+    volumes:
+      - "./cmd/file/res:/go/src/baby-fried-rice/module/file/res"
+      - "./cmd/file/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd

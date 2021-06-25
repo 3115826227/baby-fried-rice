@@ -16,10 +16,6 @@ cd $CMD/userAccount
 exec -a baby-user-account ./userAccount &
 cd $DIR
 
-cd $CMD/adminAccount
-exec -a baby-admin-account ./adminAccount &
-cd $DIR
-
 cd $CMD/rootAccount
 exec -a baby-root-account ./rootAccount &
 cd $DIR

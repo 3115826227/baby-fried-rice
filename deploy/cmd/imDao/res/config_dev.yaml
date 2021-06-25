@@ -1,21 +1,21 @@
 log:
   loglevel: "debug"
-  logpath:
+  logpath: "/baby/logs/im_dao.log"
 
 server:
   name: "im-dao"
   serial: 1
   addr: "0.0.0.0"
-  port: 18063
-  register: "http://127.0.0.1:18063"
+  port: 8080
+  register: "http://172.16.28.94:18063"
 
 redis:
-  redisurl: "localhost:26379"
+  redisurl: "redis:6379"
   redispassword: "123456"
   redisdb: 9
 
 etcd:
-  - "http://127.0.0.1:23791"
+  - "http://etcd:2379"
 
 rpc:
   server:
@@ -24,4 +24,4 @@ rpc:
 
 healthyrolltime: 1000
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby-im?charset=utf8mb4&parseTime=True&loc=Local"
+mysqlurl: "root:123456@tcp(baby-mysql:3306)/baby-im?charset=utf8mb4&parseTime=True&loc=Local"

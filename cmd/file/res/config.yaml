@@ -14,4 +14,4 @@ etcd:
 
 healthyrolltime: 1000
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
+mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby-file?charset=utf8mb4&parseTime=True&loc=Local"

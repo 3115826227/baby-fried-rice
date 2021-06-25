@@ -3,14 +3,25 @@ log:
   logpath:
 
 server:
-  name: "spaceDao"
+  name: "space-dao"
   serial: 1
-  addr: "localhost"
-  port: 18061
+  addr: "0.0.0.0"
+  port: 18062
+  register: "http://127.0.0.1:18062"
 
 redis:
   redisurl: "localhost:26379"
   redispassword: "123456"
   redisdb: 9
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
+etcd:
+  - "http://127.0.0.1:23791"
+
+rpc:
+  server:
+    certfile: "cert/server.pem"
+    keyfile: "cert/server.key"
+
+healthyrolltime: 1000
+
+mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby-space?charset=utf8mb4&parseTime=True&loc=Local"

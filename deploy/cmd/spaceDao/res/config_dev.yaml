@@ -1,13 +1,13 @@
 log:
   loglevel: "debug"
-  logpath: "/baby/logs/account_dao.log"
+  logpath: "/baby/logs/space_dao.log"
 
 server:
-  name: "account-dao"
+  name: "space-dao"
   serial: 1
   addr: "0.0.0.0"
   port: 8080
-  register: "http://172.16.28.94:18061"
+  register: "http://172.16.28.94:18062"
 
 redis:
   redisurl: "redis:6379"
@@ -24,4 +24,4 @@ rpc:
 
 healthyrolltime: 1000
 
-mysqlurl: "root:123456@tcp(baby-mysql:3306)/baby-account?charset=utf8mb4&parseTime=True&loc=Local"
+mysqlurl: "root:123456@tcp(baby-mysql:3306)/baby-space?charset=utf8mb4&parseTime=True&loc=Local"

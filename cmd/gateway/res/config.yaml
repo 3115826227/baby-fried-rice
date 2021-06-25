@@ -5,7 +5,7 @@ log:
 server:
   name: "gateway"
   serial: 1
-  addr: "localhost"
+  addr: "0.0.0.0"
   port: 18070
 
 redis:
@@ -19,3 +19,7 @@ etcd:
 servers:
   useraccountserver: "user-account"
   rootaccountserver: "root-account"
+  spaceserver: "space-service"
+  connectserver: "connect"
+  imserver: "im-service"
+  fileserver: "file"

@@ -14,7 +14,7 @@ redis:
   redisdb: 9
 
 etcd:
-  - "http://172.16.30.153:23791"
+  - "http://etcd:2379"
 
 servers:
   useraccountserver: "user-account"

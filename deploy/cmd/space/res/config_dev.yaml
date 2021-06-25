@@ -1,13 +1,13 @@
 log:
   loglevel: "debug"
-  logpath: "/baby/logs/user_account.log"
+  logpath: "/baby/logs/space.log"
 
 server:
-  name: "user-account"
+  name: "space-service"
   addr: "0.0.0.0"
   serial: 1
   port: 8080
-  register: "http://172.16.28.94:18071"
+  register: "http://172.16.28.94:18074"
 
 redis:
   redisurl: "redis:6379"
@@ -22,4 +22,9 @@ rpc:
     certfile: "cert/server.pem"
 
 servers:
+  spacedaoserver: "space-dao"
   accountdaoserver: "account-dao"
+
+nsq:
+  addr: nsqd:4150
+  topic: baby-test

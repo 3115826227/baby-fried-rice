@@ -1,0 +1,17 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/file.log"
+
+server:
+  name: "file"
+  serial: 1
+  addr: "0.0.0.0"
+  port: 8080
+  register: "http://172.16.28.94:18050"
+
+etcd:
+  - "http://etcd:2379"
+
+healthyrolltime: 1000
+
+mysqlurl: "root:123456@tcp(baby-mysql:3306)/baby-file?charset=utf8mb4&parseTime=True&loc=Local"

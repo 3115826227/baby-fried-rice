@@ -3,15 +3,23 @@ log:
   logpath:
 
 server:
-  addr: "localhost"
+  name: "user-account"
+  addr: "0.0.0.0"
+  serial: 1
   port: 18071
-
-client:
-  accountdao:
-    addr: "localhost"
-    port: 18061
+  register: "http://127.0.0.1:18071"
 
 redis:
-  redisurl: "localhost:6379"
+  redisurl: "localhost:26379"
   redispassword: "123456"
   redisdb: 9
+
+etcd:
+  - "http://localhost:23791"
+
+rpc:
+  client:
+    certfile: "cert/server.pem"
+
+servers:
+  accountdaoserver: "account-dao"

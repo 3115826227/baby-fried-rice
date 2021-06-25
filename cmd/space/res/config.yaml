@@ -3,15 +3,28 @@ log:
   logpath:
 
 server:
-  addr: "localhost"
+  name: "space-service"
+  addr: "0.0.0.0"
+  serial: 1
   port: 18074
-
-client:
-  spacedao:
-    addr: "localhost"
-    port: 18061
+  register: "http://127.0.0.1:18074"
 
 redis:
-  redisurl: "localhost:6379"
+  redisurl: "localhost:26379"
   redispassword: "123456"
   redisdb: 9
+
+etcd:
+  - "http://localhost:23791"
+
+rpc:
+  client:
+    certfile: "cert/server.pem"
+
+servers:
+  spacedaoserver: "space-dao"
+  accountdaoserver: "account-dao"
+
+nsq:
+  addr: 127.0.0.1:4150
+  topic: baby-test

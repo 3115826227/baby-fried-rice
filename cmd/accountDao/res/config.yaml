@@ -4,12 +4,24 @@ log:
 
 server:
   name: "account-dao"
-  addr: "localhost"
+  serial: 1
+  addr: "0.0.0.0"
   port: 18061
+  register: "http://127.0.0.1:18061"
 
 redis:
   redisurl: "localhost:26379"
   redispassword: "123456"
   redisdb: 9
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
+etcd:
+  - "http://127.0.0.1:23791"
+
+rpc:
+  server:
+    certfile: "cert/server.pem"
+    keyfile: "cert/server.key"
+
+healthyrolltime: 1000
+
+mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby-account?charset=utf8mb4&parseTime=True&loc=Local"
