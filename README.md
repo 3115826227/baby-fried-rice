@@ -15,11 +15,11 @@ baby-fried-rice（宝宝煎米果，以下简称baby）是一套由Go语言开�
 * connect：消息通知模块的管理，包括用户私信通知、空间动态通知、会话消息通知；
 * file：文件模块的管理，包括文件上传、查询和删除；
 
-![image-20210624101433313](/Users/mayu/Library/Application Support/typora-user-images/image-20210624101433313.png)
+![业务图](function.png)
 
 ## 微服务架构
 
-![image-20210624102715218](/Users/mayu/Library/Application Support/typora-user-images/image-20210624102715218.png)
+![架构图](arch.png)
 
 ## 运行
 
@@ -51,3 +51,12 @@ make clean
 ## 关闭所有服务
 ./bin/baby-docker-run.sh down
 ```
+
+## 开源技术列表
+* [Golang](https://github.com/golang/go)
+* [Gin](https://github.com/gin-gonic/gin)
+* [Gorm](https://github.com/go-gorm/gorm)
+* [Redis](https://github.com/redis/redis)
+* [NSQ](https://github.com/nsqio/nsq)
+* [ETCD](https://github.com/etcd-io/etcd)
+* [Docker](https://github.com/moby/moby)
