@@ -34,6 +34,11 @@ type Conf struct {
 		AccountDaoServer string `json:"account_dao_server"`
 		ImDaoServer      string `json:"im_dao_server"`
 	}
+
+	NSQ struct {
+		Addr  string `json:"addr"`
+		Topic string `json:"topic"`
+	}
 }
 
 var (

@@ -33,6 +33,7 @@ message RspUserDaoById {
 message UserDao {
   string id = 1;
   string username = 2;
+  string headImgUrl = 3;
 }
 
 message ReqUserRegister  {

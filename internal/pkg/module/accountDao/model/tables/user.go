@@ -65,34 +65,3 @@ func (table *AccountUserDetail) TableName() string {
 func (table *AccountUserDetail) Get() interface{} {
 	return *table
 }
-
-type UserDetail struct {
-	UserId    string `gorm:"column:user_id;unique"`
-	AccountId string `gorm:"column:account_id;pk"`
-	Username  string `gorm:"column:username;not null"`
-}
-
-func (table *UserDetail) TableName() string {
-	return "baby_im_user_detail"
-}
-
-func (table *UserDetail) Get() interface{} {
-	return *table
-}
-
-// 好友关系表
-type UserFriendRelation struct {
-	tables.CommonField
-
-	Friend       string `gorm:"column:friend;unique_index:idx_friend_ref_category_friend_origin"`
-	FriendRemark string `gorm:"column:friend_remark"`
-	Origin       string `gorm:"column:origin;unique_index:idx_friend_ref_category_friend_origin"`
-}
-
-func (table *UserFriendRelation) TableName() string {
-	return "baby_user_friend_relation"
-}
-
-func (table *UserFriendRelation) Get() interface{} {
-	return *table
-}

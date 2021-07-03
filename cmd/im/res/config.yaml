@@ -21,3 +21,7 @@ healthyrolltime: 1000
 servers:
   accountdaoserver: "account-dao"
   imdaoserver: "im-dao"
+
+nsq:
+  addr: 127.0.0.1:4150
+  topic: baby-test

@@ -8,9 +8,11 @@ option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/im";  // �
 
 service DaoIm {
   // 创建会话
-  rpc SessionAddDao (ReqSessionAddDao) returns (google.protobuf.Empty);
+  rpc SessionAddDao (ReqSessionAddDao) returns (RspSessionAddDao);
   // 更新会话信息
   rpc SessionUpdateDao (ReqSessionUpdateDao) returns (google.protobuf.Empty);
+  // 会话备注修改
+  rpc SessionRemarkUpdateDao (ReqSessionRemarkUpdateDao) returns (google.protobuf.Empty);
   // 查询会话列表
   rpc SessionQueryDao (ReqSessionQueryDao) returns (RspSessionQueryDao);
   // 查询会话详细信息
@@ -19,6 +21,10 @@ service DaoIm {
   rpc SessionJoinDao (ReqSessionJoinDao) returns (google.protobuf.Empty);
   // 离开会话
   rpc SessionLeaveDao (ReqSessionLeaveDao) returns (google.protobuf.Empty);
+  // 邀请加入会话
+  rpc SessionInviteJoinDao(ReqSessionInviteJoinDao) returns (google.protobuf.Empty);
+  // 从会话中移除
+  rpc SessionRemoveDao(ReqSessionRemoveDao) returns (google.protobuf.Empty);
   // 删除会话
   rpc SessionDeleteDao (ReqSessionDeleteDao) returns (google.protobuf.Empty);
   // 会话消息添加
@@ -31,9 +37,36 @@ service DaoIm {
   rpc SessionMessageDeleteDao (ReqSessionMessageDeleteDao) returns (google.protobuf.Empty);
   // 会话消息清空
   rpc SessionMessageFlushDao (ReqSessionMessageFlushDao) returns (google.protobuf.Empty);
+
+  // 添加操作
+  rpc OperatorAddDao(ReqOperatorAddDao) returns (RspOperatorAddDao);
+  // 确认操作
+  rpc OperatorConfirmDao(ReqOperatorConfirmDao) returns (google.protobuf.Empty);
+  // 更新操作读取状态
+  rpc OperatorReadStatusUpdateDao(ReqOperatorReadStatusUpdateDao) returns (google.protobuf.Empty);
+  // 查询操作列表
+  rpc OperatorsQueryDao(ReqOperatorsQueryDao) returns (RspOperatorsQueryDao);
+  // 查询单个操作
+  rpc OperatorSingleQueryDao(ReqOperatorSingleQueryDao) returns (OperatorDao);
+  // 删除操作
+  rpc OperatorDeleteDao(ReqOperatorDeleteDao) returns (google.protobuf.Empty);
+  // 好友添加
+  rpc FriendAddDao(ReqFriendAddDao) returns (google.protobuf.Empty);
+  // 好友列表查询
+  rpc FriendQueryDao(ReqFriendQueryDao) returns (RspFriendQueryDao);
+  // 好友黑名单操作
+  rpc FriendBlackListDao(ReqFriendBlackListDao) returns (google.protobuf.Empty);
+  // 修改好友备注
+  rpc FriendRemarkDao(ReqFriendRemarkDao) returns (google.protobuf.Empty);
+  // 删除好友
+  rpc FriendDeleteDao(ReqFriendDeleteDao) returns (google.protobuf.Empty);
+  // 用户管理更新
+  rpc UserManageUpdateDao(ReqUserManageUpdateDao) returns (google.protobuf.Empty);
+  // 用户管理查询
+  rpc UserManageQueryDao(ReqUserManageQueryDao) returns (RspUserManageQueryDao);
 }
 
-//会话类型
+// 会话类型
 enum SessionType
 {
   // 双人会话
@@ -44,6 +77,23 @@ enum SessionType
   GroupSession = 2;
   // 官方群会话
   OfficialSession = 3;
+}
+
+// 会话等级
+enum SessionLevel
+{
+  // 基础会话级别(仅2人)
+  SessionBaseLevel = 0;
+  // 普通会话级别(2~20)
+  SessionNormalLevel = 1;
+  // 小型群会话级别(2~100)
+  SessionSmallGroupLevel = 101;
+  // 中型群会话级别(2~300)
+  SessionMediumGroupLevel = 102;
+  // 大型群会话级别(2~500)
+  SessionLargeGroupLevel = 103;
+  // 总群会话级别(无上限)
+  SessionTotalGroupLevel = 1000;
 }
 
 // 会话创建
@@ -57,7 +107,14 @@ message ReqSessionAddDao {
   // 会话创建者
   string origin = 4;
   // 会话加入人员
-  repeated string joins = 5;
+  repeated JoinRemarkDao joins = 5;
+  // 会话创建等级
+  SessionLevel level = 6;
+}
+
+// 会话创建返回
+message RspSessionAddDao {
+  int64 session_id = 1;
 }
 
 message ReqSessionUpdateDao {
@@ -70,6 +127,13 @@ message ReqSessionUpdateDao {
   string name = 4;
   // 操作者
   string accountId = 5;
+}
+
+// 会话备注信息修改
+message ReqSessionRemarkUpdateDao {
+  int64 sessionId = 1;
+  string accountId = 2;
+  string remark = 3;
 }
 
 // 会话查询
@@ -99,18 +163,39 @@ message SessionQueryDao {
   int64 sessionId = 1;
   // 会话类型
   SessionType sessionType = 2;
-  // 会话创建者
-  string origin = 3;
   // 会话名
-  string name = 4;
+  string name = 3;
+  // 会话等级
+  SessionLevel level = 4;
   // 未读消息数
   int64 unread = 5;
   // 最近一条消息内容
   SessionMessageDao latest = 6;
-  // 会话创建时间
-  string createTime = 7;
+}
+
+// 会话详细信息
+message SessionDetailQueryDao {
+  // 会话id
+  int64 sessionId = 1;
+  // 会话类型
+  SessionType sessionType = 2;
+  // 会话名
+  string name = 3;
+  // 会话等级
+  SessionLevel level = 4;
+  // 会话创建者
+  string origin = 5;
   // 会话加入人员
-  repeated string joins = 8;
+  repeated JoinRemarkDao joins = 6;
+  // 会话加入权限
+  SessionJoinPermissionType joinPermissionType = 7;
+  // 会话创建时间
+  int64 createTime = 8;
+}
+
+message JoinRemarkDao {
+  string accountId = 1;
+  string remark = 2;
 }
 
 // 查询会话详情
@@ -128,26 +213,53 @@ enum SessionJoinPermissionType
   InviteJoin = 1;
   // 创建者审核
   OriginAudit = 2;
-  // 管理员审核
-  AdminAudit = 3;
 }
 
 message RspSessionDetailQueryDao {
-  SessionQueryDao session = 1;
+  // 会话id
+  int64 sessionId = 1;
+  // 会话类型
+  SessionType sessionType = 2;
+  // 会话名
+  string name = 3;
+  // 会话等级
+  SessionLevel level = 4;
+  // 会话创建者
+  string origin = 5;
+  // 会话加入人员
+  repeated JoinRemarkDao joins = 6;
   // 会话加入权限
-  SessionJoinPermissionType joinPermissionType = 3;
+  SessionJoinPermissionType joinPermissionType = 7;
+  // 会话创建时间
+  int64 createTime = 8;
 }
 
 // 加入会话
 message ReqSessionJoinDao {
   string accountId = 1;
   int64 sessionId = 2;
+  // 操作id
+  int64 operatorId = 3;
 }
 
 // 离开会话
 message ReqSessionLeaveDao {
   string accountId = 1;
   int64 sessionId = 2;
+}
+
+// 邀请加入会话
+message ReqSessionInviteJoinDao {
+  string origin = 1;
+  string accountId = 2;
+  int64 sessionId = 3;
+}
+
+// 从会话中移除
+message ReqSessionRemoveDao {
+  string origin = 1;
+  string accountId = 2;
+  int64 sessionId = 3;
 }
 
 // 删除会话(解散会话)
@@ -173,11 +285,11 @@ message SessionMessageDao {
   // 消息类型
   SessionMessageType messageType = 3;
   // 消息发送者
-  string send = 4;
+  JoinRemarkDao send = 4;
   // 消息接收者
   string receive = 5;
   // 消息内容
-  bytes Content = 6;
+  string content = 6;
   // 创建时间
   int64 sendTimestamp = 7;
   // 读取状态 0-未读 1-已读
@@ -193,7 +305,7 @@ message ReqSessionMessageAddDao {
   // 会话id
   int64 sessionId = 4;
   // 消息内容
-  bytes Content = 5;
+  string content = 5;
   // 发送时间
   int64 sendTimestamp = 6;
 }
@@ -231,4 +343,158 @@ message ReqSessionMessageDeleteDao {
 message ReqSessionMessageFlushDao {
   string accountId = 1;
   int64 sessionId = 2;
+}
+
+// 操作类型
+enum OptType
+{
+  // 无操作
+  NoOpt = 0;
+  // 请求添加为好友
+  AddFriend = 1;
+  // 请求加入会话
+  JoinSession = 2;
+}
+
+// 添加操作
+message ReqOperatorAddDao {
+  string origin = 1;
+  string receive = 2;
+  OptType optType = 3;
+  string content = 4;
+  bool needConfirm = 5;
+  int64 sessionId = 6;
+}
+
+message RspOperatorAddDao {
+  int64 operatorId = 1;
+}
+
+// 操作确认
+message ReqOperatorConfirmDao {
+  string accountId = 1;
+  int64 operatorId = 2;
+  bool confirm = 3;
+}
+
+// 更新操作读取状态
+message ReqOperatorReadStatusUpdateDao {
+  string accountId = 1;
+  repeated int64 operatorIds = 2;
+}
+
+// 操作列表查询请求
+message ReqOperatorsQueryDao {
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+// 操作列表查询列表
+message RspOperatorsQueryDao {
+  repeated OperatorDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+// 单个操作查询请求
+message ReqOperatorSingleQueryDao {
+  string accountId = 1;
+  int64 operatorId = 2;
+}
+
+// 操作列表结构
+message OperatorDao {
+  int64 id = 1;
+  string origin = 2;
+  string receive = 3;
+  OptType optType = 4;
+  string content = 5;
+  bool needConfirm = 6;
+  int64 confirm = 7;
+  int64 optTimestamp = 8;
+  bool receiveReadStatus = 9;
+  int64 session_id = 10;
+}
+
+// 操作信息删除
+message ReqOperatorDeleteDao {
+  string accountId = 1;
+  int64 operatorId = 2;
+}
+
+// 添加好友请求
+message ReqFriendAddDao {
+  string origin = 1;
+  string accountId = 2;
+  string remark = 3;
+  string oriRemark = 4;
+  // 操作id
+  int64 operator_id = 5;
+}
+
+// 好友列表查询请求
+message ReqFriendQueryDao {
+  string origin = 1;
+  string remarkLike = 2;
+  bool blackList = 3;
+}
+
+// 好友列表查询结果
+message RspFriendQueryDao {
+  repeated FriendDao list = 1;
+}
+
+message FriendDao {
+  string accountId = 1;
+  string remark = 2;
+  bool blackList = 3;
+  int64 timestamp = 4;
+}
+
+// 好友黑名单操作
+message ReqFriendBlackListDao {
+  string origin = 1;
+  string friend = 2;
+  bool blackList = 3;
+}
+
+// 修改好友备注
+message ReqFriendRemarkDao {
+  string origin = 1;
+  string friend = 2;
+  string remark = 3;
+}
+
+// 删除好友
+message ReqFriendDeleteDao {
+  string origin = 1;
+  string friend = 2;
+}
+
+enum AddFriendPermissionType
+{
+  // 无限制
+  NoLimit = 0;
+  // 确认添加
+  Confirm = 1;
+}
+
+// 用户管理信息更新请求
+message ReqUserManageUpdateDao {
+  string accountId = 1;
+  AddFriendPermissionType addFriendPermissionType = 2;
+}
+
+// 查看用户管理信息请求
+message ReqUserManageQueryDao {
+  string accountId = 1;
+}
+
+// 查看用户管理信息返回结果
+message RspUserManageQueryDao {
+  string accountId = 1;
+  AddFriendPermissionType addFriendPermissionType = 2;
+  int64 updateTimestamp = 3;
 }

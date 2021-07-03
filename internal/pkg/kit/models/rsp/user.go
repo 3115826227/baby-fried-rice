@@ -4,6 +4,7 @@ type User struct {
 	AccountID  string `json:"account_id"`
 	Username   string `json:"username"`
 	HeadImgUrl string `json:"head_img_url"`
+	Remark     string `json:"remark"`
 }
 
 type UserDataResp struct {

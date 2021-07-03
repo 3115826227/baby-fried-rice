@@ -28,8 +28,9 @@ func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDa
 	var users = make([]*user.UserDao, 0)
 	for _, detail := range details {
 		users = append(users, &user.UserDao{
-			Id:       detail.AccountID,
-			Username: detail.Username,
+			Id:         detail.AccountID,
+			Username:   detail.Username,
+			HeadImgUrl: detail.HeadImgUrl,
 		})
 	}
 	resp = &user.RspUserDaoById{Users: users}
@@ -68,15 +69,9 @@ func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUs
 	detail.CreatedAt = now
 	detail.UpdatedAt = now
 
-	var userDetail tables.UserDetail
-	userDetail.UserId = detail.ID
-	userDetail.AccountId = detail.AccountID
-	userDetail.Username = detail.Username
-
 	var beans = make([]interface{}, 0)
 	beans = append(beans, &accountUser)
 	beans = append(beans, &detail)
-	beans = append(beans, &userDetail)
 
 	if err = db.GetDB().CreateMulti(beans...); err != nil {
 		log.Logger.Error(err.Error())

@@ -25,3 +25,14 @@ const (
 	// 图片消息
 	ImgMessage = 3
 )
+
+type SessionMessageType int
+
+const (
+	// 操作消息
+	OperatorMessage = 1
+	// 会话消息
+	SessionMessage = 2
+	// 会话内容消息
+	SessionMessageMessage = 3
+)
