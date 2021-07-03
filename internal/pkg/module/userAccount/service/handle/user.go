@@ -68,6 +68,7 @@ func UserLoginHandle(c *gin.Context) {
 	go func() {
 		var userMeta = &handle.UserMeta{
 			AccountId: resp.User.AccountId,
+			Username:  resp.User.Username,
 			Platform:  "pc",
 		}
 		if err = cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString()); err != nil {
