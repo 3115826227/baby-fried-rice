@@ -1,10 +1,10 @@
 package query
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 )
 
 func IsDuplicateAccountID(accountID string) bool {

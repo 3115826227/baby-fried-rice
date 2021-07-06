@@ -47,7 +47,7 @@ func SuccessResp(c *gin.Context, message string, data interface{}) {
 	if data == nil {
 		data = make(map[string]interface{})
 	}
-	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": data})
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: 0, Message: message, Data: data})
 }
 
 func SuccessListResp(c *gin.Context, message string, list []interface{}, total int64, req requests.PageCommonReq) {

@@ -1,11 +1,11 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/module/file/db"
 	"baby-fried-rice/internal/pkg/module/file/log"
-	"baby-fried-rice/internal/pkg/module/file/model/tables"
 	"baby-fried-rice/internal/pkg/module/file/service/application"
 	"fmt"
 	"github.com/gin-gonic/gin"

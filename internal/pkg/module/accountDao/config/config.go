@@ -25,6 +25,7 @@ type Conf struct {
 		Addr     string `json:"addr"`
 		Port     int    `json:"port"`
 		Register string `json:"register"`
+		HttpPort int    `json:"http_port"`
 	} `json:"server"`
 
 	Rpc struct {

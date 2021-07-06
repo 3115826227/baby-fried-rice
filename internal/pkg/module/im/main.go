@@ -61,6 +61,20 @@ func ServerRun() {
 	engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port))
 }
 
+// @title im系统
+// @version 1.0
+// @description 消息通信模块服务接口
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name 马钰
+// @contact.url http://www.swagger.io/support
+// @contact.email mayu@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:18076
+// @BasePath /api/im
 func Main() {
 	go ServerRun()
 	log.Logger.Info("server run successful")

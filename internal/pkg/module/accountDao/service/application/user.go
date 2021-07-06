@@ -1,13 +1,13 @@
 package application
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
 	"context"
 	"fmt"

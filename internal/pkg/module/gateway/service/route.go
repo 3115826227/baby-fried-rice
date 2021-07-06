@@ -16,7 +16,7 @@ import (
 func Register(engine *gin.Engine) {
 	api := engine.Group("/api")
 
-	api.POST("/root/login", HandleAccountRootProxy)
+	api.POST("/admin/login", HandleBackendProxy)
 	api.POST("/user/register", HandleAccountUserProxy)
 	api.POST("/user/login", HandleAccountUserProxy)
 
@@ -24,8 +24,8 @@ func Register(engine *gin.Engine) {
 	user.Use(kitMiddleware.GenerateUUID)
 	user.Use(middleware.CheckToken)
 
+	user.Any("/backend/*any", HandleBackendProxy)
 	user.Any("/account/user/*any", HandleAccountUserProxy)
-	user.Any("/account/root/*any", HandleAccountRootProxy)
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/space/*any", HandleSpaceProxy)
 	user.Any("/connect/*any", HandleConnectProxy)
@@ -49,20 +49,20 @@ func HandleAccountUserProxy(c *gin.Context) {
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 
-func HandleAccountRootProxy(c *gin.Context) {
-	rootUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.RootAccountServer)
+func HandleBackendProxy(c *gin.Context) {
+	backendUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.Backend)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var parseRootUrl *url.URL
-	if parseRootUrl, err = url.Parse(rootUrl); err != nil {
+	var parseBackendUrl *url.URL
+	if parseBackendUrl, err = url.Parse(backendUrl); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	proxy := httputil.NewSingleHostReverseProxy(parseRootUrl)
+	proxy := httputil.NewSingleHostReverseProxy(parseBackendUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 

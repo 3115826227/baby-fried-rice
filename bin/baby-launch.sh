@@ -12,12 +12,12 @@ cd $CMD/gateway
 exec -a baby-gateway ./gateway &
 cd $DIR
 
-cd $CMD/userAccount
-exec -a baby-user-account ./userAccount &
+cd $CMD/backend
+exec -a baby-root-account ./backend &
 cd $DIR
 
-cd $CMD/rootAccount
-exec -a baby-root-account ./rootAccount &
+cd $CMD/userAccount
+exec -a baby-user-account ./userAccount &
 cd $DIR
 
 cd $CMD/accountDao

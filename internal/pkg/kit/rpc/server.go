@@ -2,16 +2,54 @@ package rpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/log"
+	"context"
 	"crypto/tls"
+	"encoding/json"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"net"
+	"time"
 )
 
 type ServerGRPC struct {
 	addr      string
 	lc        log.Logging
 	rpcServer *grpc.Server
+}
+
+type handleLog struct {
+	Req      interface{} `json:"req"`
+	Reply    interface{} `json:"reply"`
+	Success  bool        `json:"success"`
+	Method   string      `json:"method"`
+	Duration string      `json:"duration"`
+	Error    string      `json:"error"`
+}
+
+func (hl handleLog) ToString() string {
+	data, _ := json.Marshal(hl)
+	return string(data)
+}
+
+func withServerInterceptor(lc log.Logging) grpc.ServerOption {
+	return grpc.UnaryInterceptor(func(ctx context.Context, req interface{},
+		info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		start := time.Now()
+		reply, err := handler(ctx, req)
+		var hl = handleLog{
+			Req:      req,
+			Reply:    reply,
+			Method:   info.FullMethod,
+			Duration: time.Since(start).String(),
+		}
+		if err != nil {
+			hl.Error = err.Error()
+		} else {
+			hl.Success = true
+		}
+		lc.Debug(hl.ToString())
+		return reply, err
+	})
 }
 
 func NewServerGRPC(addr string, lc log.Logging, cert *tls.Certificate) *ServerGRPC {
@@ -23,7 +61,7 @@ func NewServerGRPC(addr string, lc log.Logging, cert *tls.Certificate) *ServerGR
 		server.rpcServer = grpc.NewServer()
 	} else {
 		cred := credentials.NewServerTLSFromCert(cert)
-		server.rpcServer = grpc.NewServer(grpc.Creds(cred))
+		server.rpcServer = grpc.NewServer(grpc.Creds(cred), withServerInterceptor(lc))
 	}
 	return server
 }

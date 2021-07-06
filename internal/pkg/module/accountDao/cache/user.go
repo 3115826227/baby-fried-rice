@@ -2,7 +2,7 @@ package cache
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"encoding/json"
 	"fmt"
 )

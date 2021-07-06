@@ -1,8 +1,8 @@
 package db
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/log"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"testing"
 )
 

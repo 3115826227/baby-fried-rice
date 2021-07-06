@@ -18,4 +18,4 @@ etcd:
 
 servers:
   useraccountserver: "user-account"
-  rootaccountserver: "root-account"
+  backendserver: "root-account"

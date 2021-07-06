@@ -1,11 +1,11 @@
 package application
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
 	"baby-fried-rice/internal/pkg/module/spaceDao/log"
-	"baby-fried-rice/internal/pkg/module/spaceDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/spaceDao/query"
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"

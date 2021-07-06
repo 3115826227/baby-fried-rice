@@ -16,11 +16,35 @@ import (
 	"strconv"
 )
 
-// 会话创建
+// 创建会话请求参数
+type ReqAddSession struct {
+	// 会话等级
+	SessionLevel int64 `json:"session_level"`
+	// 会话类型
+	SessionType int32 `json:"session_type"`
+	// 会话加入权限
+	JoinPermissionType int32 `json:"join_permission_type"`
+	// 会话名称
+	Name string `json:"name"`
+	// 加入会话成员id列表
+	Joins []string `json:"joins"`
+}
+
+// SessionAddHandle 会话创建接口
+// @Summary 会话创建接口
+// @Description 会话创建接口
+// @Tags 会话相关接口
+// @Accept application/json
+// @Produce application/json
+// @Param accountId header string true "用户id"
+// @Param username header string true "用户名"
+// @Param session body ReqAddSession true "会话"
+// @Success 200 {string} rsp.CommonResp
+// @Router /session [post]
 func SessionAddHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	var err error
-	var req requests.ReqAddSession
+	var req ReqAddSession
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
@@ -70,6 +94,15 @@ func SessionAddHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// SessionQueryHandle 会话列表查询接口
+// @Summary 会话列表查询接口
+// @Description 会话列表查询接口
+// @Tags 会话相关接口
+// @Accept application/json
+// @Param accountId header string true "用户id"
+// @Param username header string true "用户名"
+// @Success 200 {string} rsp.CommonResp
+// @Router /session [get]
 // 会话列表查询
 func SessionQueryHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)

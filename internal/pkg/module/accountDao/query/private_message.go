@@ -1,9 +1,9 @@
 package query
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 )
 
 func GetUserPrivateMessages(pms requests.UserPrivateMessagesReq) (messages []tables.UserPrivateMessage, total int64, err error) {

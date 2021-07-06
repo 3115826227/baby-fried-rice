@@ -2,10 +2,10 @@ package db
 
 import (
 	"baby-fried-rice/internal/pkg/kit/db"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
 	"baby-fried-rice/internal/pkg/module/spaceDao/log"
-	"baby-fried-rice/internal/pkg/module/spaceDao/model/tables"
 )
 
 var (

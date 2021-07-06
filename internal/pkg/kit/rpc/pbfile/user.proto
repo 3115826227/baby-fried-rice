@@ -1,6 +1,7 @@
 // proto 文件版本
 syntax = "proto3";
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 // 生成文件的包名
 package user;
 option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/user";  // 声明生成的 go 文件所属的包
@@ -11,7 +12,12 @@ service DaoUser {
   // 用户登录函数
   rpc UserDaoLogin(ReqPasswordLogin) returns (RspDaoUserLogin);
   // 用户详细信息获取函数
-  rpc UserDaoDetail(ReqDaoUserDetail) returns (RspDaoUserDetail);
+  rpc UserDaoDetail(ReqDaoUserDetail) returns (RspDaoUserDetail) {
+    option (google.api.http) = {
+      post: "/api/v1/dao/user/query/detail"
+      body: "*"
+    };
+  };
   // 用户详细信息修改函数
   rpc UserDaoDetailUpdate(ReqDaoUserDetailUpdate) returns (google.protobuf.Empty);
   // 用户修改密码

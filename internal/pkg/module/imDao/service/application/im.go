@@ -2,10 +2,10 @@ package application
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/module/imDao/db"
 	"baby-fried-rice/internal/pkg/module/imDao/log"
-	"baby-fried-rice/internal/pkg/module/imDao/model/tables"
 	"context"
 	"errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -238,12 +238,13 @@ func (service *IMService) SessionDetailQueryDao(ctx context.Context, req *im.Req
 			Remark:    rel.Remark,
 		})
 	}
-	var template = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).
-		Where("session_id = ? and receive = ?", req.SessionId, req.AccountId)
-	var unread int64
-	if err = template.Count(&unread).Error; err != nil {
-		log.Logger.Error(err.Error())
-		return
+	if session.SessionType == im.SessionType_DoubleSession && session.Name == "" {
+		for _, rel := range relations {
+			if req.AccountId != rel.UserID {
+				session.Name = rel.Remark
+				break
+			}
+		}
 	}
 	resp = &im.RspSessionDetailQueryDao{
 		SessionId:          session.ID,
@@ -376,25 +377,34 @@ func (service *IMService) SessionDeleteDao(ctx context.Context, req *im.ReqSessi
 	var session tables.Session
 	var exist bool
 	if exist, err = db.GetDB().ExistObject(map[string]interface{}{
-		"id":     req.SessionId,
-		"origin": req.AccountId,
+		"id": req.SessionId,
 	}, &session); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	if !exist {
-		err = errors.New("only origin can delete session, you have no permission")
+		err = errors.New("no session")
 		log.Logger.Error(err.Error())
 		return
 	}
-	if err = db.GetDB().DeleteObject(&tables.Session{ID: req.SessionId}); err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
-	if err = db.GetDB().GetDB().Where("session_id = ?", req.SessionId).
-		Delete(&tables.SessionUserRelation{}).Error; err != nil {
-		log.Logger.Error(err.Error())
-		return
+	if session.Origin == req.AccountId {
+		// 创建者删除会话
+		if err = db.GetDB().DeleteObject(&tables.Session{ID: req.SessionId}); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		if err = db.GetDB().GetDB().Where("session_id = ?", req.SessionId).
+			Delete(&tables.SessionUserRelation{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	} else {
+		// 其他成员离开会话
+		if err = db.GetDB().GetDB().Where("session_id = ? and user_id = ?",
+			req.SessionId, req.AccountId).Delete(&tables.SessionUserRelation{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	empty = new(emptypb.Empty)
 	return

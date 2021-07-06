@@ -1,11 +1,11 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/im/config"
+	"baby-fried-rice/internal/pkg/module/im/log"
 	"baby-fried-rice/internal/pkg/module/im/server"
 	"crypto/x509"
 	"fmt"

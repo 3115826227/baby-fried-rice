@@ -1,9 +1,9 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/module/connect/config"
+	"baby-fried-rice/internal/pkg/module/connect/log"
 	"baby-fried-rice/internal/pkg/module/connect/server"
 	"crypto/x509"
 	"fmt"

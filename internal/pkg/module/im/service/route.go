@@ -2,12 +2,19 @@ package service
 
 import (
 	"baby-fried-rice/internal/pkg/kit/middleware"
+	"baby-fried-rice/internal/pkg/module/im/config"
+	_ "baby-fried-rice/internal/pkg/module/im/docs"
 	"baby-fried-rice/internal/pkg/module/im/service/handle"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Register(engine *gin.Engine) {
 	handle.Init()
+	url := ginSwagger.URL(fmt.Sprintf("http://localhost:%v/swagger/doc.json", config.GetConfig().Server.Port))
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	app := engine.Group("/api/im", middleware.SetUserMeta())
 
 	app.POST("/session", handle.SessionAddHandle)

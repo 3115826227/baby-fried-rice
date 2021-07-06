@@ -11,8 +11,12 @@ import (
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/service/application"
+	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+	"net/http"
 	"time"
 )
 
@@ -66,8 +70,25 @@ func ServerRun() {
 	}
 }
 
+func HttpRun() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+
+	mux := runtime.NewServeMux()
+	// HTTP转grpc
+	err := user.RegisterDaoUserHandlerFromEndpoint(ctx, mux, fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port), opts)
+	if err != nil {
+		panic(err)
+	}
+	if err = http.ListenAndServe(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.HttpPort), mux); err != nil {
+		panic(err)
+	}
+}
+
 func Main() {
 	go ServerRun()
+	go HttpRun()
 	log.Logger.Info("server run successful")
 	select {
 	case err := <-errChan:

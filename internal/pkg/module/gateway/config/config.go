@@ -28,8 +28,8 @@ type Conf struct {
 	Etcd []string `json:"etcd"`
 
 	Servers struct {
+		Backend           string `json:"backend"`
 		UserAccountServer string `json:"user_account_server"`
-		RootAccountServer string `json:"root_account_server"`
 		SpaceServer       string `json:"space_server"`
 		ConnectServer     string `json:"connect_server"`
 		ImServer          string `json:"im_server"`

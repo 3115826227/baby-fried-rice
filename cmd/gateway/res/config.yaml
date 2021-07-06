@@ -17,8 +17,8 @@ etcd:
   - "http://127.0.0.1:23791"
 
 servers:
+  backend: "backend"
   useraccountserver: "user-account"
-  rootaccountserver: "root-account"
   spaceserver: "space-service"
   connectserver: "connect"
   imserver: "im-service"

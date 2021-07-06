@@ -2,10 +2,10 @@ package db
 
 import (
 	"baby-fried-rice/internal/pkg/kit/db"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/file/config"
 	"baby-fried-rice/internal/pkg/module/file/log"
-	"baby-fried-rice/internal/pkg/module/file/model/tables"
 )
 
 var (

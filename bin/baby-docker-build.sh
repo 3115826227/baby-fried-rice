@@ -4,6 +4,8 @@ case $1 in
 '')
   docker rmi baby-gateway
   docker build -t baby-gateway -f cmd/gateway/Dockerfile .
+  docker rmi baby-backend
+  docker build -t baby-backend -f cmd/backend/Dockerfile .
   docker rmi baby-user-account
   docker build -t baby-user-account -f cmd/userAccount/Dockerfile .
   docker rmi baby-account-dao
@@ -24,6 +26,10 @@ case $1 in
 "gateway")
   docker rmi baby-gateway
   docker build -t baby-gateway -f cmd/gateway/Dockerfile .
+;;
+"backend")
+  docker rmi baby-backend
+  docker build -t baby-backend -f cmd/backend/Dockerfile .
 ;;
 "user-account")
   docker rmi baby-user-account

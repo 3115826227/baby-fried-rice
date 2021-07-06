@@ -2,10 +2,10 @@ package application
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"

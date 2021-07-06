@@ -1,8 +1,8 @@
 package query
 
 import (
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
-	"baby-fried-rice/internal/pkg/module/spaceDao/model/tables"
 )
 
 func SpaceQuery(page, pageSize int64) (spaces []tables.Space, err error) {

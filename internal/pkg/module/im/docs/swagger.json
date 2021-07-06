@@ -1,0 +1,134 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "消息通信模块服务接口",
+        "title": "im系统",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "马钰",
+            "url": "http://www.swagger.io/support",
+            "email": "mayu@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:18076",
+    "basePath": "/api/im",
+    "paths": {
+        "/session": {
+            "get": {
+                "description": "会话列表查询接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会话相关接口"
+                ],
+                "summary": "会话列表查询接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "accountId",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "会话创建接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会话相关接口"
+                ],
+                "summary": "会话创建接口",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户id",
+                        "name": "accountId",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户名",
+                        "name": "username",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "会话",
+                        "name": "session",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handle.ReqAddSession"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handle.ReqAddSession": {
+            "type": "object",
+            "properties": {
+                "join_permission_type": {
+                    "description": "会话加入权限",
+                    "type": "integer"
+                },
+                "joins": {
+                    "description": "加入会话成员id列表",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "description": "会话名称",
+                    "type": "string"
+                },
+                "session_level": {
+                    "description": "会话等级",
+                    "type": "integer"
+                },
+                "session_type": {
+                    "description": "会话类型",
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

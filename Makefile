@@ -3,8 +3,8 @@ GOCGO=CGO_ENABLED=1 GO111MODULE=on go
 
 MICROSERVICES= \
 	cmd/gateway/gateway \
+	cmd/backend/backend \
 	cmd/userAccount/userAccount \
-	cmd/rootAccount/rootAccount \
 	cmd/accountDao/accountDao \
 	cmd/spaceDao/spaceDao \
 	cmd/space/space \
@@ -18,11 +18,11 @@ build: $(MICROSERVICES)
 cmd/gateway/gateway:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/gateway
 
+cmd/backend/backend:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/backend
+
 cmd/userAccount/userAccount:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/userAccount
-
-cmd/rootAccount/rootAccount:
-	$(GO) build $(GOFLAGS) -o $@ ./cmd/rootAccount
 
 cmd/accountDao/accountDao:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/accountDao

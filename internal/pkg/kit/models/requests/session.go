@@ -1,19 +1,5 @@
 package requests
 
-// 创建会话请求参数
-type ReqAddSession struct {
-	// 会话等级
-	SessionLevel int64 `json:"session_level"`
-	// 会话类型
-	SessionType int32 `json:"session_type"`
-	// 会话加入权限
-	JoinPermissionType int32 `json:"join_permission_type"`
-	// 会话名称
-	Name string `json:"name"`
-	// 加入会话成员id列表
-	Joins []string `json:"joins"`
-}
-
 // 会话信息更新请求参数
 type ReqUpdateSession struct {
 	SessionId          int64  `json:"session_id"`
