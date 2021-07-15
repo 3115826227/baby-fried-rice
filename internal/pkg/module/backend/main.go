@@ -3,7 +3,6 @@ package backend
 import (
 	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/backend/cache"
 	"baby-fried-rice/internal/pkg/module/backend/config"
 	"baby-fried-rice/internal/pkg/module/backend/db"
@@ -61,7 +60,7 @@ func ServerRun() {
 	engine := gin.Default()
 
 	gin.SetMode(gin.ReleaseMode)
-	engine.Use(middleware.Cors())
+	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	if err := engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port)); err != nil {

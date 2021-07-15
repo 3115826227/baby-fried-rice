@@ -3,7 +3,6 @@ package im
 import (
 	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
-	"baby-fried-rice/internal/pkg/kit/middleware"
 	"baby-fried-rice/internal/pkg/module/im/config"
 	"baby-fried-rice/internal/pkg/module/im/log"
 	"baby-fried-rice/internal/pkg/module/im/server"
@@ -55,7 +54,7 @@ func ServerRun() {
 	engine := gin.Default()
 
 	gin.SetMode(gin.ReleaseMode)
-	engine.Use(middleware.Cors())
+	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port))

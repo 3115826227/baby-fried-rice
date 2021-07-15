@@ -59,6 +59,10 @@ func (c *redisCache) Del(key string) error {
 	return c.rds.Del(key).Err()
 }
 
+func (c *redisCache) Info() (string, error) {
+	return c.rds.Info().Result()
+}
+
 func (c *redisCache) HSet(key, field string, value interface{}) error {
 	return c.rds.HSet(key, field, value).Err()
 }

@@ -11,5 +11,6 @@ func Register(engine *gin.Engine) {
 	root := engine.Group("/api/backend", middleware.SetUserMeta())
 
 	root.GET("/admin/logout", handle.RootLogout)
+	root.GET("/admin/info/cache", handle.CacheInfoHandle)
 
 }
