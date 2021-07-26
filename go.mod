@@ -19,7 +19,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-gonic/gin v1.6.3
+	github.com/gin-gonic/gin v1.7.0
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
