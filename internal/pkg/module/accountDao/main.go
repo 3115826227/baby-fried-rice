@@ -91,7 +91,7 @@ func HttpRun() {
 
 func Main() {
 	go ServerRun()
-	go HttpRun()
+	//go HttpRun()
 	log.Logger.Info("server run successful")
 	select {
 	case err := <-errChan:

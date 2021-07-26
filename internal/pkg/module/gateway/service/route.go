@@ -16,7 +16,7 @@ import (
 func Register(engine *gin.Engine) {
 	api := engine.Group("/api")
 
-	api.POST("/admin/login", HandleBackendProxy)
+	api.POST("/admin/login", HandleManageProxy)
 	api.POST("/user/register", HandleAccountUserProxy)
 	api.POST("/user/login", HandleAccountUserProxy)
 
@@ -24,7 +24,7 @@ func Register(engine *gin.Engine) {
 	user.Use(kitMiddleware.GenerateUUID)
 	user.Use(middleware.CheckToken)
 
-	user.Any("/manage/*any", HandleBackendProxy)
+	user.Any("/manage/*any", HandleManageProxy)
 	user.Any("/account/user/*any", HandleAccountUserProxy)
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/space/*any", HandleSpaceProxy)
@@ -50,8 +50,8 @@ func HandleAccountUserProxy(c *gin.Context) {
 	proxy.ServeHTTP(c.Writer, c.Request)
 }
 
-func HandleBackendProxy(c *gin.Context) {
-	backendUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.Backend)
+func HandleManageProxy(c *gin.Context) {
+	backendUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.Manage)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)

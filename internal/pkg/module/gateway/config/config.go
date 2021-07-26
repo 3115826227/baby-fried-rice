@@ -28,7 +28,7 @@ type Conf struct {
 	Etcd []string `json:"etcd"`
 
 	Servers struct {
-		Backend           string `json:"manage"`
+		Manage            string `json:"manage"`
 		UserAccountServer string `json:"user_account_server"`
 		SpaceServer       string `json:"space_server"`
 		ConnectServer     string `json:"connect_server"`
