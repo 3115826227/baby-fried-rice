@@ -9,7 +9,7 @@ type CommonField struct {
 }
 
 type CommonIntField struct {
-	ID        int       `gorm:"column:id;AUTO_INCREMENT" json:"id"`
+	ID        int64     `gorm:"column:id;AUTO_INCREMENT" json:"id"`
 	CreatedAt time.Time `gorm:"column:create_time" json:"created_at"`
 	UpdatedAt time.Time `gorm:"column:update_time" json:"updated_at"`
 }

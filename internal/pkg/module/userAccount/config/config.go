@@ -39,9 +39,22 @@ type Conf struct {
 
 	Servers struct {
 		AccountDaoServer string `json:"account_dao_server"`
+		ShopDaoServer    string `json:"shop_dao_server"`
+	}
+
+	NSQ struct {
+		Addr   string `json:"addr"`
+		Topics struct {
+			UserCoin TopicConsume `json:"user_coin"`
+		} `json:"topics"`
 	}
 
 	TokenSecret string `json:"token_secret"`
+}
+
+type TopicConsume struct {
+	Topic   string `json:"topic"`
+	Channel string `json:"channel"`
 }
 
 var (

@@ -4,7 +4,7 @@ import "github.com/gin-gonic/gin"
 
 type Response struct {
 	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Message string `json:"smsDao"`
 	Data    string `json:"data"`
 }
 

@@ -58,7 +58,7 @@ func handleWrite() {
 					log.Logger.Error(err.Error())
 					continue
 				}
-				log.Logger.Debug(fmt.Sprintf("write message %v to %v success", msg.WSMessage.ToString(), msg.Receive))
+				log.Logger.Debug(fmt.Sprintf("write smsDao %v to %v success", msg.WSMessage.ToString(), msg.Receive))
 			}
 		}
 	}

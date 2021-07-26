@@ -4,8 +4,8 @@ case $1 in
 '')
   docker rmi baby-gateway
   docker build -t baby-gateway -f cmd/gateway/Dockerfile .
-  docker rmi baby-backend
-  docker build -t baby-backend -f cmd/backend/Dockerfile .
+  docker rmi baby-manage
+  docker build -t baby-manage -f cmd/manage/Dockerfile .
   docker rmi baby-user-account
   docker build -t baby-user-account -f cmd/userAccount/Dockerfile .
   docker rmi baby-account-dao
@@ -22,14 +22,20 @@ case $1 in
   docker build -t baby-connect -f cmd/connect/Dockerfile .
   docker rmi baby-file
   docker build -t baby-file -f cmd/file/Dockerfile .
+  docker rmi baby-shop
+  docker build -t baby-shop -f cmd/shop/Dockerfile .
+  docker rmi baby-shop-dao
+  docker build -t baby-shop-dao -f cmd/shopDao/Dockerfile .
+  docker rmi baby-sms-dao
+  docker build -t baby-sms-dao -f cmd/smsDao/Dockerfile .
 ;;
 "gateway")
   docker rmi baby-gateway
   docker build -t baby-gateway -f cmd/gateway/Dockerfile .
 ;;
 "backend")
-  docker rmi baby-backend
-  docker build -t baby-backend -f cmd/backend/Dockerfile .
+  docker rmi baby-manage
+  docker build -t baby-manage -f cmd/manage/Dockerfile .
 ;;
 "user-account")
   docker rmi baby-user-account
@@ -62,5 +68,17 @@ case $1 in
 "file")
   docker rmi baby-file
   docker build -t baby-file -f cmd/file/Dockerfile .
+;;
+"shop")
+  docker rmi baby-shop
+  docker build -t baby-shop -f cmd/shop/Dockerfile .
+;;
+"shop-dao")
+  docker rmi baby-shop-dao
+  docker build -t baby-shop-dao -f cmd/shopDao/Dockerfile .
+;;
+"sms-dao")
+  docker rmi baby-sms-dao
+  docker build -t baby-sms-dao -f cmd/smsDao/Dockerfile .
 ;;
 esac

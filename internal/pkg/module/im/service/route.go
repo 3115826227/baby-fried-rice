@@ -27,9 +27,9 @@ func Register(engine *gin.Engine) {
 	app.GET("/session/leave", handle.SessionLeaveHandle)
 	app.DELETE("/session", handle.SessionDeleteHandle)
 
-	app.GET("/session/message", handle.SessionMessageQueryHandle)
-	app.GET("/session/message/read_status", handle.SessionMessageReadStatusUpdateHandle)
-	app.DELETE("/session/message/flush", handle.SessionMessageFlushHandle)
+	app.GET("/session/smsDao", handle.SessionMessageQueryHandle)
+	app.GET("/session/smsDao/read_status", handle.SessionMessageReadStatusUpdateHandle)
+	app.DELETE("/session/smsDao/flush", handle.SessionMessageFlushHandle)
 
 	app.GET("/session/manage", handle.UserManageQueryHandle)
 	app.PATCH("/session/manage", handle.UserManageUpdateHandle)

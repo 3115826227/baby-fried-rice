@@ -1,7 +1,7 @@
 // proto 文件版本
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-import "google/api/annotations.proto";
+//import "google/api/annotations.proto";
 // 生成文件的包名
 package user;
 option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/user";  // 声明生成的 go 文件所属的包
@@ -13,10 +13,10 @@ service DaoUser {
   rpc UserDaoLogin(ReqPasswordLogin) returns (RspDaoUserLogin);
   // 用户详细信息获取函数
   rpc UserDaoDetail(ReqDaoUserDetail) returns (RspDaoUserDetail) {
-    option (google.api.http) = {
-      post: "/api/v1/dao/user/query/detail"
-      body: "*"
-    };
+    //    option (google.api.http) = {
+    //      post: "/api/v1/dao/user/query/detail"
+    //      body: "*"
+    //    };
   };
   // 用户详细信息修改函数
   rpc UserDaoDetailUpdate(ReqDaoUserDetailUpdate) returns (google.protobuf.Empty);
@@ -26,6 +26,23 @@ service DaoUser {
   rpc UserDaoById(ReqUserDaoById) returns (RspUserDaoById);
   // 获取所有用户id
   rpc UserDaoAll(google.protobuf.Empty) returns (RspUserDaoAll);
+
+  // 查询用户积分
+  rpc UserCoinDao (ReqUserCoinDao) returns (RspUserCoinDao);
+  // 添加用户积分消息费记录
+  rpc UserCoinLogAddDao(ReqUserCoinLogAddDao) returns (google.protobuf.Empty);
+  // 查询用户积分消费记录
+  rpc UserCoinLogQueryDao(ReqUserCoinLogQueryDao) returns (RspUserCoinLogQueryDao);
+  // 删除用户积分消费记录
+  rpc UserCoinLogDeleteDao(ReqUserCoinLogDeleteDao) returns (google.protobuf.Empty);
+  // 查询用户积分排名
+  rpc UserCoinRankQueryDao(ReqUserCoinRankQueryDao) returns (RspUserCoinRankQueryDao);
+  // 查询用户积分排行榜
+  rpc UserCoinRankBoardQueryDao(google.protobuf.Empty) returns (RspUserCoinRankBoardQueryDao);
+  // 用户签到
+  rpc UserSignInDao(ReqUserSignInDao) returns (RspUserSignInDao);
+  // 用户签到记录查询
+  rpc UserSignInLogQueryDao(ReqUserSignInLogQueryDao) returns (RspUserSignInLogQueryDao);
 }
 
 message ReqUserDaoById {
@@ -105,7 +122,7 @@ message ReqDaoUserDetailUpdate {
 
 // 定义用户密码修改请求
 message ReqDaoUserPwdUpdate {
-  string AccountId = 1;
+  string accountId = 1;
   string password = 2;
   string newPassword = 3;
 }
@@ -113,4 +130,108 @@ message ReqDaoUserPwdUpdate {
 // 获取所有用户AccountId
 message RspUserDaoAll {
   repeated string accountIds = 1;
+}
+
+// 查询用户积分
+message ReqUserCoinDao {
+  string accountId = 1;
+}
+
+message RspUserCoinDao {
+  string accountId = 1;
+  int64 coin = 2;
+}
+
+// 添加用户积分消费记录
+message ReqUserCoinLogAddDao {
+  string accountId = 1;
+  int64 coin = 2;
+  int64 coinType = 3;
+}
+
+// 查询用户自己积分消费记录
+message ReqUserCoinLogQueryDao {
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+message RspUserCoinLogQueryDao {
+  repeated UserCoinLogQueryDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+message UserCoinLogQueryDao  {
+  int64 id = 1;
+  string accountId = 2;
+  int64 coin = 3;
+  int64 coinType = 4;
+  string describe = 5;
+  int64 timestamp = 6;
+}
+
+// 删除自己的积分消费记录
+message ReqUserCoinLogDeleteDao {
+  string accountId = 1;
+  repeated int64 ids = 2;
+}
+
+// 查询用户积分排名
+message ReqUserCoinRankQueryDao {
+  string accountId = 1;
+}
+
+// 用户积分排行榜
+message UserCoinRankBoardQueryDao {
+  string accountId = 1;
+  int64 rank = 2;
+  int64 coin = 3;
+  int64 updateTimestamp = 4;
+}
+
+message RspUserCoinRankBoardQueryDao {
+  repeated UserCoinRankBoardQueryDao list = 1;
+  // 统计时间
+  int64 statisticTimestamp = 2;
+}
+
+// 用户积分排名信息UserCoinRankQueryDao
+message RspUserCoinRankQueryDao {
+  string accountId = 1;
+  int64 rank = 2;
+  int64 coin = 3;
+  int64 sameCoinUsers = 4;
+}
+
+// 用户签到
+message ReqUserSignInDao {
+  string accountId = 1;
+}
+
+message RspUserSignInDao {
+  string accountId = 1;
+  bool ok = 2;
+  string describe = 3;
+  int64 coin = 4;
+}
+
+// 用户签到记录查询
+message ReqUserSignInLogQueryDao {
+  string accountId = 1;
+  int64 year = 2;
+  int64 month = 3;
+  int64 day = 4;
+}
+
+message RspUserSignInLogQueryDao {
+  repeated UserSignInLogQueryDao list = 1;
+}
+
+message UserSignInLogQueryDao {
+  string accountId = 1;
+  int64 timestamp = 2;
+  int64 coin = 3;
+  int64 signInType = 4;
 }

@@ -23,3 +23,11 @@ rpc:
 
 servers:
   accountdaoserver: "account-dao"
+  shopdaoserver: "shop-dao"
+
+nsq:
+  addr: "127.0.0.1:4150"
+  topics:
+    usercoin:
+      topic: "baby/user-coin"
+      channel: "baby/user-coin-channel"

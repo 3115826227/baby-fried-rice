@@ -1,0 +1,28 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  name: "shop-service"
+  serial: 1
+  addr: "0.0.0.0"
+  port: 18077
+  register: "http://127.0.0.1:18077"
+
+etcd:
+  - "http://127.0.0.1:23791"
+
+rpc:
+  client:
+    certfile: "cert/server.pem"
+
+healthyrolltime: 1000
+
+servers:
+  accountdaoserver: "account-dao"
+  shopdaoserver: "shop-dao"
+
+nsq:
+  addr: 127.0.0.1:4150
+  topics:
+    usercointopic: baby/user-coin

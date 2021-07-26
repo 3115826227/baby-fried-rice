@@ -40,6 +40,9 @@ func init() {
 	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB, log.Logger); err != nil {
 		panic(err)
 	}
+	if err := cache.InitRedisClient(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB); err != nil {
+		panic(err)
+	}
 	srv := etcd.NewServerETCD(conf.Etcd, log.Logger)
 	if err := srv.Connect(); err != nil {
 		panic(err)

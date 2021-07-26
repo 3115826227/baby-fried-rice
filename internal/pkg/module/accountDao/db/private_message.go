@@ -35,7 +35,7 @@ func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
 	case constant.SendGroup:
 	case constant.SendGlobal:
 	default:
-		return errors.New("send private message type is invalid")
+		return errors.New("send private smsDao type is invalid")
 	}
 	return GetDB().CreateMulti(beans...)
 }

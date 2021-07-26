@@ -2,6 +2,6 @@ package rsp
 
 type CommonResp struct {
 	Code    int         `json:"code"`
-	Message string      `json:"message"`
+	Message string      `json:"smsDao"`
 	Data    interface{} `json:"data"`
 }

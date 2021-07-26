@@ -29,18 +29,18 @@ var ErrCodeM = map[int]string{
 }
 
 var LoginErrResponse = gin.H{
-	"code":    ErrCodeLoginFailed,
-	"message": ErrCodeM[ErrCodeLoginFailed],
+	"code":   ErrCodeLoginFailed,
+	"smsDao": ErrCodeM[ErrCodeLoginFailed],
 }
 
 var ParamErrResponse = gin.H{
-	"code":    ErrCodeInvalidParam,
-	"message": ErrCodeM[ErrCodeInvalidParam],
+	"code":   ErrCodeInvalidParam,
+	"smsDao": ErrCodeM[ErrCodeInvalidParam],
 }
 
 var SysErrResponse = gin.H{
-	"code":    ErrCodeSystemError,
-	"message": ErrCodeM[ErrCodeSystemError],
+	"code":   ErrCodeSystemError,
+	"smsDao": ErrCodeM[ErrCodeSystemError],
 }
 
 func SuccessResp(c *gin.Context, message string, data interface{}) {
@@ -54,7 +54,7 @@ func SuccessListResp(c *gin.Context, message string, list []interface{}, total i
 	if list == nil {
 		list = make([]interface{}, 0)
 	}
-	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": rsp.CommonListResp{
+	c.JSON(http.StatusOK, gin.H{"code": 0, "smsDao": message, "data": rsp.CommonListResp{
 		List:     list,
 		Page:     req.Page,
 		PageSize: req.PageSize,
@@ -67,11 +67,11 @@ func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
 	if ok && message == "" {
 		message = msg
 	}
-	c.AbortWithStatusJSON(statusCode, gin.H{"code": errCode, "message": message, "data": nil})
+	c.AbortWithStatusJSON(statusCode, gin.H{"code": errCode, "smsDao": message, "data": nil})
 }
 
-func EncodePassword(pwd string) string {
-	hexStr := fmt.Sprintf("%x", md5.Sum([]byte(pwd)))
+func EncodePassword(id, pwd string) string {
+	hexStr := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%v:%v", id, pwd))))
 	return hexStr
 }
 
@@ -104,7 +104,7 @@ func GenerateToken(userID string, createTime time.Time, tokenSecret string) (str
 func ResponseHandle(data []byte) (ok bool, err error) {
 	var resp struct {
 		Code    int         `json:"code"`
-		Message string      `json:"message"`
+		Message string      `json:"smsDao"`
 		Data    interface{} `json:"data"`
 	}
 	if err = json.Unmarshal(data, &resp); err != nil {

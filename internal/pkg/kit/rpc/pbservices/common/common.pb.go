@@ -94,7 +94,7 @@ type CommonListResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	Code    int64  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Message string `protobuf:"bytes,2,opt,name=smsDao,proto3" json:"smsDao,omitempty"`
 	List    *List  `protobuf:"bytes,3,opt,name=list,proto3" json:"list,omitempty"`
 }
 
@@ -228,7 +228,7 @@ type CommonResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	Code    int64      `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message string     `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Message string     `protobuf:"bytes,2,opt,name=smsDao,proto3" json:"smsDao,omitempty"`
 	Data    *anypb.Any `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
 }
 

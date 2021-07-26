@@ -113,15 +113,15 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // and use it for large scale production services.
 //
 // `HttpRule` defines the schema of the gRPC/REST mapping. The mapping specifies
-// how different portions of the gRPC request message are mapped to the URL
+// how different portions of the gRPC request smsDao are mapped to the URL
 // path, URL query parameters, and HTTP request body. It also controls how the
-// gRPC response message is mapped to the HTTP response body. `HttpRule` is
+// gRPC response smsDao is mapped to the HTTP response body. `HttpRule` is
 // typically specified as an `google.api.http` annotation on the gRPC method.
 //
 // Each mapping specifies a URL path template and an HTTP method. The path
-// template may refer to one or more fields in the gRPC request message, as long
-// as each field is a non-repeated field with a primitive (non-message) type.
-// The path template controls how fields of the request message are mapped to
+// template may refer to one or more fields in the gRPC request smsDao, as long
+// as each field is a non-repeated field with a primitive (non-smsDao) type.
+// The path template controls how fields of the request smsDao are mapped to
 // the URL path.
 //
 // Example:
@@ -133,10 +133,10 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 //         };
 //       }
 //     }
-//     message GetMessageRequest {
+//     smsDao GetMessageRequest {
 //       string name = 1; // Mapped to URL path.
 //     }
-//     message Message {
+//     smsDao Message {
 //       string text = 1; // The resource content.
 //     }
 //
@@ -146,7 +146,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // -----|-----
 // `GET /v1/messages/123456`  | `GetMessage(name: "messages/123456")`
 //
-// Any fields in the request message which are not bound by the path template
+// Any fields in the request smsDao which are not bound by the path template
 // automatically become HTTP query parameters if there is no HTTP request body.
 // For example:
 //
@@ -157,8 +157,8 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 //         };
 //       }
 //     }
-//     message GetMessageRequest {
-//       message SubMessage {
+//     smsDao GetMessageRequest {
+//       smsDao SubMessage {
 //         string subfield = 1;
 //       }
 //       string message_id = 1; // Mapped to URL path.
@@ -175,27 +175,27 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // "foo"))`
 //
 // Note that fields which are mapped to URL query parameters must have a
-// primitive type or a repeated primitive type or a non-repeated message type.
+// primitive type or a repeated primitive type or a non-repeated smsDao type.
 // In the case of a repeated type, the parameter can be repeated in the URL
-// as `...?param=A&param=B`. In the case of a message type, each field of the
-// message is mapped to a separate parameter, such as
+// as `...?param=A&param=B`. In the case of a smsDao type, each field of the
+// smsDao is mapped to a separate parameter, such as
 // `...?foo.a=A&foo.b=B&foo.c=C`.
 //
 // For HTTP methods that allow a request body, the `body` field
 // specifies the mapping. Consider a REST update method on the
-// message resource collection:
+// smsDao resource collection:
 //
 //     service Messaging {
 //       rpc UpdateMessage(UpdateMessageRequest) returns (Message) {
 //         option (google.api.http) = {
 //           patch: "/v1/messages/{message_id}"
-//           body: "message"
+//           body: "smsDao"
 //         };
 //       }
 //     }
-//     message UpdateMessageRequest {
+//     smsDao UpdateMessageRequest {
 //       string message_id = 1; // mapped to the URL
-//       Message message = 2;   // mapped to the body
+//       Message smsDao = 2;   // mapped to the body
 //     }
 //
 // The following HTTP JSON to RPC mapping is enabled, where the
@@ -205,7 +205,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // HTTP | gRPC
 // -----|-----
 // `PATCH /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id:
-// "123456" message { text: "Hi!" })`
+// "123456" smsDao { text: "Hi!" })`
 //
 // The special name `*` can be used in the body mapping to define that
 // every field not bound by the path template should be mapped to the
@@ -220,7 +220,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 //         };
 //       }
 //     }
-//     message Message {
+//     smsDao Message {
 //       string message_id = 1;
 //       string text = 2;
 //     }
@@ -252,7 +252,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 //         };
 //       }
 //     }
-//     message GetMessageRequest {
+//     smsDao GetMessageRequest {
 //       string message_id = 1;
 //       string user_id = 2;
 //     }
@@ -268,12 +268,12 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // ## Rules for HTTP mapping
 //
 // 1. Leaf request fields (recursive expansion nested messages in the request
-//    message) are classified into three categories:
+//    smsDao) are classified into three categories:
 //    - Fields referred by the path template. They are passed via the URL path.
 //    - Fields referred by the [HttpRule.body][google.api.HttpRule.body]. They are passed via the HTTP
 //      request body.
 //    - All other fields are passed via the URL query parameters, and the
-//      parameter name is the field path in the request message. A repeated
+//      parameter name is the field path in the request smsDao. A repeated
 //      field can be represented as multiple query parameters under the same
 //      name.
 //  2. If [HttpRule.body][google.api.HttpRule.body] is "*", there is no URL query parameter, all fields
@@ -325,7 +325,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // gRPC API Service Configuration (service config) is a configuration language
 // for configuring a gRPC service to become a user-facing product. The
 // service config is simply the YAML representation of the `google.api.Service`
-// proto message.
+// proto smsDao.
 //
 // As an alternative to annotating your proto file, you can configure gRPC
 // transcoding in your service config YAML files. You do this by specifying a
@@ -364,7 +364,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 // is that the most common use case "{var}" does not capture the leading "/"
 // character. For consistency, all path variables must share the same behavior.
 //
-// Repeated message fields must not be mapped to URL query parameters, because
+// Repeated smsDao fields must not be mapped to URL query parameters, because
 // no client library can support such complicated mapping.
 //
 // If an API needs to use a JSON array for request or response body, it can map
@@ -396,14 +396,14 @@ type HttpRule struct {
 	// pattern to the HTTP body, or omitted for not having any HTTP request body.
 	//
 	// NOTE: the referred field must be present at the top-level of the request
-	// message type.
+	// smsDao type.
 	Body string `protobuf:"bytes,7,opt,name=body,proto3" json:"body,omitempty"`
 	// Optional. The name of the response field whose value is mapped to the HTTP
-	// response body. When omitted, the entire response message will be used
+	// response body. When omitted, the entire response smsDao will be used
 	// as the HTTP response body.
 	//
 	// NOTE: The referred field must be present at the top-level of the response
-	// message type.
+	// smsDao type.
 	ResponseBody string `protobuf:"bytes,12,opt,name=response_body,json=responseBody,proto3" json:"response_body,omitempty"`
 	// Additional HTTP bindings for the selector. Nested bindings must
 	// not contain an `additional_bindings` field themselves (that is,

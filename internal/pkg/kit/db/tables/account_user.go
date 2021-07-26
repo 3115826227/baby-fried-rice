@@ -1,6 +1,7 @@
 package tables
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func (table *AccountUser) Get() interface{} {
 
 type AccountUserLoginLog struct {
 	ID         int       `gorm:"column:id;AUTO_INCREMENT" json:"id"`
-	UserID     string    `json:"user_id"`
+	AccountId  string    `json:"account_id"`
 	LoginCount int       `json:"login_count"`
 	IP         string    `json:"ip"`
 	LoginTime  time.Time `gorm:"column:login_time;type:timestamp" json:"login_time"`
@@ -61,6 +62,32 @@ func (table *AccountUserDetail) TableName() string {
 	return "baby_account_user_detail"
 }
 
-func (table *AccountUserDetail) Get() interface{} {
-	return *table
+// 用户积分
+type AccountUserCoin struct {
+	AccountID       string `gorm:"column:account_id;primaryKey" json:"account_id"`
+	Coin            int64  `gorm:"column:coin" json:"coin"`
+	CoinTotal       int64  `gorm:"column:coin_total" json:"coin_total"`
+	UpdateTimestamp int64  `gorm:"column:update_timestamp" json:"update_timestamp"`
+}
+
+func (table *AccountUserCoin) TableName() string {
+	return "baby_account_user_coin"
+}
+
+// 用户积分日志
+type AccountUserCoinLog struct {
+	ID        int64  `gorm:"column:id;AUTO_INCREMENT" json:"id"`
+	AccountID string `gorm:"column:account_id" json:"account_id"`
+	Coin      int64  `gorm:"column:coin" json:"coin"`
+	/*
+		积分类型：
+			1、每日登陆奖励  2、签到
+			101、商城消费
+	*/
+	CoinType  constant.CoinType `gorm:"column:coin_type" json:"coin_type"`
+	Timestamp int64             `gorm:"column:timestamp" json:"timestamp"`
+}
+
+func (table *AccountUserCoinLog) TableName() string {
+	return "baby_account_user_coin_log"
 }

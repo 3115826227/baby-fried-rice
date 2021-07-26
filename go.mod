@@ -9,22 +9,22 @@ replace (
 )
 
 require (
-	fyne.io/fyne/v2 v2.0.3
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
+	github.com/alibabacloud-go/darabonba-openapi v0.1.5
+	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.1
+	github.com/alibabacloud-go/tea v1.1.17
 	github.com/coreos/bbolt v1.3.2 // indirect
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/flopp/go-findfont v0.0.0-20201114153133-e7393a00c15b
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/gogo/protobuf v1.2.1 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0 // indirect
@@ -32,7 +32,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.9.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.5.0
 	github.com/jonboulle/clockwork v0.1.0 // indirect
-	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nsqio/go-nsq v1.0.8
 	github.com/onsi/ginkgo v1.15.1 // indirect

@@ -30,10 +30,11 @@ func InitDB(mysqlUrl string) (err error) {
 		&tables.AccountUser{},
 		&tables.AccountUserDetail{},
 		&tables.AccountUserLoginLog{},
-		&tables.AccountRoot{},
-		&tables.AccountRootLoginLog{},
 		&tables.Area{},
 		&tables.UserPrivateMessage{},
 		&tables.UserPrivateMessageContent{},
+		&tables.AccountUserSignInLog{},
+		&tables.AccountUserCoin{},
+		&tables.AccountUserCoinLog{},
 	)
 }

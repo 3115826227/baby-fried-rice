@@ -17,9 +17,14 @@ type redisCache struct {
 	rds *redis.Client
 }
 
-var (
-	rc *redisCache
-)
+func NewRedisClient(addr, passwd string, db int) (rds *redis.Client, err error) {
+	rds, err = newRedis(addr, passwd, db)
+	if err != nil {
+		err = errors.Wrap(err, "failed to new redis")
+		return
+	}
+	return
+}
 
 func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, error) {
 	rds, err := newRedis(addr, passwd, db)
@@ -27,7 +32,7 @@ func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, e
 		err = errors.Wrap(err, "failed to new redis")
 		return nil, err
 	}
-	rc = &redisCache{
+	rc := &redisCache{
 		lc:  lc,
 		rds: rds,
 	}
@@ -73,4 +78,8 @@ func (c *redisCache) HGet(key, field string) (string, error) {
 
 func (c *redisCache) HGetAll(key string) (map[string]string, error) {
 	return c.rds.HGetAll(key).Result()
+}
+
+func (c *redisCache) HDel(key string, field ...string) error {
+	return c.rds.HDel(key, field...).Err()
 }

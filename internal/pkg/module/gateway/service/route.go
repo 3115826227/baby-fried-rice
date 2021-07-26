@@ -24,12 +24,13 @@ func Register(engine *gin.Engine) {
 	user.Use(kitMiddleware.GenerateUUID)
 	user.Use(middleware.CheckToken)
 
-	user.Any("/backend/*any", HandleBackendProxy)
+	user.Any("/manage/*any", HandleBackendProxy)
 	user.Any("/account/user/*any", HandleAccountUserProxy)
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/space/*any", HandleSpaceProxy)
 	user.Any("/connect/*any", HandleConnectProxy)
 	user.Any("/file/*any", HandleFileProxy)
+	user.Any("/shop/*any", HandleShopProxy)
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
@@ -131,5 +132,22 @@ func HandleFileProxy(c *gin.Context) {
 		return
 	}
 	proxy := httputil.NewSingleHostReverseProxy(parserFileUrl)
+	proxy.ServeHTTP(c.Writer, c.Request)
+}
+
+func HandleShopProxy(c *gin.Context) {
+	shopUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.ShopServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var parseShopUrl *url.URL
+	if parseShopUrl, err = url.Parse(shopUrl); err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	proxy := httputil.NewSingleHostReverseProxy(parseShopUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }

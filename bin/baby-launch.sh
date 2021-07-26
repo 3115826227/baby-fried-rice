@@ -12,8 +12,8 @@ cd $CMD/gateway
 exec -a baby-gateway ./gateway &
 cd $DIR
 
-cd $CMD/backend
-exec -a baby-root-account ./backend &
+cd $CMD/manage
+exec -a baby-manage ./manage &
 cd $DIR
 
 cd $CMD/userAccount
@@ -46,6 +46,18 @@ cd $DIR
 
 cd $CMD/file
 exec -a baby-file ./file &
+cd $DIR
+
+cd $CMD/shopDao
+exec -a baby-shop-dao ./shopDao &
+cd $DIR
+
+cd $CMD/shop
+exec -a baby-shop ./shop &
+cd $DIR
+
+cd $CMD/smsDao
+exec -a baby-sms-dao ./smsDao &
 cd $DIR
 
 trap cleanup EXIT

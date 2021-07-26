@@ -10,11 +10,11 @@ type RspSuccess struct {
 
 type RspOkResponse struct {
 	Code    int    `json:"code"`
-	Message string `json:"message"`
+	Message string `json:"smsDao"`
 }
 
 type RespSuccessData struct {
 	Code    int         `json:"code"`
-	Message string      `json:"message"`
+	Message string      `json:"smsDao"`
 	Data    interface{} `json:"data"`
 }

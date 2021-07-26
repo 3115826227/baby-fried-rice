@@ -26,3 +26,8 @@ type UserPwdUpdateReq struct {
 	Password    string `json:"password"`
 	NewPassword string `json:"new_password"`
 }
+
+type UserCoinGiveawayReq struct {
+	Coin int64    `json:"coin"`
+	Ids  []string `json:"ids"`
+}

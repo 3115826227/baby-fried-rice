@@ -1,6 +1,7 @@
 package spaceDao
 
 import (
+	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
@@ -8,7 +9,6 @@ import (
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
 	"baby-fried-rice/internal/pkg/module/spaceDao/log"
-	"baby-fried-rice/internal/pkg/module/spaceDao/server"
 	"baby-fried-rice/internal/pkg/module/spaceDao/service/application"
 	"crypto/tls"
 	"fmt"
@@ -35,7 +35,8 @@ func init() {
 	if err := cache.InitCache(conf.Redis.RedisUrl, conf.Redis.RedisPassword, conf.Redis.RedisDB, log.Logger); err != nil {
 		panic(err)
 	}
-	if err := server.InitRegisterServer(conf.Etcd); err != nil {
+	srv := etcd.NewServerETCD(conf.Etcd, log.Logger)
+	if err := srv.Connect(); err != nil {
 		panic(err)
 	}
 	var serverInfo = interfaces.RegisterServerInfo{
@@ -43,11 +44,11 @@ func init() {
 		ServerName:   conf.Server.Name,
 		ServerSerial: conf.Server.Serial,
 	}
-	if err := server.GetRegisterServer().Register(serverInfo); err != nil {
+	if err := srv.Register(serverInfo); err != nil {
 		panic(err)
 	}
 	errChan = make(chan error, 1)
-	go server.GetRegisterServer().HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
+	go srv.HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
 }
 
 func ServerRun() {

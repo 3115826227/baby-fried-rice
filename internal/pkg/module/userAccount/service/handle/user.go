@@ -166,6 +166,7 @@ func UserDetailHandle(c *gin.Context) {
 		Gender:     resp.Detail.Gender,
 		Age:        resp.Detail.Age,
 		Phone:      resp.Detail.Phone,
+		Coin:       resp.Detail.Coin,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }

@@ -3,7 +3,7 @@ GOCGO=CGO_ENABLED=1 GO111MODULE=on go
 
 MICROSERVICES= \
 	cmd/gateway/gateway \
-	cmd/backend/backend \
+	cmd/manage/manage \
 	cmd/userAccount/userAccount \
 	cmd/accountDao/accountDao \
 	cmd/spaceDao/spaceDao \
@@ -11,15 +11,18 @@ MICROSERVICES= \
 	cmd/imDao/imDao \
 	cmd/im/im \
 	cmd/connect/connect \
-	cmd/file/file
+	cmd/file/file \
+	cmd/shopDao/shopDao \
+	cmd/shop/shop \
+	cmd/smsDao/smsDao
 
 build: $(MICROSERVICES)
 
 cmd/gateway/gateway:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/gateway
 
-cmd/backend/backend:
-	$(GO) build $(GOFLAGS) -o $@ ./cmd/backend
+cmd/manage/manage:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/manage
 
 cmd/userAccount/userAccount:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/userAccount
@@ -45,6 +48,14 @@ cmd/connect/connect:
 cmd/file/file:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/file
 
+cmd/shopDao/shopDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/shopDao
+
+cmd/shop/shop:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/shop
+
+cmd/smsDao/smsDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/smsDao
 
 clean:
 	rm -f $(MICROSERVICES)
