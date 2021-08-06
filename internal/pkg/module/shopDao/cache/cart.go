@@ -14,3 +14,8 @@ func SetCommodityCart(accountId string, relation tables.CommodityCartRel) (err e
 func GetCommodityCart(accountId string) (relations []tables.CommodityCartRel, err error) {
 	return
 }
+
+func DeleteCommodityCart(accountId string) error {
+	key := fmt.Sprintf("%v:%v", constant.AccountUserCommodityCartPrefix, accountId)
+	return GetCache().Del(key)
+}

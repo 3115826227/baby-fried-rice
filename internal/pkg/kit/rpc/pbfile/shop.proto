@@ -15,8 +15,12 @@ service DaoShop {
 
   // 更新购物车商品信息
   rpc CommodityCartUpdateDao (ReqCommodityCartUpdateDao) returns (google.protobuf.Empty);
+  // 选择购物车商品信息
+  rpc CommodityCartSelectDao (ReqCommodityCartSelectDao) returns (google.protobuf.Empty);
   // 查询购物车
   rpc CommodityCartQueryDao (ReqCommodityCartQueryDao) returns (RspCommodityCartQueryDao);
+  // 从购物车移除商品
+  rpc CommodityCartDeleteDao (ReqCommodityCartDeleteDao) returns (google.protobuf.Empty);
 
   // 添加商品订单
   rpc CommodityOrderAddDao (ReqCommodityOrderAddDao) returns (google.protobuf.Empty);
@@ -102,6 +106,13 @@ message ReqCommodityCartUpdateDao {
   int64 updateCount = 3;
 }
 
+// 购物车选择商品
+message ReqCommodityCartSelectDao {
+  string accountId = 1;
+  // 被选择的商品id列表
+  repeated string selectedCommodityIds = 2;
+}
+
 // 购物车商品
 message CommodityCartDao {
   // 商品信息
@@ -115,6 +126,12 @@ message CommodityCartDao {
 // 购物车查询
 message ReqCommodityCartQueryDao {
   string accountId = 1;
+}
+
+// 删除购物车商品
+message ReqCommodityCartDeleteDao {
+  string accountId = 1;
+  string commodityId = 2;
 }
 
 message RspCommodityCartQueryDao {

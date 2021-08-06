@@ -5,6 +5,8 @@ const (
 	AccountUserIDPrefix = "account:user:id"
 	AccountRootIDPrefix = "account:root:id"
 
+	AccountUserSignInPrefix = "account:user:sign_in"
+
 	AccountUserCoinIDPrefix = "account:user:id:coin"
 
 	AccountUserCoinRankKey = "account:user:coin:rank"

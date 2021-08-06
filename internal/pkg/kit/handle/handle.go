@@ -17,30 +17,37 @@ import (
 )
 
 const (
-	ErrCodeLoginFailed  = 99
-	ErrCodeInvalidParam = 400
-	ErrCodeSystemError  = 1000
+	ErrCodeLoginFailed     = 99
+	ErrCodeInvalidParam    = 400
+	ErrCodePermissionError = 401
+	ErrCodeSystemError     = 1000
 )
 
 var ErrCodeM = map[int]string{
-	ErrCodeLoginFailed:  "用户名或密码错误",
-	ErrCodeInvalidParam: "参数错误",
-	ErrCodeSystemError:  "请求出错",
+	ErrCodeLoginFailed:     "用户名或密码错误",
+	ErrCodeInvalidParam:    "参数错误",
+	ErrCodeSystemError:     "请求出错",
+	ErrCodePermissionError: "权限错误",
 }
 
 var LoginErrResponse = gin.H{
-	"code":   ErrCodeLoginFailed,
-	"smsDao": ErrCodeM[ErrCodeLoginFailed],
+	"code":    ErrCodeLoginFailed,
+	"message": ErrCodeM[ErrCodeLoginFailed],
 }
 
 var ParamErrResponse = gin.H{
-	"code":   ErrCodeInvalidParam,
-	"smsDao": ErrCodeM[ErrCodeInvalidParam],
+	"code":    ErrCodeInvalidParam,
+	"message": ErrCodeM[ErrCodeInvalidParam],
 }
 
 var SysErrResponse = gin.H{
-	"code":   ErrCodeSystemError,
-	"smsDao": ErrCodeM[ErrCodeSystemError],
+	"code":    ErrCodeSystemError,
+	"message": ErrCodeM[ErrCodeSystemError],
+}
+
+var PermissionErrResponse = gin.H{
+	"code":    ErrCodePermissionError,
+	"message": ErrCodeM[ErrCodePermissionError],
 }
 
 func SuccessResp(c *gin.Context, message string, data interface{}) {
@@ -50,14 +57,14 @@ func SuccessResp(c *gin.Context, message string, data interface{}) {
 	c.JSON(http.StatusOK, rsp.CommonResp{Code: 0, Message: message, Data: data})
 }
 
-func SuccessListResp(c *gin.Context, message string, list []interface{}, total int64, req requests.PageCommonReq) {
+func SuccessListResp(c *gin.Context, message string, list []interface{}, total, page, pageSize int64) {
 	if list == nil {
 		list = make([]interface{}, 0)
 	}
-	c.JSON(http.StatusOK, gin.H{"code": 0, "smsDao": message, "data": rsp.CommonListResp{
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: 0, Message: message, Data: rsp.CommonListResp{
 		List:     list,
-		Page:     req.Page,
-		PageSize: req.PageSize,
+		Page:     page,
+		PageSize: pageSize,
 		Total:    total,
 	}})
 }

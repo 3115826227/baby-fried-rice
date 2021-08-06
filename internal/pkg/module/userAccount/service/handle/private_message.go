@@ -6,10 +6,10 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
-	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -23,7 +23,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	pmClient, err := grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -37,8 +37,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 		Title:           pm.MessageTitle,
 		Content:         pm.MessageContent,
 	}
-	_, err = privatemessage.NewDaoPrivateMessageClient(client.GetRpcClient()).
-		PrivateMessageAddDao(context.Background(), &reqAdd)
+	_, err = pmClient.PrivateMessageAddDao(context.Background(), &reqAdd)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -56,7 +55,8 @@ func PrivateMessagesHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	var pmClient privatemessage.DaoPrivateMessageClient
+	pmClient, err = grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -69,22 +69,28 @@ func PrivateMessagesHandle(c *gin.Context) {
 		AccountId: userMeta.AccountId,
 	}
 	var resp *privatemessage.RspPrivateMessageQueryDao
-	resp, err = privatemessage.NewDaoPrivateMessageClient(client.GetRpcClient()).
-		PrivateMessageQueryDao(context.Background(), &reqQuery)
+	resp, err = pmClient.PrivateMessageQueryDao(context.Background(), &reqQuery)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var list = make([]rsp.UserPrivateMessage, 0)
 	var ids = make([]string, 0)
 	for _, pm := range resp.List {
 		ids = append(ids, pm.SendId)
 	}
-	var userResp *user.RspUserDaoById
-	userResp, err = user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
 	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var userResp *user.RspUserDaoById
+	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 	var idsMap = make(map[string]rsp.User)
@@ -94,6 +100,7 @@ func PrivateMessagesHandle(c *gin.Context) {
 			Username:  u.Username,
 		}
 	}
+	var list = make([]interface{}, 0)
 	for _, pm := range resp.List {
 		var pmsg = rsp.UserPrivateMessage{
 			MessageId:     pm.Id,
@@ -105,13 +112,7 @@ func PrivateMessagesHandle(c *gin.Context) {
 		}
 		list = append(list, pmsg)
 	}
-	var response = rsp.UserPrivateMessagesResp{
-		List:     list,
-		Page:     resp.Page,
-		PageSize: resp.PageSize,
-		Total:    resp.Total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, resp.Total, resp.Page, resp.PageSize)
 }
 
 func UpdatePrivateMessageStatusHandle(c *gin.Context) {
@@ -121,7 +122,7 @@ func UpdatePrivateMessageStatusHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	pmClient, err := grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -131,8 +132,7 @@ func UpdatePrivateMessageStatusHandle(c *gin.Context) {
 		AccountId: upm.AccountId,
 		Ids:       upm.MessageIds,
 	}
-	_, err = privatemessage.NewDaoPrivateMessageClient(client.GetRpcClient()).
-		PrivateMessageStatusUpdateDao(context.Background(), &reqUpdate)
+	_, err = pmClient.PrivateMessageStatusUpdateDao(context.Background(), &reqUpdate)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -144,7 +144,7 @@ func UpdatePrivateMessageStatusHandle(c *gin.Context) {
 func PrivateMessageDetailHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	messageId := c.Query("message_id")
-	client, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	pmClient, err := grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -155,8 +155,7 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 		Id:        messageId,
 	}
 	var resp *privatemessage.RspPrivateMessageDetailDao
-	resp, err = privatemessage.NewDaoPrivateMessageClient(client.GetRpcClient()).
-		PrivateMessageDetailDao(context.Background(), &reqDetail)
+	resp, err = pmClient.PrivateMessageDetailDao(context.Background(), &reqDetail)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -164,12 +163,21 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 	}
 	var pm = resp.PrivateMessage
 	var userResp *user.RspUserDaoById
-	userResp, err = user.NewDaoUserClient(client.GetRpcClient()).
-		UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{pm.SendId}})
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
 	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{pm.SendId}})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 	if len(userResp.Users) != 1 {
+		err = fmt.Errorf("query user error")
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return

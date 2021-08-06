@@ -74,13 +74,13 @@ func (service *ShopService) CommodityDetailQueryDao(ctx context.Context, req *sh
 		log.Logger.Error(err.Error())
 		return
 	}
-	var releations []tables.CommodityImageRel
-	if releations, err = query.GetCommodityImageRelation(req.CommodityId); err != nil {
+	var relations []tables.CommodityImageRel
+	if relations, err = query.GetCommodityImageRelation(req.CommodityId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	var images = make([]string, 0)
-	for _, rel := range releations {
+	for _, rel := range relations {
 		images = append(images, rel.Image)
 	}
 	resp = &shop.RspCommodityDetailQueryDao{
@@ -91,10 +91,113 @@ func (service *ShopService) CommodityDetailQueryDao(ctx context.Context, req *sh
 }
 
 func (service *ShopService) CommodityCartUpdateDao(ctx context.Context, req *shop.ReqCommodityCartUpdateDao) (empty *emptypb.Empty, err error) {
+	var updateMap = map[string]interface{}{
+		"count":            req.UpdateCount,
+		"update_timestamp": time.Now().Unix(),
+	}
+	// todo 考虑商品库存的问题
+	if err = db.GetDB().GetDB().Model(&tables.CommodityCartRel{}).Where("account_id = ? and commodity_id = ?",
+		req.AccountId, req.CommodityId).Updates(updateMap).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
+	return
+}
+
+func (service *ShopService) CommodityCartSelectDao(ctx context.Context, req *shop.ReqCommodityCartSelectDao) (empty *emptypb.Empty, err error) {
+	var relations []tables.CommodityCartRel
+	if relations, err = query.GetCommodityCartById(req.AccountId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var selectIds, unselectIds []string
+	var selectIdMap = make(map[string]struct{})
+	for _, id := range req.SelectedCommodityIds {
+		selectIdMap[id] = struct{}{}
+	}
+	for _, rel := range relations {
+		if _, exist := selectIdMap[rel.CommodityId]; !exist {
+			if rel.Selected {
+				unselectIds = append(unselectIds, rel.CommodityId)
+			}
+		} else {
+			if !rel.Selected {
+				selectIds = append(selectIds, rel.CommodityId)
+			}
+		}
+	}
+	var tx = db.GetDB().GetDB().Begin()
+	var now = time.Now().Unix()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	if err = tx.Model(&tables.CommodityCartRel{}).Where("account_id = ? and commodity_id in (?)",
+		req.AccountId, selectIds).Updates(map[string]interface{}{
+		"selected":         true,
+		"update_timestamp": now,
+	}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = tx.Model(&tables.CommodityCartRel{}).Where("account_id = ? and commodity_id in (?)",
+		req.AccountId, unselectIds).Updates(map[string]interface{}{
+		"selected":         false,
+		"update_timestamp": now,
+	}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
 	return
 }
 
 func (service *ShopService) CommodityCartQueryDao(ctx context.Context, req *shop.ReqCommodityCartQueryDao) (resp *shop.RspCommodityCartQueryDao, err error) {
+	var relations []tables.CommodityCartRel
+	if relations, err = query.GetCommodityCartById(req.AccountId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var ids = make([]string, 0)
+	for _, rel := range relations {
+		ids = append(ids, rel.CommodityId)
+	}
+	var commodities []tables.Commodity
+	if commodities, err = query.GetCommoditiesByIds(ids); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var commodityMap = make(map[string]tables.Commodity)
+	for _, c := range commodities {
+		commodityMap[c.ID] = c
+	}
+	var list = make([]*shop.CommodityCartDao, 0)
+	for _, rel := range relations {
+		var cart = &shop.CommodityCartDao{
+			Commodity: CommodityModelToRpc(commodityMap[rel.CommodityId]),
+			Count:     rel.Count,
+			Selected:  rel.Selected,
+		}
+		list = append(list, cart)
+	}
+	resp = &shop.RspCommodityCartQueryDao{
+		AccountId: req.AccountId,
+		List:      list,
+	}
+	return
+}
+
+func (service *ShopService) CommodityCartDeleteDao(ctx context.Context, req *shop.ReqCommodityCartDeleteDao) (empty *emptypb.Empty, err error) {
+	if err = db.GetDB().GetDB().Where("account_id = ? and commodity_id = ?", req.AccountId,
+		req.CommodityId).Delete(&tables.CommodityCartRel{}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
 	return
 }
 

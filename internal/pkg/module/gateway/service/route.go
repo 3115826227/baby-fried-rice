@@ -34,120 +34,46 @@ func Register(engine *gin.Engine) {
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
-	userUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.UserAccountServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parserUserUrl *url.URL
-	if parserUserUrl, err = url.Parse(userUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parserUserUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.UserAccountServer)
 }
 
 func HandleManageProxy(c *gin.Context) {
-	backendUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.Manage)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parseBackendUrl *url.URL
-	if parseBackendUrl, err = url.Parse(backendUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parseBackendUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.Manage)
 }
 
 func HandleImProxy(c *gin.Context) {
-	imUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.ImServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parserImUrl *url.URL
-	if parserImUrl, err = url.Parse(imUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parserImUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.ImServer)
 }
 
 func HandleSpaceProxy(c *gin.Context) {
-	spaceUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.SpaceServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parserSpaceUrl *url.URL
-	if parserSpaceUrl, err = url.Parse(spaceUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parserSpaceUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.SpaceServer)
 }
 
 func HandleConnectProxy(c *gin.Context) {
-	connectUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.ConnectServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parserConnectUrl *url.URL
-	if parserConnectUrl, err = url.Parse(connectUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parserConnectUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.ConnectServer)
 }
 
 func HandleFileProxy(c *gin.Context) {
-	fileUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.FileServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var parserFileUrl *url.URL
-	if parserFileUrl, err = url.Parse(fileUrl); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(parserFileUrl)
-	proxy.ServeHTTP(c.Writer, c.Request)
+	handleProxy(c, config.GetConfig().Servers.FileServer)
 }
 
 func HandleShopProxy(c *gin.Context) {
-	shopUrl, err := server.GetRegisterClient().GetServer(config.GetConfig().Servers.ShopServer)
+	handleProxy(c, config.GetConfig().Servers.ShopServer)
+}
+
+func handleProxy(c *gin.Context, serverName string) {
+	serverUrl, err := server.GetRegisterClient().GetServer(serverName)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var parseShopUrl *url.URL
-	if parseShopUrl, err = url.Parse(shopUrl); err != nil {
+	var parseServerUrl *url.URL
+	if parseServerUrl, err = url.Parse(serverUrl); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	proxy := httputil.NewSingleHostReverseProxy(parseShopUrl)
+	proxy := httputil.NewSingleHostReverseProxy(parseServerUrl)
 	proxy.ServeHTTP(c.Writer, c.Request)
 }

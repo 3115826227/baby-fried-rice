@@ -63,7 +63,7 @@ func initClient(serverName, addr string) (err error) {
 func GetShopClient() (shop.DaoShopClient, error) {
 	cli, err := GetClientGRPC(config.GetConfig().Servers.ShopDaoServer)
 	if err != nil {
-		log.Logger.Error(err.Error())
+		err = errors.Wrap(err, "failed to get shop rpc client")
 		return nil, err
 	}
 	return shop.NewDaoShopClient(cli.GetRpcClient()), nil
@@ -72,7 +72,7 @@ func GetShopClient() (shop.DaoShopClient, error) {
 func GetUserClient() (user.DaoUserClient, error) {
 	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
 	if err != nil {
-		log.Logger.Error(err.Error())
+		err = errors.Wrap(err, "failed to get user rpc client")
 		return nil, err
 	}
 	return user.NewDaoUserClient(cli.GetRpcClient()), nil

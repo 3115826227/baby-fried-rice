@@ -6,6 +6,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
+	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -24,6 +25,7 @@ func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, 
 		MessageContent:  req.Content,
 	}
 	if err = db.SendPrivateMessage(request); err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
@@ -32,6 +34,7 @@ func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, 
 
 func (service *PrivateMessageService) PrivateMessageStatusUpdateDao(ctx context.Context, req *privatemessage.ReqPrivateMessageStatusUpdateDao) (empty *emptypb.Empty, err error) {
 	if err = db.UpdatePrivateMessagesStatus(req.AccountId, req.Ids); err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
@@ -40,14 +43,18 @@ func (service *PrivateMessageService) PrivateMessageStatusUpdateDao(ctx context.
 
 func (service *PrivateMessageService) PrivateMessageQueryDao(ctx context.Context, req *privatemessage.ReqPrivateMessageQueryDao) (resp *privatemessage.RspPrivateMessageQueryDao, err error) {
 	var pms = requests.UserPrivateMessagesReq{
-		AccountId:     req.AccountId,
-		SendId:        req.SendId,
-		PageCommonReq: requests.PageCommonReq{},
+		AccountId: req.AccountId,
+		SendId:    req.SendId,
+		PageCommonReq: requests.PageCommonReq{
+			Page:     req.Page,
+			PageSize: req.PageSize,
+		},
 	}
 	var messages []tables.UserPrivateMessage
 	var total int64
 	messages, total, err = query.GetUserPrivateMessages(pms)
 	if err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 	var list = make([]*privatemessage.PrivateMessageQueryDao, 0)

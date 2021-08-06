@@ -25,7 +25,7 @@ type UserService struct {
 
 func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDaoById) (resp *user.RspUserDaoById, err error) {
 	var details []tables.AccountUserDetail
-	details, err = query.GetUsers(req.Ids)
+	details, err = query.GetUserDetails(req.Ids)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -100,6 +100,15 @@ func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUs
 		log.Logger.Error(err.Error())
 		return
 	}
+	// 将用户信息和用户积分信息写入缓存
+	if err = cache.SetUserDetail(detail); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = cache.SetUserCoin(coin); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	empty = new(emptypb.Empty)
 	return
 }
@@ -129,11 +138,6 @@ func (service *UserService) UserDaoLogin(ctx context.Context, req *user.ReqPassw
 		LoginTime: time.Now(),
 	}
 	if err = db.GetDB().CreateObject(&loginLog); err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
-	// 写入缓存
-	if err = cache.SetUserDetail(*detail); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -196,16 +200,21 @@ func (service *UserService) UserDaoDetailUpdate(ctx context.Context, req *user.R
 		Phone:      req.Detail.Phone,
 		Describe:   req.Detail.Describe,
 	}
-	if err = db.GetDB().GetDB().Where("account_id = ?", req.Detail.AccountId).Updates(&detail).Error; err != nil {
+	var tx = db.GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	// 更新数据库的用户修改信息
+	if err = tx.Where("account_id = ?", req.Detail.AccountId).Updates(&detail).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var newDetail tables.AccountUserDetail
-	if err = db.GetDB().GetObject(map[string]interface{}{"account_id": req.Detail.AccountId}, &newDetail); err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
-	if err = cache.SetUserDetail(newDetail); err != nil {
+	// 删除缓存信息
+	if err = cache.DeleteUserDetail(detail.AccountID); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -291,6 +300,11 @@ func (service *UserService) UserCoinLogAddDao(ctx context.Context, req *user.Req
 		log.Logger.Error(err.Error())
 		return
 	}
+	// 删除积分缓存
+	if err = cache.DeleteUserCoin(req.AccountId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	// 添加积分记录
 	var coinLog = tables.AccountUserCoinLog{
 		AccountID: req.AccountId,
@@ -306,6 +320,7 @@ func (service *UserService) UserCoinLogAddDao(ctx context.Context, req *user.Req
 	return
 }
 
+// 用户积分日志查询
 func (service *UserService) UserCoinLogQueryDao(ctx context.Context, req *user.ReqUserCoinLogQueryDao) (resp *user.RspUserCoinLogQueryDao, err error) {
 	var pageReq = requests.PageCommonReq{
 		PageSize: req.PageSize,
@@ -338,6 +353,7 @@ func (service *UserService) UserCoinLogQueryDao(ctx context.Context, req *user.R
 	return
 }
 
+// 用户积分日志删除
 func (service *UserService) UserCoinLogDeleteDao(ctx context.Context, req *user.ReqUserCoinLogDeleteDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Where("account_id = ? and id in (?)",
 		req.AccountId, req.Ids).Delete(&tables.AccountUserCoinLog{}).Error; err != nil {
@@ -348,6 +364,7 @@ func (service *UserService) UserCoinLogDeleteDao(ctx context.Context, req *user.
 	return
 }
 
+// 用户积分排名查询
 func (service *UserService) UserCoinRankQueryDao(ctx context.Context, req *user.ReqUserCoinRankQueryDao) (resp *user.RspUserCoinRankQueryDao, err error) {
 	resp = new(user.RspUserCoinRankQueryDao)
 	resp.AccountId = req.AccountId
@@ -362,6 +379,7 @@ func (service *UserService) UserCoinRankQueryDao(ctx context.Context, req *user.
 	return
 }
 
+// 用户积分排行榜查询
 func (service *UserService) UserCoinRankBoardQueryDao(ctx context.Context, empty *emptypb.Empty) (resp *user.RspUserCoinRankBoardQueryDao, err error) {
 	var usersMap []map[string]interface{}
 	if usersMap, err = query.GetUserCoinRankBoard(constant.UserCoinBoardTotal); err != nil {
@@ -392,7 +410,7 @@ func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUser
 		signInCoin      constant.RewardCoinBySignedInType //推算出来的签到积分奖励
 	)
 	// 查出最近一条签到日志
-	if err = db.GetDB().GetDB().Where("account_id = ?", req.AccountId).Order("timestamp desc").First(&latestSignInLog).Error; err != nil {
+	if latestSignInLog, err = query.GetUserLatestSignIn(req.AccountId); err != nil {
 		// 没有找到记录 按照第一次签到计算
 		if err == gorm.ErrRecordNotFound {
 			signInCoin = constant.RewardCoinBySignedInContinuedOneDay
@@ -427,7 +445,7 @@ func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUser
 	}
 	// 查询用户现有积分，计算出新的需要更新积分值
 	var userCoin tables.AccountUserCoin
-	if err = db.GetDB().GetObject(map[string]interface{}{"account_id": req.AccountId}, &userCoin); err != nil {
+	if userCoin, err = query.GetUserCoin(req.AccountId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -477,7 +495,17 @@ func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUser
 		Describe:  fmt.Sprintf("连续签到第%v天，奖励%v积分", constant.RewardCoinBySignInContinueDayMap[signInCoin], signInCoin),
 		Coin:      int64(signInCoin),
 	}
-	// 更新缓存中的 用户积分排名
+	// 删除缓存中的用户积分
+	if err = cache.DeleteUserCoin(req.AccountId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 删除缓存中的最近更新日志
+	if err = cache.DeleteUserSignInLatestLog(req.AccountId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 更新缓存中的用户积分排名
 	if err = cache.SetUserCoinRank(coinLog, int64(signInCoin)); err != nil {
 		log.Logger.Error(err.Error())
 		return

@@ -83,12 +83,12 @@ type UserCoin struct {
 	UpdateTimestamp int64 `json:"update_timestamp"`
 }
 
-type UserCoinLogResp struct {
-	List     []UserCoinLog `json:"list"`
-	Page     int64         `json:"page"`
-	PageSize int64         `json:"page_size"`
-	Total    int64         `json:"total"`
-}
+//type UserCoinLogResp struct {
+//	List     []UserCoinLog `json:"list"`
+//	Page     int64         `json:"page"`
+//	PageSize int64         `json:"page_size"`
+//	Total    int64         `json:"total"`
+//}
 
 // 用户积分日志信息
 type UserCoinLog struct {

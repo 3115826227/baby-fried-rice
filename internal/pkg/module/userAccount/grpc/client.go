@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/shop"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
@@ -76,4 +77,13 @@ func GetShopClient() (shop.DaoShopClient, error) {
 		return nil, err
 	}
 	return shop.NewDaoShopClient(cli.GetRpcClient()), nil
+}
+
+func GetPrivateMessageClient() (privatemessage.DaoPrivateMessageClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return privatemessage.NewDaoPrivateMessageClient(cli.GetRpcClient()), nil
 }

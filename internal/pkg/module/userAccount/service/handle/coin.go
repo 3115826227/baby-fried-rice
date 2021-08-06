@@ -8,6 +8,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
@@ -43,7 +44,7 @@ func CoinLogHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var list = make([]rsp.UserCoinLog, 0)
+	var list = make([]interface{}, 0)
 	for _, cl := range resp.List {
 		var coinLog = rsp.UserCoinLog{
 			Id:        cl.Id,
@@ -54,27 +55,27 @@ func CoinLogHandle(c *gin.Context) {
 		}
 		list = append(list, coinLog)
 	}
-	var response = rsp.UserCoinLogResp{
-		List:     list,
-		Page:     resp.Page,
-		PageSize: resp.PageSize,
-		Total:    resp.Total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, resp.Total, resp.Page, resp.PageSize)
 }
 
 func DeleteCoinLogHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	idsStr := strings.Split(c.Query("ids"), ",")
+	if len(idsStr) == 0 {
+		err := fmt.Errorf("id list can't null")
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
 	var ids = make([]int64, 0)
 	for _, idStr := range idsStr {
-		if id, err := strconv.Atoi(idStr); err != nil {
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
 			log.Logger.Error(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 			return
-		} else {
-			ids = append(ids, int64(id))
 		}
+		ids = append(ids, int64(id))
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {

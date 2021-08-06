@@ -14,6 +14,10 @@ import (
 	"encoding/json"
 )
 
+var (
+	payFailedChan = make(chan models.UserCoinChangeMQMessage, 10)
+)
+
 func InitBackend() {
 	conf := config.GetConfig()
 	if err := NewConsume(conf.NSQ.Topics.UserCoin, runUserCoinConsume); err != nil {
@@ -35,6 +39,7 @@ func NewConsume(consume config.TopicConsume, handle func(mq interfaces.MQ)) (err
 
 // 处理用户积分变动的消息
 func runUserCoinConsume(mq interfaces.MQ) {
+	go handlePayFailed()
 	for {
 		value, err := mq.Consume()
 		if err != nil {
@@ -44,12 +49,14 @@ func runUserCoinConsume(mq interfaces.MQ) {
 		var msg models.UserCoinChangeMQMessage
 		if err = json.Unmarshal([]byte(value), &msg); err != nil {
 			log.Logger.Error(err.Error())
+			payFailedChan <- msg
 			continue
 		}
 		var userClient user.DaoUserClient
 		userClient, err = grpc.GetUserClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
+			payFailedChan <- msg
 			continue
 		}
 		var reqCoin = &user.ReqUserCoinLogAddDao{
@@ -59,9 +66,10 @@ func runUserCoinConsume(mq interfaces.MQ) {
 		}
 		if _, err = userClient.UserCoinLogAddDao(context.Background(), reqCoin); err != nil {
 			log.Logger.Error(err.Error())
+			payFailedChan <- msg
 			continue
 		}
-		// 用户积分修改成功后，更新订单状态
+		// 用户积分修改成功后，更新订单状态为已支付
 		var shopClient shop.DaoShopClient
 		shopClient, err = grpc.GetShopClient()
 		if err != nil {
@@ -76,6 +84,29 @@ func runUserCoinConsume(mq interfaces.MQ) {
 		if _, err = shopClient.CommodityOrderStatusUpdateDao(context.Background(), reqOrder); err != nil {
 			log.Logger.Error(err.Error())
 			continue
+		}
+	}
+}
+
+// 处理支付失败的问题
+func handlePayFailed() {
+	for {
+		select {
+		case msg := <-payFailedChan:
+			shopClient, err := grpc.GetShopClient()
+			if err != nil {
+				log.Logger.Error(err.Error())
+				continue
+			}
+			var reqOrder = &shop.ReqCommodityOrderStatusUpdateDao{
+				AccountId:   msg.AccountId,
+				Id:          msg.OrderId,
+				OrderStatus: constant.PayFailed,
+			}
+			if _, err = shopClient.CommodityOrderStatusUpdateDao(context.Background(), reqOrder); err != nil {
+				log.Logger.Error(err.Error())
+				continue
+			}
 		}
 	}
 }

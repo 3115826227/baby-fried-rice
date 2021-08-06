@@ -7,7 +7,9 @@ type Cache interface {
 	Del(key string) error
 	// hash操作
 	HSet(key, field string, value interface{}) error
+	HMSet(key string, field map[string]interface{}) error
 	HGet(key, field string) (string, error)
+	HMGet(key string, fields ...string) ([]interface{}, error)
 	HGetAll(key string) (map[string]string, error)
 	HDel(key string, field ...string) error
 	// 监控信息查询

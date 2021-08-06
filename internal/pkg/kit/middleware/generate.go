@@ -7,8 +7,8 @@ import (
 )
 
 func GenerateUUID(c *gin.Context) {
-	u := uuid.NewV4()
-	c.Request.Header.Set(handle.HeaderUUID, u.String())
-	c.Set(handle.HeaderUUID, u.String())
+	u := uuid.NewV4().String()
+	c.Request.Header.Set(handle.HeaderUUID, u)
+	c.Set(handle.HeaderUUID, u)
 	c.Next()
 }

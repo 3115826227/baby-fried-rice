@@ -37,14 +37,14 @@ func UserLoginHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
 		return
 	}
 	var resp *user.RspDaoUserLogin
 	resp, err = userClient.UserDaoLogin(context.Background(), reqLogin)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
 		return
 	}
 
@@ -238,6 +238,12 @@ func UserPwdUpdateHandle(c *gin.Context) {
 // 查看他人用户信息
 func UserQueryHandle(c *gin.Context) {
 	accountId := c.Query("account_id")
+	if accountId == "" {
+		err := fmt.Errorf("account_id can't null")
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.ParamErrResponse)
+		return
+	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())

@@ -14,12 +14,16 @@ import (
 )
 
 func IsDuplicateAccountID(accountID string) bool {
-	var count int64 = 0
-	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("id = ?", accountID).Count(&count).Error; err != nil {
-		log.Logger.Error(err.Error())
-		return true
+	if _, err := cache.GetUserDetail(accountID); err != nil {
+		var count int64 = 0
+		if err = db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("account_id = ?", accountID).Count(&count).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return true
+		}
+		return count != 0
 	}
-	return count != 0
+	return false
+
 }
 
 func IsDuplicateLoginNameByUser(loginName string) bool {
@@ -50,16 +54,35 @@ func GetUserDetail(accountId string) (detail tables.AccountUserDetail, err error
 	return
 }
 
-func GetUsers(ids []string) (details []tables.AccountUserDetail, err error) {
+func GetUserDetails(ids []string) (details []tables.AccountUserDetail, err error) {
+	var detailMap = make(map[string]tables.AccountUserDetail, 0)
+	var failedIds = make([]string, 0)
+	var cacheDetails []tables.AccountUserDetail
+	// 获取缓存中有效用户信息
+	cacheDetails, err = cache.GetUserByIds(ids)
+	for _, detail := range cacheDetails {
+		detailMap[detail.ID] = detail
+	}
 	details = make([]tables.AccountUserDetail, 0)
+	// 过滤找出缓存未命中的用户信息
 	for _, id := range ids {
-		var detail tables.AccountUserDetail
-		if detail, err = cache.GetUserDetail(id); err != nil {
-			if err = db.GetDB().GetObject(map[string]interface{}{"account_id": id}, &detail); err != nil {
-				return
-			}
+		if _, exist := detailMap[id]; !exist {
+			failedIds = append(failedIds, id)
 		}
-		details = append(details, detail)
+	}
+	// 从数据库中批量查找未命中的用户信息，并更新到缓存中
+	var failedDetails []tables.AccountUserDetail
+	if err = db.GetDB().GetDB().Where("id in (?)", failedIds).Find(&failedDetails).Error; err != nil {
+		return
+	}
+	if err = cache.SetUserDetails(failedDetails); err != nil {
+		return
+	}
+	for _, detail := range failedDetails {
+		detailMap[detail.AccountID] = detail
+	}
+	for _, id := range ids {
+		details = append(details, detailMap[id])
 	}
 	return
 }
@@ -149,5 +172,16 @@ func ParseUserCoinFromScore(score float64) (timestamp int64, coin int64, err err
 		return
 	}
 	timestamp = constant.MaxTimestamp - ts
+	return
+}
+
+// 查询用户最近一条签到信息
+func GetUserLatestSignIn(accountId string) (signInLog tables.AccountUserSignInLog, err error) {
+	if signInLog, err = cache.GetUserSignInLatestLog(accountId); err != nil {
+		if err = db.GetDB().GetDB().Where("account_id = ?", accountId).Order("timestamp desc").First(&signInLog).Error; err != nil {
+			return
+		}
+		go cache.SetUserSignInLatestLog(signInLog)
+	}
 	return
 }
