@@ -189,7 +189,7 @@ func (x *Http) GetFullyDecodeReservedExpansion() bool {
 //       rpc UpdateMessage(UpdateMessageRequest) returns (Message) {
 //         option (google.api.http) = {
 //           patch: "/v1/messages/{message_id}"
-//           body: "smsDao"
+//           body: "message"
 //         };
 //       }
 //     }

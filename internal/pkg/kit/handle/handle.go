@@ -74,7 +74,7 @@ func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
 	if ok && message == "" {
 		message = msg
 	}
-	c.AbortWithStatusJSON(statusCode, gin.H{"code": errCode, "smsDao": message, "data": nil})
+	c.AbortWithStatusJSON(statusCode, gin.H{"code": errCode, "message": message, "data": nil})
 }
 
 func EncodePassword(id, pwd string) string {
@@ -111,7 +111,7 @@ func GenerateToken(userID string, createTime time.Time, tokenSecret string) (str
 func ResponseHandle(data []byte) (ok bool, err error) {
 	var resp struct {
 		Code    int         `json:"code"`
-		Message string      `json:"smsDao"`
+		Message string      `json:"message"`
 		Data    interface{} `json:"data"`
 	}
 	if err = json.Unmarshal(data, &resp); err != nil {

@@ -18,8 +18,8 @@ func SetUserMeta() gin.HandlerFunc {
 
 		if accountId == "" {
 			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"code":   400,
-				"smsDao": "请求头错误",
+				"code":    400,
+				"message": "请求头错误",
 			})
 		}
 

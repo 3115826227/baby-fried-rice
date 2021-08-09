@@ -34,13 +34,6 @@ func CommodityRpcToRsp(commodity *shop.CommodityQueryDao) Commodity {
 	}
 }
 
-type CommoditiesResp struct {
-	List     []Commodity `json:"list"`
-	Page     int64       `json:"page"`
-	PageSize int64       `json:"page_size"`
-	Total    int64       `json:"total"`
-}
-
 type Commodity struct {
 	Id         string            `json:"id"`
 	Name       string            `json:"name"`

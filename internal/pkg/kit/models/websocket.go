@@ -58,7 +58,7 @@ type SessionMessage struct {
 	// 新会话信息
 	Session rsp.Session `json:"session"`
 	// 新会话消息信息
-	Message rsp.Message `json:"smsDao"`
+	Message rsp.Message `json:"message"`
 }
 
 type PrivateMessage struct {

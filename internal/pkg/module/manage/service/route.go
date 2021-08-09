@@ -23,4 +23,6 @@ func Register(engine *gin.Engine) {
 
 	app.POST("/admin/coin/giveaway", handle.SystemGiveawayUserCoinHandle)
 	app.GET("/admin/coin", handle.UserCoinHandle)
+
+	app.GET("/admin/sms/log", handle.SmsLogHandle)
 }

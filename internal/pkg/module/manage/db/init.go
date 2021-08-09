@@ -96,6 +96,7 @@ func InitDB() (err error) {
 		return
 	}
 	if err = smsClient.InitTables(
+		&tables.SendMessageLog{},
 		&tables.SendMessageTemplate{},
 	); err != nil {
 		panic(err)

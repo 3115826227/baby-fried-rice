@@ -63,15 +63,9 @@ func CommodityHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var list = make([]rsp.Commodity, 0)
+	var list = make([]interface{}, 0)
 	for _, commodity := range commodities {
 		list = append(list, rsp.CommodityModelToRsp(commodity))
 	}
-	var response = rsp.CommoditiesResp{
-		List:     list,
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
-		Total:    total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, total, reqPage.Page, reqPage.PageSize)
 }
