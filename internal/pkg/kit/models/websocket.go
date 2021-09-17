@@ -39,7 +39,7 @@ type WSMessage struct {
 	// 会话消息
 	SessionMessage *SessionMessage `json:"session_message,omitempty"`
 	// 私信消息
-	PrivateMessage *PrivateMessage `json:"private_message,omitempty"`
+	PrivateMessage rsp.UserPrivateMessageDetailResp `json:"private_message,omitempty"`
 }
 
 func (message *WSMessage) ToString() string {

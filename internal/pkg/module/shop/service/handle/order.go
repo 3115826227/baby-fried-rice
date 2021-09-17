@@ -161,7 +161,7 @@ func CommodityOrderPayHandle(c *gin.Context) {
 			OrderId:   resp.CommodityOrder.Id,
 		}
 		go func() {
-			if err = mq.Send(config.GetConfig().NSQ.Topics.UserCoinTopic, mqMessage.ToString()); err != nil {
+			if err = mq.Send(config.GetConfig().MessageQueue.PublishTopics.UserCoin, mqMessage.ToString()); err != nil {
 				log.Logger.Error(err.Error())
 				return
 			}
@@ -198,7 +198,7 @@ func CommodityOrderQueryHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var list = make([]rsp.CommodityOrder, 0)
+	var list = make([]interface{}, 0)
 	for _, commodityOrder := range resp.List {
 		var commodities = make([]rsp.Commodity, 0)
 		for _, commodity := range commodityOrder.Commodities {
@@ -210,13 +210,7 @@ func CommodityOrderQueryHandle(c *gin.Context) {
 		}
 		list = append(list, co)
 	}
-	var response = rsp.CommodityOrdersResp{
-		List:     list,
-		Page:     resp.Page,
-		PageSize: resp.PageSize,
-		Total:    resp.Total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, resp.Total, reqPage.Page, reqPage.PageSize)
 }
 
 // 商品订单详细信息查询

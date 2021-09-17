@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/models"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,14 @@ const (
 	HeaderIsSuper   = "isSuper"
 
 	GinContextKeyUserMeta = "userMeta"
+
+	QueryId           = "id"
+	QueryAccountId    = "account_id"
+	QueryLikeUsername = "username"
+	QueryLikeName     = "name"
+
+	QueryPage     = "page"
+	QueryPageSize = "page_size"
 )
 
 type UserMeta struct {
@@ -43,4 +52,11 @@ func (meta *UserMeta) ToString() string {
 
 func GetUserMeta(c *gin.Context) *UserMeta {
 	return c.MustGet(GinContextKeyUserMeta).(*UserMeta)
+}
+
+func (meta *UserMeta) GetUserBaseInfo() models.UserBaseInfo {
+	return models.UserBaseInfo{
+		AccountId: meta.AccountId,
+		Username:  meta.Username,
+	}
 }

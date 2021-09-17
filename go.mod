@@ -34,8 +34,8 @@ require (
 	github.com/jonboulle/clockwork v0.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nsqio/go-nsq v1.0.8
-	github.com/onsi/ginkgo v1.15.1 // indirect
-	github.com/onsi/gomega v1.11.0 // indirect
+	github.com/pion/rtcp v1.2.6
+	github.com/pion/webrtc/v3 v3.0.32
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v0.9.3 // indirect
 	github.com/qiniu/api.v7/v7 v7.8.2

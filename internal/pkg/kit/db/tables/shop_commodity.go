@@ -21,6 +21,8 @@ type Commodity struct {
 	Coin int64 `gorm:"column:coin"`
 	// 商品主图片
 	MainImg string `gorm:"column:main_img"`
+	// 商品状态 1-未上架 2-上架
+	Status int64 `gorm:"column:status"`
 }
 
 func (table *Commodity) TableName() string {

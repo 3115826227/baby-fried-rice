@@ -61,7 +61,7 @@ func GetUserDetails(ids []string) (details []tables.AccountUserDetail, err error
 	// 获取缓存中有效用户信息
 	cacheDetails, err = cache.GetUserByIds(ids)
 	for _, detail := range cacheDetails {
-		detailMap[detail.ID] = detail
+		detailMap[detail.AccountID] = detail
 	}
 	details = make([]tables.AccountUserDetail, 0)
 	// 过滤找出缓存未命中的用户信息
@@ -72,7 +72,7 @@ func GetUserDetails(ids []string) (details []tables.AccountUserDetail, err error
 	}
 	// 从数据库中批量查找未命中的用户信息，并更新到缓存中
 	var failedDetails []tables.AccountUserDetail
-	if err = db.GetDB().GetDB().Where("id in (?)", failedIds).Find(&failedDetails).Error; err != nil {
+	if err = db.GetDB().GetDB().Where("account_id in (?)", failedIds).Find(&failedDetails).Error; err != nil {
 		return
 	}
 	if err = cache.SetUserDetails(failedDetails); err != nil {

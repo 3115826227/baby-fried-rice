@@ -7,7 +7,7 @@ import (
 )
 
 func Register(engine *gin.Engine) {
-	InitBackend()
+	handle.InitBackend()
 
 	engine.POST("/api/user/register", handle.UserRegisterHandle)
 	engine.POST("/api/user/login", handle.UserLoginHandle)

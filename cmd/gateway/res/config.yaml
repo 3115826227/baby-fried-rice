@@ -3,24 +3,31 @@ log:
   logpath:
 
 server:
-  name: "gateway"
-  serial: 1
-  addr: "0.0.0.0"
-  port: 18070
+  httpserver:
+    name: "gateway"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18070
 
-redis:
-  redisurl: "localhost:26379"
-  redispassword: "123456"
-  redisdb: 9
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
 
-etcd:
-  - "http://127.0.0.1:23791"
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
 
-servers:
-  backend: "manage"
-  useraccountserver: "user-account"
-  spaceserver: "space-service"
-  connectserver: "connect"
-  imserver: "im-service"
-  fileserver: "file"
-  shopserver: "shop-service"
+rpc:
+  subservers:
+    manageserver: "manage"
+    useraccountserver: "user-account"
+    spaceserver: "space-service"
+    connectserver: "connect"
+    imserver: "im-service"
+    fileserver: "file"
+    shopserver: "shop-service"

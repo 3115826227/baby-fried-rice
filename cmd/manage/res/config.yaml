@@ -3,23 +3,51 @@ log:
   logpath:
 
 server:
-  name: "manage"
-  serial: 1
-  addr: "0.0.0.0"
-  port: 18073
-  register: "http://127.0.0.1:18073"
+  httpserver:
+    name: "manage"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18073
+    register: "http://127.0.0.1:18073"
 
-redis:
-  redisurl: "localhost:26379"
-  redispassword: "123456"
-  redisdb: 9
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
 
-etcd:
-  - "http://localhost:23791"
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
 
-healthyrolltime: 1000
+messagequeue:
+  consumetopics:
+    deletefile:
+      topic: "baby-delete-file"
+      channel: "baby-delete-file-channel"
+  nsq:
+    cluster: 127.0.0.1:4150
 
-mysqls:
-  account: "root:123456@tcp(127.0.0.1:23306)/baby-account?charset=utf8mb4&parseTime=True&loc=Local"
-  shop: "root:123456@tcp(127.0.0.1:23306)/baby-shop?charset=utf8mb4&parseTime=True&loc=Local"
-  sms: "root:123456@tcp(127.0.0.1:23306)/baby-sms?charset=utf8mb4&parseTime=True&loc=Local"
+database:
+  subdatabase:
+    accountdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-account
+    shopdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-shop
+    smsdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-sms

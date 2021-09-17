@@ -70,18 +70,19 @@ func GetSmsDB() interfaces.DB {
 
 func InitDB() (err error) {
 	var conf = config.GetConfig()
-	accountClient, err = db.NewClientDB(conf.Mysqls.Account, log.Logger)
+	accountClient, err = db.NewClientDB(conf.Database.SubDatabase.AccountDatabase.GetMysqlUrl(), log.Logger)
 	if err != nil {
 		return
 	}
 	if err = accountClient.InitTables(
 		&tables.AccountAdmin{},
 		&tables.AccountAdminLoginLog{},
+		&tables.IterativeVersion{},
 	); err != nil {
 		panic(err)
 	}
 	initAdmin()
-	shopClient, err = db.NewClientDB(conf.Mysqls.Shop, log.Logger)
+	shopClient, err = db.NewClientDB(conf.Database.SubDatabase.ShopDatabase.GetMysqlUrl(), log.Logger)
 	if err != nil {
 		return
 	}
@@ -91,7 +92,7 @@ func InitDB() (err error) {
 	); err != nil {
 		panic(err)
 	}
-	smsClient, err = db.NewClientDB(conf.Mysqls.Sms, log.Logger)
+	smsClient, err = db.NewClientDB(conf.Database.SubDatabase.SmsDatabase.GetMysqlUrl(), log.Logger)
 	if err != nil {
 		return
 	}

@@ -7,6 +7,8 @@ import (
 )
 
 func Register(engine *gin.Engine) {
+	handle.InitBackend()
+
 	group := engine.Group("/api/file/", middleware.SetUserMeta())
 	group.POST("/upload", handle.FileUploadHandle)
 

@@ -14,8 +14,8 @@ var (
 
 func Init() {
 	conf := config.GetConfig()
-	topic = conf.NSQ.Topic
-	mq = nsq.InitNSQMQ(conf.NSQ.Addr)
+	topic = conf.MessageQueue.PublishTopics.WebsocketNotify
+	mq = nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
 	if err := mq.NewProducer(); err != nil {
 		log.Logger.Error(err.Error())
 		return

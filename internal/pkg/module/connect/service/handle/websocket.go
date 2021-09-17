@@ -39,8 +39,9 @@ func Init() {
 	go handleWrite()
 
 	conf := config.GetConfig()
-	mq = nsq.InitNSQMQ(conf.NSQ.Addr)
-	err := mq.NewConsumer(conf.NSQ.Topic, conf.NSQ.Channel)
+	mq = nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
+	tc := conf.MessageQueue.ConsumeTopics.WebsocketNotify
+	err := mq.NewConsumer(tc.Topic, tc.Channel)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -106,6 +107,7 @@ func WebSocketHandle(c *gin.Context) {
 			case constant.SessionMessageMessage:
 				handleSessionMessage(msg, userMeta.AccountId)
 			}
+		case constant.SpaceMessageNotify:
 		default:
 			continue
 		}
@@ -113,12 +115,12 @@ func WebSocketHandle(c *gin.Context) {
 }
 
 func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
-	imClient, err := grpc.GetClientGRPC(config.GetConfig().Servers.ImDaoServer)
+	imClient, err := grpc.GetClientGRPC(config.GetConfig().Rpc.SubServers.ImDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	accountClient, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	accountClient, err := grpc.GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -153,7 +155,7 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 		}
 		notify.WSMessage.SessionMessage.Message = rsp.Message{
 			SessionId:   resp.SessionId,
-			MessageType: 0,
+			MessageType: msg.WSMessage.SessionMessage.Message.MessageType,
 			Send: rsp.User{
 				AccountID:  userResp.Detail.AccountId,
 				Username:   userResp.Detail.Username,
@@ -162,6 +164,9 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 			Receive:       u.AccountId,
 			Content:       msg.WSMessage.SessionMessage.Message.Content,
 			SendTimestamp: msg.Timestamp,
+		}
+		switch notify.WSMessage.WSMessageType {
+
 		}
 		writeChan <- notify
 	}

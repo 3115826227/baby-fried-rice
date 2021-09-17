@@ -715,6 +715,21 @@ func (service *IMService) OperatorDeleteDao(ctx context.Context, req *im.ReqOper
 
 // 添加好友
 func (service *IMService) FriendAddDao(ctx context.Context, req *im.ReqFriendAddDao) (empty *emptypb.Empty, err error) {
+	// 校验是否已经为好友
+	var resp *im.RspIsFriendDao
+	resp, err = service.FriendIsDao(ctx, &im.ReqIsFriendDao{
+		Origin:    req.Origin,
+		AccountId: req.AccountId,
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if resp.IsFriend {
+		// 已经为好友关系
+		empty = new(emptypb.Empty)
+		return
+	}
 	// 校验好友是否有验证权限
 	var um *im.RspUserManageQueryDao
 	um, err = service.UserManageQueryDao(ctx, &im.ReqUserManageQueryDao{AccountId: req.AccountId})
@@ -769,12 +784,29 @@ func (service *IMService) FriendAddDao(ctx context.Context, req *im.ReqFriendAdd
 		Timestamp: now,
 	}
 	beans = append(beans, &friend)
-	beans = append(beans, oriFriend)
+	beans = append(beans, &oriFriend)
 	if err = db.GetDB().CreateMulti(beans...); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
+	return
+}
+
+// 判断是否为好友
+func (service *IMService) FriendIsDao(ctx context.Context, req *im.ReqIsFriendDao) (resp *im.RspIsFriendDao, err error) {
+	var friends []tables.Friend
+	template := db.GetDB().GetDB()
+	if err = template.Where("origin = ? and friend = ?", req.Origin, req.AccountId).Find(&friends).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = new(im.RspIsFriendDao)
+	if len(friends) == 1 {
+		resp.IsFriend = true
+		resp.AccountId = friends[0].Friend
+		resp.Remark = friends[0].Remark
+	}
 	return
 }
 

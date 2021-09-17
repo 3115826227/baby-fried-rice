@@ -3,25 +3,29 @@ log:
   logpath:
 
 server:
-  name: "im-service"
-  serial: 1
-  addr: "0.0.0.0"
-  port: 18076
-  register: "http://127.0.0.1:18076"
+  httpserver:
+    name: "im-service"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18076
+    register: "http://127.0.0.1:18076"
 
-etcd:
-  - "http://127.0.0.1:23791"
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
 
 rpc:
-  client:
-    certfile: "cert/server.pem"
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    imdaoserver: "im-dao"
 
-healthyrolltime: 1000
-
-servers:
-  accountdaoserver: "account-dao"
-  imdaoserver: "im-dao"
-
-nsq:
-  addr: 127.0.0.1:4150
-  topic: baby-test
+messagequeue:
+  publishtopics:
+    websocket_notify:  "baby/websocket-notify"
+  nsq:
+    cluster: "127.0.0.1:4150"

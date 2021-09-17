@@ -15,7 +15,7 @@ import (
 type PrivateMessageService struct {
 }
 
-func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, req *privatemessage.ReqPrivateMessageAddDao) (empty *emptypb.Empty, err error) {
+func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, req *privatemessage.ReqPrivateMessageAddDao) (resp *privatemessage.RspPrivateMessageAddDao, err error) {
 	var request = requests.UserSendPrivateMessageReq{
 		SendId:          req.SendId,
 		ReceiveId:       req.ReceiveId,
@@ -24,7 +24,17 @@ func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, 
 		MessageTitle:    req.Title,
 		MessageContent:  req.Content,
 	}
-	if err = db.SendPrivateMessage(request); err != nil {
+	var id string
+	if id, err = db.SendPrivateMessage(request); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = &privatemessage.RspPrivateMessageAddDao{Id: id}
+	return
+}
+
+func (service *PrivateMessageService) PrivateMessageStatusUpdateDao(ctx context.Context, req *privatemessage.ReqPrivateMessageStatusUpdateDao) (empty *emptypb.Empty, err error) {
+	if err = db.UpdatePrivateMessagesStatus(req.AccountId, req.Ids); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -32,8 +42,8 @@ func (service *PrivateMessageService) PrivateMessageAddDao(ctx context.Context, 
 	return
 }
 
-func (service *PrivateMessageService) PrivateMessageStatusUpdateDao(ctx context.Context, req *privatemessage.ReqPrivateMessageStatusUpdateDao) (empty *emptypb.Empty, err error) {
-	if err = db.UpdatePrivateMessagesStatus(req.AccountId, req.Ids); err != nil {
+func (service *PrivateMessageService) PrivateMessageDeleteDao(ctx context.Context, req *privatemessage.ReqPrivateMessageDeleteDao) (empty *emptypb.Empty, err error) {
+	if err = db.DeletePrivateMessage(req.AccountId, req.Ids); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}

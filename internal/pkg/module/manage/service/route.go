@@ -7,6 +7,8 @@ import (
 )
 
 func Register(engine *gin.Engine) {
+	handle.InitBackend()
+
 	engine.POST("/api/admin/login", handle.AdminLoginHandle)
 	app := engine.Group("/api/manage", middleware.SetUserMeta())
 
@@ -19,10 +21,17 @@ func Register(engine *gin.Engine) {
 	app.GET("/admin/login/log/user", handle.UserLoginLogHandle)
 
 	app.POST("/admin/shop/commodity", handle.AddCommodityHandle)
+	app.PATCH("/admin/shop/commodity", handle.UpdateCommodityHandle)
 	app.GET("/admin/shop/commodity", handle.CommodityHandle)
+
+	app.GET("/admin/shop/order", handle.OrderHandle)
 
 	app.POST("/admin/coin/giveaway", handle.SystemGiveawayUserCoinHandle)
 	app.GET("/admin/coin", handle.UserCoinHandle)
 
 	app.GET("/admin/sms/log", handle.SmsLogHandle)
+
+	app.POST("/admin/iter/version", handle.AddIterativeVersionHandle)
+	app.PATCH("/admin/iter/version", handle.UpdateIterativeVersionHandle)
+	app.GET("/admin/iter/version", handle.QueryIterativeVersionHandle)
 }

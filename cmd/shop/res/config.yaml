@@ -3,26 +3,29 @@ log:
   logpath:
 
 server:
-  name: "shop-service"
-  serial: 1
-  addr: "0.0.0.0"
-  port: 18077
-  register: "http://127.0.0.1:18077"
+  rpcserver:
+    name: "shop-service"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18077
+    register: "http://127.0.0.1:18077"
 
-etcd:
-  - "http://127.0.0.1:23791"
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
 
 rpc:
-  client:
-    certfile: "cert/server.pem"
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    shopdaoserver: "shop-dao"
 
-healthyrolltime: 1000
-
-servers:
-  accountdaoserver: "account-dao"
-  shopdaoserver: "shop-dao"
-
-nsq:
-  addr: 127.0.0.1:4150
-  topics:
-    usercointopic: baby/user-coin
+messagequeue:
+  publishtopics:
+    usercoin:  "baby/user-coin"
+  nsq:
+    cluster: "127.0.0.1:4150"

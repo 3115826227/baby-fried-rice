@@ -22,13 +22,19 @@ func UserHandle(c *gin.Context) {
 		details []tables.AccountUserDetail
 		total   int64
 	)
-	details, total, err = query.GetUsers(reqPage.Page, reqPage.PageSize)
+	var param = query.UserQueryParam{
+		AccountId:    c.Query(handle.QueryAccountId),
+		LikeUsername: c.Query(handle.QueryLikeUsername),
+		Page:         reqPage.Page,
+		PageSize:     reqPage.PageSize,
+	}
+	details, total, err = query.GetUsers(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var list = make([]rsp.UserBackendResp, 0)
+	var list = make([]interface{}, 0)
 	for _, d := range details {
 		var detail = rsp.UserBackendResp{
 			AccountId:    d.AccountID,
@@ -42,11 +48,5 @@ func UserHandle(c *gin.Context) {
 		}
 		list = append(list, detail)
 	}
-	var response = rsp.UserBackendListResp{
-		List:     list,
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
-		Total:    total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, total, reqPage.Page, reqPage.PageSize)
 }

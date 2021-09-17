@@ -33,6 +33,8 @@ type UserDetailResp struct {
 	Age        int64  `json:"age"`
 	Phone      string `json:"phone,"`
 	Coin       int64  `json:"coin"`
+	IsFriend   bool   `json:"is_friend"`
+	Remark     string `json:"remark"`
 }
 
 // 后台管理用户信息
@@ -45,14 +47,6 @@ type UserBackendResp struct {
 	Age          int64  `json:"age"`
 	Phone        string `json:"phone"`
 	RegisterTime int64  `json:"register_time"`
-}
-
-// 后台管理用户信息列表
-type UserBackendListResp struct {
-	List     []UserBackendResp `json:"list"`
-	Page     int64             `json:"page"`
-	PageSize int64             `json:"page_size"`
-	Total    int64             `json:"total"`
 }
 
 type UserSignInResp struct {
@@ -68,16 +62,8 @@ type UserSignInLogResp struct {
 	Timestamp  int64               `json:"timestamp"`
 }
 
-// 用户积分信息
-type UserCoinResp struct {
-	List     []UserCoin `json:"list"`
-	Page     int64      `json:"page"`
-	PageSize int64      `json:"page_size"`
-	Total    int64      `json:"total"`
-}
-
 type UserCoin struct {
-	User            User  `json:"user"`
+	User
 	Coin            int64 `json:"coin"`
 	CoinTotal       int64 `json:"coin_total"`
 	UpdateTimestamp int64 `json:"update_timestamp"`
@@ -141,8 +127,8 @@ type UserLoginLogListResp struct {
 }
 
 type UserLoginLogResp struct {
-	ID             int    `json:"id"`
-	User           User   `json:"user"`
+	ID int `json:"id"`
+	User
 	LoginCount     int    `json:"login_count"`
 	IP             string `json:"ip"`
 	LoginTimestamp int64  `json:"login_timestamp"`

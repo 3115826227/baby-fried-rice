@@ -34,31 +34,31 @@ func Register(engine *gin.Engine) {
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.UserAccountServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.UserAccountServer)
 }
 
 func HandleManageProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.Manage)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.ManageServer)
 }
 
 func HandleImProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.ImServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.ImServer)
 }
 
 func HandleSpaceProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.SpaceServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.SpaceServer)
 }
 
 func HandleConnectProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.ConnectServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.ConnectServer)
 }
 
 func HandleFileProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.FileServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.FileServer)
 }
 
 func HandleShopProxy(c *gin.Context) {
-	handleProxy(c, config.GetConfig().Servers.ShopServer)
+	handleProxy(c, config.GetConfig().Rpc.SubServers.ShopServer)
 }
 
 func handleProxy(c *gin.Context, serverName string) {

@@ -14,7 +14,7 @@ var (
 
 func GetDB() interfaces.DB {
 	if client == nil {
-		if err := InitDB(config.GetConfig().MysqlUrl); err != nil {
+		if err := InitDB(config.GetConfig().Database.MainDatabase.GetMysqlUrl()); err != nil {
 			panic(err)
 		}
 	}

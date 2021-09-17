@@ -13,7 +13,7 @@ import (
 
 func Register(engine *gin.Engine) {
 	handle.Init()
-	url := ginSwagger.URL(fmt.Sprintf("http://localhost:%v/swagger/doc.json", config.GetConfig().Server.Port))
+	url := ginSwagger.URL(fmt.Sprintf("http://localhost:%v/swagger/doc.json", config.GetConfig().Server.HTTPServer.Port))
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	app := engine.Group("/api/im", middleware.SetUserMeta())
 
@@ -44,4 +44,5 @@ func Register(engine *gin.Engine) {
 	app.PATCH("/session/friend/black_list", handle.FriendBlackListUpdateHandle)
 	app.PATCH("/session/friend/remark", handle.FriendRemarkUpdateHandle)
 	app.DELETE("/session/friend", handle.FriendDeleteHandle)
+	app.POST("/session/webrtc", handle.SessionCreateWebRTC)
 }

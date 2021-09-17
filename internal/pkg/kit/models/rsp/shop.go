@@ -52,11 +52,17 @@ type CommodityDetailResp struct {
 	Images []string `json:"images"`
 }
 
-type CommodityOrdersResp struct {
-	List     []CommodityOrder `json:"list"`
-	Page     int64            `json:"page"`
-	PageSize int64            `json:"page_size"`
-	Total    int64            `json:"total"`
+func CommodityOrderModelToRsp(order tables.CommodityOrder) CommodityOrderBase {
+	return CommodityOrderBase{
+		Id:              order.ID,
+		AccountId:       order.AccountId,
+		PaymentType:     order.PaymentType,
+		TotalPrice:      order.TotalPrice,
+		TotalCoin:       order.TotalCoin,
+		Status:          int64(order.Status),
+		CreateTimestamp: order.CreatedAt.Unix(),
+		UpdateTimestamp: order.UpdatedAt.Unix(),
+	}
 }
 
 type CommodityOrder struct {

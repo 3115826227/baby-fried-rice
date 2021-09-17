@@ -7,7 +7,7 @@ server:
   addr: "0.0.0.0"
   serial: 1
   port: 8080
-  register: "http://172.16.28.94:18071"
+  register: "http://127.0.0.1:18071"
 
 redis:
   redisurl: "redis:6379"
@@ -23,3 +23,4 @@ rpc:
 
 servers:
   accountdaoserver: "account-dao"
+  imdaoserver: "im-dao"

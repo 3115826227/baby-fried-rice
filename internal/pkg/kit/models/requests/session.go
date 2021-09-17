@@ -76,3 +76,21 @@ type ReqUpdateFriendRemark struct {
 type ReqUserManageUpdate struct {
 	AddFriendPermissionType int32 `json:"add_friend_permission_type"`
 }
+
+// 用户webrtc创建请求参数
+type ReqCreateWebRTC struct {
+	// 会话id
+	SessionId int64 `json:"session_id"`
+	// 用户sdp
+	Sdp string `json:"sdp"`
+}
+
+// 用户webrtc邀请加入参数
+type ReqReturnWebRTC struct {
+	// 回复
+	Return bool `json:"return"`
+	// 会话id
+	SessionId int64 `json:"session_id"`
+	// 用户sdp
+	Sdp string `json:"sdp"`
+}

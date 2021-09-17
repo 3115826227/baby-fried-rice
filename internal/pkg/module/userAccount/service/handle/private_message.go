@@ -1,24 +1,29 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
+	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
+	"time"
 )
 
 func SendPrivateMessageHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	var pm requests.UserSendPrivateMessageReq
-	pm.SendId = userMeta.AccountId
-	if err := c.ShouldBind(&pm); err != nil {
+	var pmReq requests.UserSendPrivateMessageReq
+	pmReq.SendId = userMeta.AccountId
+	if err := c.ShouldBind(&pmReq); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
@@ -29,20 +34,62 @@ func SendPrivateMessageHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	var now = time.Now().Unix()
 	reqAdd := privatemessage.ReqPrivateMessageAddDao{
-		SendId:          pm.SendId,
-		ReceiveId:       pm.ReceiveId,
-		MessageType:     pm.MessageType,
-		MessageSendType: int32(pm.MessageSendType),
-		Title:           pm.MessageTitle,
-		Content:         pm.MessageContent,
+		SendId:          pmReq.SendId,
+		ReceiveId:       pmReq.ReceiveId,
+		MessageType:     pmReq.MessageType,
+		MessageSendType: int32(pmReq.MessageSendType),
+		Title:           pmReq.MessageTitle,
+		Content:         pmReq.MessageContent,
+		CreateTimestamp: now,
 	}
-	_, err = pmClient.PrivateMessageAddDao(context.Background(), &reqAdd)
+	var resp *privatemessage.RspPrivateMessageAddDao
+	resp, err = pmClient.PrivateMessageAddDao(context.Background(), &reqAdd)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	go func() {
+		reqDetail := &privatemessage.ReqPrivateMessageDetailDao{
+			AccountId: userMeta.AccountId,
+			Id:        resp.Id,
+		}
+		var respDetail *privatemessage.RspPrivateMessageDetailDao
+		respDetail, err = pmClient.PrivateMessageDetailDao(context.Background(), reqDetail)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			return
+		}
+		var pm = respDetail.PrivateMessage
+		var notify = models.WSMessageNotify{
+			WSMessageNotifyType: constant.PrivateMessageNotify,
+			Receive:             pmReq.ReceiveId,
+			WSMessage: models.WSMessage{
+				Send: userMeta.GetUserBaseInfo(),
+				PrivateMessage: rsp.UserPrivateMessageDetailResp{
+					UserPrivateMessage: rsp.UserPrivateMessage{
+						MessageId: pm.Id,
+						Send: rsp.User{
+							AccountID: userMeta.AccountId,
+							Username:  userMeta.Username,
+						},
+						ReceiveId:     pm.ReceiveId,
+						MessageStatus: pm.Status,
+						ReceiveTime:   pm.CreateTime,
+						Title:         pm.Title,
+					},
+					Content: respDetail.Content,
+				},
+			},
+			Timestamp: now,
+		}
+		if err = mq.Send(config.GetConfig().MessageQueue.PublishTopics.WebsocketNotify, notify.ToString()); err != nil {
+			log.Logger.Error(err.Error())
+		}
+	}()
 	handle.SuccessResp(c, "", nil)
 }
 
@@ -200,4 +247,23 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 }
 
 func DeletePrivateMessageHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	ids := strings.Split(c.Query("ids"), ",")
+	pmClient, err := grpc.GetPrivateMessageClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	req := &privatemessage.ReqPrivateMessageDeleteDao{
+		AccountId: userMeta.AccountId,
+		Ids:       ids,
+	}
+	_, err = pmClient.PrivateMessageDeleteDao(context.Background(), req)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
 }

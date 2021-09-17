@@ -10,7 +10,7 @@ func GetCommodities(page, pageSize int64, id string) (commodities []tables.Commo
 		offset = int((page - 1) * pageSize)
 		limit  = int(pageSize)
 	)
-	var template = db.GetDB().GetDB().Model(&tables.Commodity{})
+	var template = db.GetDB().GetDB().Model(&tables.Commodity{}).Where("status == 2")
 	if id != "" {
 		template = template.Where("id = ?", id)
 	}

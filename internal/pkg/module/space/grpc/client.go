@@ -43,7 +43,7 @@ func initClient(serverName, addr string) (err error) {
 	if _, exist := clientMp[serverName][addr]; exist {
 		return nil
 	}
-	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Client.CertFile)
+	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Cert.Client.ClientCertFile)
 	if err != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func initClient(serverName, addr string) (err error) {
 }
 
 func GetSpaceClient() (space.DaoSpaceClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Servers.SpaceDaoServer)
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.SpaceDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return nil, err
@@ -70,7 +70,7 @@ func GetSpaceClient() (space.DaoSpaceClient, error) {
 }
 
 func GetUserClient() (user.DaoUserClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return nil, err

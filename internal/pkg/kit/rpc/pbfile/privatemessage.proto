@@ -7,9 +7,11 @@ option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemess
 
 service DaoPrivateMessage {
   // 发送私信
-  rpc PrivateMessageAddDao(ReqPrivateMessageAddDao) returns (google.protobuf.Empty);
+  rpc PrivateMessageAddDao(ReqPrivateMessageAddDao) returns (RspPrivateMessageAddDao);
   // 更新私信阅读状态
   rpc PrivateMessageStatusUpdateDao(ReqPrivateMessageStatusUpdateDao) returns (google.protobuf.Empty);
+  // 删除私信
+  rpc PrivateMessageDeleteDao(ReqPrivateMessageDeleteDao) returns (google.protobuf.Empty);
   // 查询私信列表
   rpc PrivateMessageQueryDao(ReqPrivateMessageQueryDao) returns (RspPrivateMessageQueryDao);
   // 查询私信详情
@@ -29,6 +31,13 @@ message ReqPrivateMessageAddDao {
   string title = 5;
   // 内容
   string content = 6;
+  // 时间
+  int64 createTimestamp = 7;
+}
+
+message RspPrivateMessageAddDao {
+  // 私信id
+  string id = 1;
 }
 
 message ReqPrivateMessageDeleteDao {

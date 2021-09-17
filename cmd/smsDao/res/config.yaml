@@ -3,28 +3,39 @@ log:
   logpath:
 
 server:
-  name: "sms-dao"
-  serial: 1
-  addr: "0.0.0.0"
-  port: 18065
-  register: "http://127.0.0.1:18065"
-
-redis:
-  redisurl: "localhost:26379"
-  redispassword: "123456"
-  redisdb: 9
-
-etcd:
-  - "http://127.0.0.1:23791"
+  rpcserver:
+    name: "sms-dao"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18065
+    register: "http://127.0.0.1:18065"
 
 rpc:
-  server:
-    certfile: "cert/server.pem"
-    keyfile: "cert/server.key"
+  cert:
+    server:
+      servercertfile: "cert/server.pem"
+      serverkeyfile: "cert/server.key"
 
-healthyrolltime: 1000
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby-sms?charset=utf8mb4&parseTime=True&loc=Local"
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+database:
+  maindatabase:
+    host: 127.0.0.1
+    port: 23306
+    username: root
+    password: 123456
+    dbname: baby-sms
 
 endpoint: ""
 accesskeyid: ""

@@ -20,6 +20,16 @@ type ReqAddCommodity struct {
 	MainImg string `json:"main_img"`
 }
 
+// 商品信息更新请求
+type ReqUpdateCommodity struct {
+	// 商品id
+	Id string `json:"id"`
+	// 商品添加信息
+	ReqAddCommodity
+	// 商品信息
+	Status *int64 `json:"status"`
+}
+
 // 下单请求
 type ReqAddCommodityOrder struct {
 	Commodities []OrderCommodity `json:"commodities" binding:"required"`

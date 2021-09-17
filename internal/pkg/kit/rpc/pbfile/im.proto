@@ -52,6 +52,8 @@ service DaoIm {
   rpc OperatorDeleteDao(ReqOperatorDeleteDao) returns (google.protobuf.Empty);
   // 好友添加
   rpc FriendAddDao(ReqFriendAddDao) returns (google.protobuf.Empty);
+  // 判断是否为好友
+  rpc FriendIsDao(ReqIsFriendDao) returns (RspIsFriendDao);
   // 好友列表查询
   rpc FriendQueryDao(ReqFriendQueryDao) returns (RspFriendQueryDao);
   // 好友黑名单操作
@@ -271,9 +273,18 @@ message ReqSessionDeleteDao {
 // 会话消息类型
 enum  SessionMessageType
 {
+  // 文字消息
   TextMessage = 0;
+  // 文件消息
   FileMessage = 1;
+  // 图片消息
   ImgMessage = 2;
+  // 邀请消息
+  InviteMessage = 3;
+  // 回复消息
+  ReturnMessage = 4;
+  // 加入消息
+  JoinMessage = 5;
 }
 
 // 会话消息
@@ -432,6 +443,19 @@ message ReqFriendAddDao {
   string oriRemark = 4;
   // 操作id
   int64 operator_id = 5;
+}
+
+// 判断是否为好友关系请求
+message ReqIsFriendDao {
+  string origin = 1;
+  string accountId = 2;
+}
+
+// 判断是否为好友关系结果
+message RspIsFriendDao {
+  bool isFriend = 1;
+  string accountId = 2;
+  string remark = 3;
 }
 
 // 好友列表查询请求

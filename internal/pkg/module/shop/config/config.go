@@ -1,59 +1,18 @@
 package config
 
 import (
+	"baby-fried-rice/internal/pkg/kit/models"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
-type Conf struct {
-	Log struct {
-		LogLevel string `json:"log_level"`
-		LogPath  string `json:"log_path"`
-	} `json:"log"`
-
-	Server struct {
-		Name     string `json:"name"`
-		Serial   int    `json:"serial"`
-		Addr     string `json:"addr"`
-		Port     int    `json:"port"`
-		Register string `json:"register"`
-	} `json:"server"`
-
-	Redis struct {
-		RedisUrl      string `json:"redis_url"`
-		RedisPassword string `json:"redis_password"`
-		RedisDB       int    `json:"redis_db"`
-	} `json:"redis"`
-
-	Etcd            []string `json:"etcd"`
-	HealthyRollTime int64    `json:"healthy_roll_time"`
-
-	Rpc struct {
-		Client struct {
-			CertFile string `json:"cert_file"`
-		} `json:"client"`
-	} `json:"rpc"`
-
-	Servers struct {
-		AccountDaoServer string `json:"account_dao_server"`
-		ShopDaoServer    string `json:"shop_dao_server"`
-	}
-
-	NSQ struct {
-		Addr   string `json:"addr"`
-		Topics struct {
-			UserCoinTopic string `json:"user_coin_topic"`
-		} `json:"topics"`
-	}
-}
-
 var (
-	config Conf
+	config models.Conf
 )
 
-func GetConfig() Conf {
+func GetConfig() models.Conf {
 	return config
 }
 

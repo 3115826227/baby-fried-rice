@@ -5,11 +5,12 @@ import (
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
+	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"errors"
 	"time"
 )
 
-func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
+func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (string, error) {
 	var pmID = handle.GenerateSerialNumberByLen(constant.PrivateMessageIDDefaultLength)
 	var now = time.Now()
 	var pmc = tables.UserPrivateMessageContent{
@@ -35,13 +36,44 @@ func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (err error) {
 	case constant.SendGroup:
 	case constant.SendGlobal:
 	default:
-		return errors.New("send private smsDao type is invalid")
+		return pmID, errors.New("send private smsDao type is invalid")
 	}
-	return GetDB().CreateMulti(beans...)
+	return pmID, GetDB().CreateMulti(beans...)
 }
 
 func UpdatePrivateMessagesStatus(receiveId string, messageId []string) (err error) {
 	return GetDB().GetDB().Model(&tables.UserPrivateMessage{}).
 		Where("receive_id = ? and message_id in (?)", receiveId, messageId).
 		Updates(map[string]interface{}{"status": 1}).Error
+}
+
+func DeletePrivateMessage(accountId string, messageId []string) (err error) {
+	var checkPrivateMessages []tables.UserPrivateMessage
+	var checkIds []string
+	if err = GetDB().GetDB().Where("send_id = ? or receive = ?", accountId, accountId).
+		Where("message_id in (?)", messageId).
+		Find(&checkPrivateMessages).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	for _, pm := range checkPrivateMessages {
+		checkIds = append(checkIds, pm.MessageId)
+	}
+	var tx = GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		if err = tx.Commit().Error; err != nil {
+			log.Logger.Error(err.Error())
+		}
+	}()
+	if err = tx.Model(&tables.UserPrivateMessage{}).Where("message_id in (?)", checkIds).
+		Delete(&tables.UserPrivateMessage{}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	return tx.Model(&tables.UserPrivateMessageContent{}).Where("id in (?)", checkIds).
+		Delete(&tables.UserPrivateMessageContent{}).Error
 }

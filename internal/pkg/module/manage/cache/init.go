@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/cache"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/log"
+	"baby-fried-rice/internal/pkg/kit/models"
 	"github.com/go-redis/redis"
 )
 
@@ -16,8 +17,8 @@ func GetRedisClient() *redis.Client {
 	return rds
 }
 
-func InitRedisClient(addr, passwd string, db int) (err error) {
-	rds, err = cache.NewRedisClient(addr, passwd, db)
+func InitRedisClient(redisConf models.Redis) (err error) {
+	rds, err = cache.NewRedisClient(redisConf.Addr, redisConf.Password, redisConf.DB)
 	if err != nil {
 		return
 	}
@@ -28,7 +29,7 @@ func GetCache() interfaces.Cache {
 	return c
 }
 
-func InitCache(addr, passwd string, db int, lc log.Logging) (err error) {
-	c, err = cache.InitCache(addr, passwd, db, lc)
+func InitCache(redisConf models.Redis, lc log.Logging) (err error) {
+	c, err = cache.InitCache(redisConf.Addr, redisConf.Password, redisConf.DB, lc)
 	return
 }

@@ -6,9 +6,10 @@ import (
 )
 
 type SmsLogsQueryParam struct {
-	AccountId string `json:"account_id"`
-	Page      int64  `json:"page"`
-	PageSize  int64  `json:"page_size"`
+	AccountId string
+	Phone     string
+	Page      int64
+	PageSize  int64
 }
 
 func GetSmsLog(param SmsLogsQueryParam) (logs []tables.SendMessageLog, total int64, err error) {
@@ -19,6 +20,9 @@ func GetSmsLog(param SmsLogsQueryParam) (logs []tables.SendMessageLog, total int
 	template := db.GetSmsDB().GetDB().Model(&tables.SendMessageLog{})
 	if param.AccountId != "" {
 		template = template.Where("account_id = ?", param.AccountId)
+	}
+	if param.Phone != "" {
+		template = template.Where("phone = ?", param.Phone)
 	}
 	if err = template.Count(&total).Error; err != nil {
 		return

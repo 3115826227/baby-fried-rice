@@ -24,8 +24,9 @@ func AdminLoginLogHandle(c *gin.Context) {
 		total int64
 	)
 	var param = query.LoginLogsQueryParam{
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
+		AccountId: c.Query(handle.QueryAccountId),
+		Page:      reqPage.Page,
+		PageSize:  reqPage.PageSize,
 	}
 	logs, total, err = query.GetAdminLoginLogs(param)
 	if err != nil {
@@ -47,7 +48,7 @@ func AdminLoginLogHandle(c *gin.Context) {
 	for _, admin := range admins {
 		idsMap[admin.ID] = admin
 	}
-	var list = make([]rsp.UserLoginLogResp, 0)
+	var list = make([]interface{}, 0)
 	for _, l := range logs {
 		list = append(list, rsp.UserLoginLogResp{
 			ID: l.ID,
@@ -61,13 +62,7 @@ func AdminLoginLogHandle(c *gin.Context) {
 			LoginTimestamp: l.LoginTime.Unix(),
 		})
 	}
-	var response = rsp.UserLoginLogListResp{
-		List:     list,
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
-		Total:    total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, total, reqPage.Page, reqPage.PageSize)
 }
 
 // 用户登录日志查询
@@ -83,8 +78,9 @@ func UserLoginLogHandle(c *gin.Context) {
 		total int64
 	)
 	var param = query.LoginLogsQueryParam{
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
+		AccountId: c.Query(handle.QueryAccountId),
+		Page:      reqPage.Page,
+		PageSize:  reqPage.PageSize,
 	}
 	logs, total, err = query.GetUserLoginLogs(param)
 	if err != nil {
@@ -106,7 +102,7 @@ func UserLoginLogHandle(c *gin.Context) {
 	for _, d := range details {
 		idsMap[d.AccountID] = d
 	}
-	var list = make([]rsp.UserLoginLogResp, 0)
+	var list = make([]interface{}, 0)
 	for _, l := range logs {
 		list = append(list, rsp.UserLoginLogResp{
 			ID: l.ID,
@@ -120,11 +116,5 @@ func UserLoginLogHandle(c *gin.Context) {
 			LoginTimestamp: l.LoginTime.Unix(),
 		})
 	}
-	var response = rsp.UserLoginLogListResp{
-		List:     list,
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
-		Total:    total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, total, reqPage.Page, reqPage.PageSize)
 }

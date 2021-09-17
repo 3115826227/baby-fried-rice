@@ -1,61 +1,32 @@
 package config
 
 import (
+	"baby-fried-rice/internal/pkg/kit/models"
 	"errors"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
 
-type Conf struct {
-	Log struct {
-		LogLevel string `json:"log_level"`
-		LogPath  string `json:"log_path"`
-	} `json:"log"`
-
-	Server struct {
-		Name string `json:"name"`
-		Addr string `json:"addr"`
-		Port int    `json:"port"`
-	} `json:"server"`
-
-	Redis struct {
-		RedisUrl      string `json:"redis_url"`
-		RedisPassword string `json:"redis_password"`
-		RedisDB       int    `json:"redis_db"`
-	} `json:"redis"`
-
-	Etcd []string `json:"etcd"`
-
-	Servers struct {
-		Manage            string `json:"manage"`
-		UserAccountServer string `json:"user_account_server"`
-		SpaceServer       string `json:"space_server"`
-		ConnectServer     string `json:"connect_server"`
-		ImServer          string `json:"im_server"`
-		FileServer        string `json:"file_server"`
-		ShopServer        string `json:"shop_server"`
-	}
-}
-
 var (
-	config Conf
+	config models.Conf
 )
 
-func GetConfig() Conf {
+func GetConfig() models.Conf {
 	return config
 }
 
-func readConfig() (err error) {
-	var data []byte
-	if data, err = ioutil.ReadFile("res/config_dev.yaml"); err != nil {
+func readConfig() error {
+	data, err := ioutil.ReadFile("res/config_dev.yaml")
+	if err != nil {
 		err = errors.New(fmt.Sprintf("failed read config file: %s \n", err))
-		return
+		return err
 	}
 	if err = yaml.Unmarshal(data, &config); err != nil {
 		err = errors.New(fmt.Sprintf("failed unmarshal config file: %s \n", err))
+		return err
 	}
-	return
+	return nil
 }
 
 func init() {

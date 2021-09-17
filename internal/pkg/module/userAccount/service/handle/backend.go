@@ -1,4 +1,4 @@
-package service
+package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
@@ -15,33 +15,43 @@ import (
 )
 
 var (
+	mq            interfaces.MQ
 	payFailedChan = make(chan models.UserCoinChangeMQMessage, 10)
 )
 
 func InitBackend() {
 	conf := config.GetConfig()
-	if err := NewConsume(conf.NSQ.Topics.UserCoin, runUserCoinConsume); err != nil {
+	if err := NewProducer(); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err := NewConsume(conf.MessageQueue.ConsumeTopics.UserCoin, runUserCoinConsume); err != nil {
+		log.Logger.Error(err.Error())
 		return
 	}
 }
 
-func NewConsume(consume config.TopicConsume, handle func(mq interfaces.MQ)) (err error) {
+func NewProducer() error {
 	conf := config.GetConfig()
-	var mq = nsq.InitNSQMQ(conf.NSQ.Addr)
-	err = mq.NewConsumer(consume.Topic, consume.Channel)
-	if err != nil {
-		log.Logger.Error(err.Error())
+	mq = nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
+	return mq.NewProducer()
+}
+
+func NewConsume(consume models.TopicConsume, handle func(mq interfaces.MQ)) (err error) {
+	conf := config.GetConfig()
+	consumeMQ := nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
+	if err = consumeMQ.NewConsumer(consume.Topic, consume.Channel); err != nil {
 		return
 	}
-	go handle(mq)
+	go handle(consumeMQ)
 	return
 }
 
 // 处理用户积分变动的消息
-func runUserCoinConsume(mq interfaces.MQ) {
+func runUserCoinConsume(consumeMQ interfaces.MQ) {
 	go handlePayFailed()
 	for {
-		value, err := mq.Consume()
+		value, err := consumeMQ.Consume()
 		if err != nil {
 			log.Logger.Error(err.Error())
 			continue

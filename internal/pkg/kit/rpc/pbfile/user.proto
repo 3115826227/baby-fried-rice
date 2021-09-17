@@ -107,7 +107,7 @@ message DaoUserDetail {
 
 // 定义用户详细信息请求参数
 message ReqDaoUserDetail {
-  string AccountId = 1;
+  string accountId = 1;
 }
 
 // 定义用户详细信息返回参数

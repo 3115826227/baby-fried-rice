@@ -13,7 +13,7 @@ var (
 
 func Init() {
 	conf := config.GetConfig()
-	mq = nsq.InitNSQMQ(conf.NSQ.Addr)
+	mq = nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
 	if err := mq.NewProducer(); err != nil {
 		log.Logger.Error(err.Error())
 		return

@@ -6,8 +6,11 @@ import (
 )
 
 type CommoditiesQueryParam struct {
-	Page     int64 `json:"page"`
-	PageSize int64 `json:"page_size"`
+	SellType string
+	LikeName string
+	Status   string
+	Page     int64
+	PageSize int64
 }
 
 func GetCommodities(param CommoditiesQueryParam) (commodities []tables.Commodity, total int64, err error) {
@@ -16,6 +19,15 @@ func GetCommodities(param CommoditiesQueryParam) (commodities []tables.Commodity
 		limit  = int(param.PageSize)
 	)
 	template := db.GetShopDB().GetDB().Model(&tables.Commodity{})
+	if param.SellType != "" {
+		template = template.Where("sell_type = ?", param.SellType)
+	}
+	if param.LikeName != "" {
+		template = template.Where("name like ?%", param.LikeName)
+	}
+	if param.Status != "" {
+		template = template.Where("status = ?", param.Status)
+	}
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}

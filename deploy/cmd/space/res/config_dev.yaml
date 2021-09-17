@@ -7,7 +7,7 @@ server:
   addr: "0.0.0.0"
   serial: 1
   port: 8080
-  register: "http://172.16.28.94:18074"
+  register: "http://127.0.0.1:18074"
 
 redis:
   redisurl: "redis:6379"

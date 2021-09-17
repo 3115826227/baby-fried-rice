@@ -17,13 +17,13 @@ func SmsLogHandle(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
-	accountId := c.Query("account_id")
 	var (
 		logs  []tables.SendMessageLog
 		total int64
 	)
 	var param = query.SmsLogsQueryParam{
-		AccountId: accountId,
+		AccountId: c.Query(handle.QueryAccountId),
+		Phone:     c.Query("phone"),
 		Page:      reqPage.Page,
 		PageSize:  reqPage.PageSize,
 	}

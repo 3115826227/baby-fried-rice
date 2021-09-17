@@ -3,6 +3,7 @@ package connect
 import (
 	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
+	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/module/connect/config"
 	"baby-fried-rice/internal/pkg/module/connect/log"
 	"baby-fried-rice/internal/pkg/module/connect/server"
@@ -13,7 +14,7 @@ import (
 )
 
 var (
-	conf    config.Conf
+	conf    models.Conf
 	errChan chan error
 )
 
@@ -21,32 +22,32 @@ func init() {
 	// 初始化配置文件并获取
 	conf = config.GetConfig()
 	// 初始化日志
-	if err := log.InitLog(conf.Server.Name, conf.Log.LogLevel, conf.Log.LogPath); err != nil {
+	if err := log.InitLog(conf.Server.HTTPServer.Name, conf.Log.LogLevel, conf.Log.LogPath); err != nil {
 		panic(err)
 	}
-	if err := server.InitRegisterClient(conf.Etcd); err != nil {
+	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster); err != nil {
 		panic(err)
 	}
-	srv := etcd.NewServerETCD(conf.Etcd, log.Logger)
+	srv := etcd.NewServerETCD(conf.Register.ETCD.Cluster, log.Logger)
 	if err := srv.Connect(); err != nil {
 		panic(err)
 	}
 	var serverInfo = interfaces.RegisterServerInfo{
-		Addr:         conf.Server.Register,
-		ServerName:   conf.Server.Name,
-		ServerSerial: conf.Server.Serial,
+		Addr:         conf.Server.HTTPServer.Register,
+		ServerName:   conf.Server.HTTPServer.Name,
+		ServerSerial: conf.Server.HTTPServer.Serial,
 	}
 	if err := srv.Register(serverInfo); err != nil {
 		panic(err)
 	}
 	errChan = make(chan error, 1)
-	go srv.HealthCheck(serverInfo, time.Duration(conf.HealthyRollTime), errChan)
+	go srv.HealthCheck(serverInfo, time.Duration(conf.Register.HealthyRollTime), errChan)
 }
 
 func Main() {
 	engine := gin.Default()
 	service.Register(engine)
-	if err := engine.Run(fmt.Sprintf("%v:%v", conf.Server.Addr, conf.Server.Port)); err != nil {
+	if err := engine.Run(fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port)); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}

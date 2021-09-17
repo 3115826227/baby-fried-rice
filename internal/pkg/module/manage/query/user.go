@@ -6,12 +6,25 @@ import (
 	"baby-fried-rice/internal/pkg/module/manage/db"
 )
 
-func GetUsers(page, pageSize int64) (details []tables.AccountUserDetail, total int64, err error) {
+type UserQueryParam struct {
+	AccountId    string
+	LikeUsername string
+	Page         int64
+	PageSize     int64
+}
+
+func GetUsers(param UserQueryParam) (details []tables.AccountUserDetail, total int64, err error) {
 	var (
-		offset = int((page - 1) * pageSize)
-		limit  = int(pageSize)
+		offset = int((param.Page - 1) * param.PageSize)
+		limit  = int(param.PageSize)
 	)
 	template := db.GetAccountDB().GetDB().Model(&tables.AccountUserDetail{})
+	if param.AccountId != "" {
+		template = template.Where("account_id = ?", param.AccountId)
+	}
+	if param.LikeUsername != "" {
+		template = template.Where("username like ?%", param.LikeUsername)
+	}
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}

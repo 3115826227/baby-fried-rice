@@ -42,7 +42,7 @@ func initClient(serverName, addr string) (err error) {
 		return nil
 	}
 	var b []byte
-	if b, err = ioutil.ReadFile(config.GetConfig().Rpc.Client.CertFile); err != nil {
+	if b, err = ioutil.ReadFile(config.GetConfig().Rpc.Cert.Client.ClientCertFile); err != nil {
 		return
 	}
 	var cp *x509.CertPool

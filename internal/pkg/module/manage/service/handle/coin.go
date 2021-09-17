@@ -115,7 +115,13 @@ func UserCoinHandle(c *gin.Context) {
 		userCoins []tables.AccountUserCoin
 		total     int64
 	)
-	details, total, err = query.GetUsers(reqPage.Page, reqPage.PageSize)
+	var param = query.UserQueryParam{
+		AccountId:    c.Query(handle.QueryAccountId),
+		LikeUsername: c.Query(handle.QueryLikeUsername),
+		Page:         reqPage.Page,
+		PageSize:     reqPage.PageSize,
+	}
+	details, total, err = query.GetUsers(param)
 	var ids = make([]string, 0)
 	for _, d := range details {
 		ids = append(ids, d.AccountID)
@@ -130,7 +136,7 @@ func UserCoinHandle(c *gin.Context) {
 	for _, uc := range userCoins {
 		userCoinMap[uc.AccountID] = uc
 	}
-	var list = make([]rsp.UserCoin, 0)
+	var list = make([]interface{}, 0)
 	for _, d := range details {
 		var userCoin = rsp.UserCoin{
 			User: rsp.User{
@@ -146,11 +152,5 @@ func UserCoinHandle(c *gin.Context) {
 		}
 		list = append(list, userCoin)
 	}
-	var response = rsp.UserCoinResp{
-		List:     list,
-		Page:     reqPage.Page,
-		PageSize: reqPage.PageSize,
-		Total:    total,
-	}
-	handle.SuccessResp(c, "", response)
+	handle.SuccessListResp(c, "", list, total, reqPage.Page, reqPage.PageSize)
 }

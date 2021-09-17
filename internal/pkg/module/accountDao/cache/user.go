@@ -73,6 +73,9 @@ func SetUserCoinRank(userCoinLog tables.AccountUserCoinLog, coin int64) (err err
 }
 
 func SetUserDetails(details []tables.AccountUserDetail) error {
+	if len(details) == 0 {
+		return nil
+	}
 	var mp = make(map[string]interface{})
 	for _, detail := range details {
 		data, err := json.Marshal(detail)

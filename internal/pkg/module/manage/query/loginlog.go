@@ -17,6 +17,9 @@ func GetUserLoginLogs(param LoginLogsQueryParam) (logs []tables.AccountUserLogin
 		limit  = int(param.PageSize)
 	)
 	template := db.GetAccountDB().GetDB().Model(&tables.AccountUserLoginLog{})
+	if param.AccountId != "" {
+		template = template.Where("account_id = ?", param.AccountId)
+	}
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}
@@ -30,6 +33,9 @@ func GetAdminLoginLogs(param LoginLogsQueryParam) (logs []tables.AccountAdminLog
 		limit  = int(param.PageSize)
 	)
 	template := db.GetAccountDB().GetDB().Model(&tables.AccountAdminLoginLog{})
+	if param.AccountId != "" {
+		template = template.Where("account_id = ?", param.AccountId)
+	}
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}
