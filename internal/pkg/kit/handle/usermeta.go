@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/models"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
@@ -11,14 +12,22 @@ const (
 	TokenPrefix = "token"
 	HeaderIP    = "IP"
 
-	HeaderAccountId = "accountId"
-	HeaderUsername  = "username"
-	HeaderSchoolId  = "schoolId"
-	HeaderPlatform  = "platform"
-	HeaderReqId     = "reqId"
-	HeaderIsSuper   = "isSuper"
+	HeaderAccountId  = "accountId"
+	HeaderUsername   = "username"
+	HeaderSchoolId   = "schoolId"
+	HeaderPlatform   = "platform"
+	HeaderReqId      = "reqId"
+	HeaderIsOfficial = "isOfficial"
 
 	GinContextKeyUserMeta = "userMeta"
+
+	QueryId           = "id"
+	QueryAccountId    = "account_id"
+	QueryLikeUsername = "username"
+	QueryLikeName     = "name"
+
+	QueryPage     = "page"
+	QueryPageSize = "page_size"
 )
 
 type UserMeta struct {
@@ -33,7 +42,7 @@ type UserMeta struct {
 	//平台
 	Platform string `json:"platform"`
 	//是否为超级管理员
-	IsSuper string `json:"isSuper"`
+	IsOfficial bool `json:"isOfficial"`
 }
 
 func (meta *UserMeta) ToString() string {
@@ -43,4 +52,12 @@ func (meta *UserMeta) ToString() string {
 
 func GetUserMeta(c *gin.Context) *UserMeta {
 	return c.MustGet(GinContextKeyUserMeta).(*UserMeta)
+}
+
+func (meta *UserMeta) GetUserBaseInfo() models.UserBaseInfo {
+	return models.UserBaseInfo{
+		AccountId:  meta.AccountId,
+		Username:   meta.Username,
+		IsOfficial: meta.IsOfficial,
+	}
 }

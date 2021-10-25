@@ -17,9 +17,14 @@ type redisCache struct {
 	rds *redis.Client
 }
 
-var (
-	rc *redisCache
-)
+func NewRedisClient(addr, passwd string, db int) (rds *redis.Client, err error) {
+	rds, err = newRedis(addr, passwd, db)
+	if err != nil {
+		err = errors.Wrap(err, "failed to new redis")
+		return
+	}
+	return
+}
 
 func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, error) {
 	rds, err := newRedis(addr, passwd, db)
@@ -27,7 +32,7 @@ func InitCache(addr, passwd string, db int, lc log.Logging) (interfaces.Cache, e
 		err = errors.Wrap(err, "failed to new redis")
 		return nil, err
 	}
-	rc = &redisCache{
+	rc := &redisCache{
 		lc:  lc,
 		rds: rds,
 	}
@@ -59,14 +64,30 @@ func (c *redisCache) Del(key string) error {
 	return c.rds.Del(key).Err()
 }
 
+func (c *redisCache) Info() (string, error) {
+	return c.rds.Info().Result()
+}
+
 func (c *redisCache) HSet(key, field string, value interface{}) error {
 	return c.rds.HSet(key, field, value).Err()
+}
+
+func (c *redisCache) HMSet(key string, field map[string]interface{}) error {
+	return c.rds.HMSet(key, field).Err()
 }
 
 func (c *redisCache) HGet(key, field string) (string, error) {
 	return c.rds.HGet(key, field).Result()
 }
 
+func (c *redisCache) HMGet(key string, fields ...string) ([]interface{}, error) {
+	return c.rds.HMGet(key, fields...).Result()
+}
+
 func (c *redisCache) HGetAll(key string) (map[string]string, error) {
 	return c.rds.HGetAll(key).Result()
+}
+
+func (c *redisCache) HDel(key string, field ...string) error {
+	return c.rds.HDel(key, field...).Err()
 }

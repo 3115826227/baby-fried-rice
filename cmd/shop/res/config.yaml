@@ -1,0 +1,31 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  rpcserver:
+    name: "shop-service"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18077
+    register: "http://127.0.0.1:18077"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    shopdaoserver: "shop-dao"
+
+messagequeue:
+  publishtopics:
+    usercoin:  "user_coin"
+  nsq:
+    cluster: "127.0.0.1:4150"

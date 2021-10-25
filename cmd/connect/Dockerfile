@@ -1,7 +1,6 @@
 FROM golang:1.15 AS build
 WORKDIR /go/src/baby-fried-rice
 COPY . .
-RUN go env -w GO111MODULE=off
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -tags=jsoniter -o connect cmd/connect/connect.go
 
 FROM alpine:3.8

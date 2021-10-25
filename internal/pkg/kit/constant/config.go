@@ -9,4 +9,6 @@ const (
 	PrivateMessageIDDefaultLength = 12
 	DefaultPageSize               = 10
 	DefaultPage                   = 1
+
+	DefaultUserEncryMd5 = "md5"
 )

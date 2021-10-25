@@ -40,7 +40,7 @@ func CheckToken(c *gin.Context) {
 	header.Set(handle.HeaderUsername, userMeta.Username)
 	header.Set(handle.HeaderSchoolId, userMeta.SchoolId)
 	header.Set(handle.HeaderReqId, userMeta.ReqId)
-	header.Set(handle.HeaderIsSuper, userMeta.IsSuper)
+	header.Set(handle.HeaderIsOfficial, fmt.Sprintf("%v", userMeta.IsOfficial))
 	header.Set(handle.HeaderPlatform, userMeta.Platform)
 	c.Next()
 }

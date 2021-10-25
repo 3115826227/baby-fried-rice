@@ -1,0 +1,32 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  httpserver:
+    name: "connect"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18075
+    register: "http://127.0.0.1:18075"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    imdaoserver: "im-dao"
+    spacedaoserver: "space-dao"
+
+messagequeue:
+  publishtopics:
+    websocketnotify:  "websocket_notify"
+  nsq:
+    cluster: "127.0.0.1:4150"

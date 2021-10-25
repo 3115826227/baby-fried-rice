@@ -2,10 +2,10 @@ package db
 
 import (
 	"baby-fried-rice/internal/pkg/kit/db"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
 	"baby-fried-rice/internal/pkg/module/spaceDao/log"
-	"baby-fried-rice/internal/pkg/module/spaceDao/model/tables"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 
 func GetDB() interfaces.DB {
 	if client == nil {
-		if err := InitDB(config.GetConfig().MysqlUrl); err != nil {
+		if err := InitDB(config.GetConfig().Database.MainDatabase.GetMysqlUrl()); err != nil {
 			panic(err)
 		}
 	}
@@ -28,7 +28,10 @@ func InitDB(mysqlUrl string) (err error) {
 	}
 	return client.InitTables(
 		&tables.Space{},
-		&tables.SpaceOperatorRelation{},
-		&tables.SpaceCommentRelation{},
+		&tables.SpaceDetail{},
+		&tables.VisitedRelation{},
+		&tables.OperatorRelation{},
+		&tables.CommentRelation{},
+		&tables.CommentDetail{},
 	)
 }

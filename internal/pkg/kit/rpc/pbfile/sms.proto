@@ -1,0 +1,25 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+// 生成文件的包名
+package sms;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/sms";  // 声明生成的 go 文件所属的包
+
+service DaoSms {
+  rpc SendMessageDao (ReqSendMessageDao) returns (google.protobuf.Empty);
+}
+
+// 发送短信
+message ReqSendMessageDao {
+  // 用户id
+  string accountId = 1;
+  // 用户手机号码
+  string phone = 2;
+  // 发送手机验证码
+  string phoneCode = 3;
+  // 签名名称
+  string signName = 4;
+  // 发送模板代码
+  int64 code = 5;
+}

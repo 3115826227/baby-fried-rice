@@ -1,0 +1,65 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/manage.log"
+
+server:
+  httpserver:
+    name: "manage"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 8080
+    register: "http://127.0.0.1:18073"
+
+cache:
+  redis:
+    maincache:
+      addr: "redis:6379"
+      password: "123456"
+      db: 9
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+messagequeue:
+  consumetopics:
+    deletefile:
+      topic: "delete_file"
+      channel: "delete_file_channel"
+  nsq:
+    cluster: nsq:4150
+
+database:
+  subdatabase:
+    accountdatabase:
+      host: baby-mysql
+      port: 3306
+      username: root
+      password: 123456
+      dbname: baby-account
+    shopdatabase:
+      host: baby-mysql
+      port: 3306
+      username: root
+      password: 123456
+      dbname: baby-shop
+    smsdatabase:
+      host: baby-mysql
+      port: 3306
+      username: root
+      password: 123456
+      dbname: baby-sms
+    spacedatabase:
+      host: baby-mysql
+      port: 3306
+      username: root
+      password: 123456
+      dbname: baby-space
+    imdatabase:
+      host: baby-mysql
+      port: 3306
+      username: root
+      password: 123456
+      dbname: baby-im

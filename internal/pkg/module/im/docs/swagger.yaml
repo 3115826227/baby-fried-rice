@@ -1,0 +1,92 @@
+basePath: /api/im
+definitions:
+  handle.ReqAddSession:
+    properties:
+      join_permission_type:
+        description: 会话加入权限
+        type: integer
+      joins:
+        description: 加入会话成员id列表
+        items:
+          type: string
+        type: array
+      name:
+        description: 会话名称
+        type: string
+      session_level:
+        description: 会话等级
+        type: integer
+      session_type:
+        description: 会话类型
+        type: integer
+    type: object
+host: localhost:18076
+info:
+  contact:
+    email: mayu@swagger.io
+    name: 马钰
+    url: http://www.swagger.io/support
+  description: 消息通信模块服务接口
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: im系统
+  version: "1.0"
+paths:
+  /session:
+    get:
+      consumes:
+      - application/json
+      description: 会话列表查询接口
+      parameters:
+      - description: 用户id
+        in: header
+        name: accountId
+        required: true
+        type: string
+      - description: 用户名
+        in: header
+        name: username
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 会话列表查询接口
+      tags:
+      - 会话相关接口
+    post:
+      consumes:
+      - application/json
+      description: 会话创建接口
+      parameters:
+      - description: 用户id
+        in: header
+        name: accountId
+        required: true
+        type: string
+      - description: 用户名
+        in: header
+        name: username
+        required: true
+        type: string
+      - description: 会话
+        in: body
+        name: session
+        required: true
+        schema:
+          $ref: '#/definitions/handle.ReqAddSession'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 会话创建接口
+      tags:
+      - 会话相关接口
+swagger: "2.0"

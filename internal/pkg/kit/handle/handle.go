@@ -17,15 +17,17 @@ import (
 )
 
 const (
-	ErrCodeLoginFailed  = 99
-	ErrCodeInvalidParam = 400
-	ErrCodeSystemError  = 1000
+	ErrCodeLoginFailed     = 99
+	ErrCodeInvalidParam    = 400
+	ErrCodePermissionError = 401
+	ErrCodeSystemError     = 1000
 )
 
 var ErrCodeM = map[int]string{
-	ErrCodeLoginFailed:  "用户名或密码错误",
-	ErrCodeInvalidParam: "参数错误",
-	ErrCodeSystemError:  "请求出错",
+	ErrCodeLoginFailed:     "用户名或密码错误",
+	ErrCodeInvalidParam:    "参数错误",
+	ErrCodeSystemError:     "请求出错",
+	ErrCodePermissionError: "权限错误",
 }
 
 var LoginErrResponse = gin.H{
@@ -43,21 +45,30 @@ var SysErrResponse = gin.H{
 	"message": ErrCodeM[ErrCodeSystemError],
 }
 
+var PermissionErrResponse = gin.H{
+	"code":    ErrCodePermissionError,
+	"message": ErrCodeM[ErrCodePermissionError],
+}
+
+var (
+	randSource = rand.NewSource(time.Now().UnixNano())
+)
+
 func SuccessResp(c *gin.Context, message string, data interface{}) {
 	if data == nil {
 		data = make(map[string]interface{})
 	}
-	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": data})
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: 0, Message: message, Data: data})
 }
 
-func SuccessListResp(c *gin.Context, message string, list []interface{}, total int64, req requests.PageCommonReq) {
+func SuccessListResp(c *gin.Context, message string, list []interface{}, total, page, pageSize int64) {
 	if list == nil {
 		list = make([]interface{}, 0)
 	}
-	c.JSON(http.StatusOK, gin.H{"code": 0, "message": message, "data": rsp.CommonListResp{
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: 0, Message: message, Data: rsp.CommonListResp{
 		List:     list,
-		Page:     req.Page,
-		PageSize: req.PageSize,
+		Page:     page,
+		PageSize: pageSize,
 		Total:    total,
 	}})
 }
@@ -70,8 +81,8 @@ func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
 	c.AbortWithStatusJSON(statusCode, gin.H{"code": errCode, "message": message, "data": nil})
 }
 
-func EncodePassword(pwd string) string {
-	hexStr := fmt.Sprintf("%x", md5.Sum([]byte(pwd)))
+func EncodePassword(id, pwd string) string {
+	hexStr := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%v:%v", id, pwd))))
 	return hexStr
 }
 
@@ -81,12 +92,12 @@ func GenerateID() string {
 
 //生成八位数字
 func GenerateSerialNumber() string {
-	return fmt.Sprintf("1%08v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
+	return fmt.Sprintf("1%08v", rand.New(randSource).Int31n(1000000))
 }
 
 //生成十二位数字
 func GenerateSerialNumberByLen(len int) string {
-	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(int32(10*len)))
+	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(randSource).Int31n(int32(10*len)))
 }
 
 /*

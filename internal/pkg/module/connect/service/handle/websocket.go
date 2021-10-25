@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/models"
+	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/mq/nsq"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
@@ -17,6 +18,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"time"
 )
 
 var (
@@ -37,8 +39,9 @@ func Init() {
 	go handleWrite()
 
 	conf := config.GetConfig()
-	mq = nsq.InitNSQMQ(conf.NSQ.Addr)
-	err := mq.NewConsumer(conf.NSQ.Topic, conf.NSQ.Channel)
+	mq = nsq.InitNSQMQ(conf.MessageQueue.NSQ.Cluster)
+	tc := conf.MessageQueue.ConsumeTopics.WebsocketNotify
+	err := mq.NewConsumer(tc.Topic, tc.Channel)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -56,12 +59,13 @@ func handleWrite() {
 					log.Logger.Error(err.Error())
 					continue
 				}
-				log.Logger.Debug(fmt.Sprintf("write message %v to %v success", msg.WSMessage.ToString(), msg.Receive))
+				log.Logger.Debug(fmt.Sprintf("write smsDao %v to %v success", msg.WSMessage.ToString(), msg.Receive))
 			}
 		}
 	}
 }
 
+// 消费MQ，推送给前端
 func runConsume() {
 	for {
 		value, err := mq.Consume()
@@ -92,18 +96,6 @@ func WebSocketHandle(c *gin.Context) {
 	}()
 	log.Logger.Info(userMeta.AccountId + " connect success")
 	ConnectionMap[userMeta.AccountId] = conn
-	imClient, err := grpc.GetClientGRPC(config.GetConfig().Servers.ImDaoServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	accountClient, err := grpc.GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
 	for {
 		var msg models.WSMessageNotify
 		if err = conn.ReadJSON(&msg); err != nil {
@@ -112,51 +104,84 @@ func WebSocketHandle(c *gin.Context) {
 		}
 		switch msg.WSMessageNotifyType {
 		case constant.SessionMessageNotify:
-			// 从accountDao服务获取消息发送者的用户名和头像
-			var userResp *user.RspDaoUserDetail
-			userResp, err = user.NewDaoUserClient(accountClient.GetRpcClient()).
-				UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: userMeta.AccountId})
-			if err != nil {
-				log.Logger.Error(err.Error())
-				continue
-			}
-			msg.WSMessage.Send.AccountId = userResp.Detail.AccountId
-			msg.WSMessage.Send.Username = userResp.Detail.Username
-			msg.WSMessage.Send.HeadImgUrl = userResp.Detail.HeadImgUrl
-			// 从imDao服务中获取会话中的所有用户id
-			var resp *im.RspSessionDetailQueryDao
-			resp, err = im.NewDaoImClient(imClient.GetRpcClient()).
-				SessionDetailQueryDao(context.Background(), &im.ReqSessionDetailQueryDao{SessionId: msg.WSMessage.SessionId})
-			if err != nil {
-				log.Logger.Error(err.Error())
-				continue
-			}
-			// 发送给nsq
-			for _, u := range resp.Session.Joins {
-				var notify = models.WSMessageNotify{
-					WSMessageNotifyType: msg.WSMessageNotifyType,
-					Receive:             u,
-					WSMessage:           msg.WSMessage,
-					Timestamp:           msg.Timestamp,
-				}
-				writeChan <- notify
-			}
-			// 将会话消息发给imDao服务存入数据库中
-			var req = &im.ReqSessionMessageAddDao{
-				MessageType:   msg.WSMessage.WSMessageType,
-				Send:          msg.WSMessage.Send.AccountId,
-				SessionId:     msg.WSMessage.SessionId,
-				Content:       []byte(msg.WSMessage.Content),
-				SendTimestamp: msg.Timestamp,
-			}
-			_, err = im.NewDaoImClient(imClient.GetRpcClient()).
-				SessionMessageAddDao(context.Background(), req)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				continue
+			switch msg.WSMessage.SessionMessage.SessionMessageType {
+			case constant.SessionMessageMessage:
+				handleSessionMessage(msg, userMeta.AccountId)
 			}
 		default:
 			continue
 		}
+	}
+}
+
+func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 从accountDao服务获取消息发送者的用户名和头像
+	var userResp *user.RspDaoUserDetail
+	userResp, err = userClient.UserDaoDetail(context.Background(),
+		&user.ReqDaoUserDetail{AccountId: accountId})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	msg.WSMessage.Send.AccountId = userResp.Detail.AccountId
+	msg.WSMessage.Send.Username = userResp.Detail.Username
+	msg.WSMessage.Send.HeadImgUrl = userResp.Detail.HeadImgUrl
+	msg.Timestamp = time.Now().Unix()
+	// 从imDao服务中获取会话中的所有用户id
+	var resp *im.RspSessionDetailQueryDao
+	resp, err = imClient.SessionDetailQueryDao(context.Background(),
+		&im.ReqSessionDetailQueryDao{SessionId: msg.WSMessage.SessionMessage.Message.SessionId})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 发送给nsq
+	for _, u := range resp.Joins {
+		var notify = models.WSMessageNotify{
+			WSMessageNotifyType: msg.WSMessageNotifyType,
+			Receive:             u.AccountId,
+			WSMessage:           msg.WSMessage,
+			Timestamp:           msg.Timestamp,
+		}
+		notify.WSMessage.SessionMessage.Message = rsp.Message{
+			SessionId:   resp.SessionId,
+			MessageType: msg.WSMessage.SessionMessage.Message.MessageType,
+			Send: rsp.User{
+				AccountID:  userResp.Detail.AccountId,
+				Username:   userResp.Detail.Username,
+				HeadImgUrl: userResp.Detail.HeadImgUrl,
+			},
+			Receive:       u.AccountId,
+			Content:       msg.WSMessage.SessionMessage.Message.Content,
+			SendTimestamp: msg.Timestamp,
+		}
+		switch notify.WSMessage.WSMessageType {
+
+		}
+		writeChan <- notify
+	}
+	// 将会话消息发给imDao服务存入数据库中
+	var req = &im.ReqSessionMessageAddDao{
+		MessageType:   msg.WSMessage.WSMessageType,
+		Send:          msg.WSMessage.Send.AccountId,
+		SessionId:     msg.WSMessage.SessionMessage.Message.SessionId,
+		Content:       msg.WSMessage.SessionMessage.Message.Content,
+		SendTimestamp: msg.Timestamp,
+	}
+	_, err = imClient.SessionMessageAddDao(context.Background(), req)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
 	}
 }

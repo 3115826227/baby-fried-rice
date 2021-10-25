@@ -32,7 +32,7 @@ func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
 	for _, do := range dos {
 		tables = append(tables, do)
 	}
-	return client.db.AutoMigrate(tables...)
+	return client.db.Debug().AutoMigrate(tables...)
 }
 
 // 添加
@@ -42,7 +42,7 @@ func (client *ClientDB) CreateObject(object interfaces.DataObject) (err error) {
 
 // 删除
 func (client *ClientDB) DeleteObject(object interfaces.DataObject) (err error) {
-	return client.db.Delete(object).Error
+	return client.db.Debug().Delete(object).Error
 }
 
 // 获取结果
@@ -56,13 +56,13 @@ func (client *ClientDB) GetObject(query map[string]interface{}, object interface
 
 // 更新数据
 func (client *ClientDB) UpdateObject(object interfaces.DataObject) (err error) {
-	return client.db.Table(object.TableName()).Save(object).Error
+	return client.db.Debug().Table(object.TableName()).Save(object).Error
 }
 
 // 判断是否存在
 func (client *ClientDB) ExistObject(query map[string]interface{}, do interfaces.DataObject) (exist bool, err error) {
 	var count int64
-	template := client.db.Table(do.TableName())
+	template := client.db.Debug().Table(do.TableName())
 	for key, value := range query {
 		template = template.Where(fmt.Sprintf("%v = ?", key), value)
 	}

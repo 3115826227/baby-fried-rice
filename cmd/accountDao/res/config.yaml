@@ -3,13 +3,37 @@ log:
   logpath:
 
 server:
-  name: "account-dao"
-  addr: "localhost"
-  port: 18061
+  rpcserver:
+    name: "account-dao"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18061
+    register: "http://127.0.0.1:18061"
+    httpport: 17061
 
-redis:
-  redisurl: "localhost:26379"
-  redispassword: "123456"
-  redisdb: 9
+rpc:
+  cert:
+    server:
+      servercertfile: "cert/server.pem"
+      serverkeyfile: "cert/server.key"
 
-mysqlurl: "root:123456@tcp(127.0.0.1:23306)/baby?charset=utf8mb4&parseTime=True&loc=Local"
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+database:
+  maindatabase:
+    host: 127.0.0.1
+    port: 23306
+    username: root
+    password: 123456
+    dbname: baby-account

@@ -2,10 +2,10 @@ package db
 
 import (
 	"baby-fried-rice/internal/pkg/kit/db"
+	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
-	"baby-fried-rice/internal/pkg/module/accountDao/model/tables"
 )
 
 var (
@@ -14,7 +14,7 @@ var (
 
 func GetDB() interfaces.DB {
 	if client == nil {
-		if err := InitDB(config.GetConfig().MysqlUrl); err != nil {
+		if err := InitDB(config.GetConfig().Database.MainDatabase.GetMysqlUrl()); err != nil {
 			panic(err)
 		}
 	}
@@ -30,11 +30,11 @@ func InitDB(mysqlUrl string) (err error) {
 		&tables.AccountUser{},
 		&tables.AccountUserDetail{},
 		&tables.AccountUserLoginLog{},
-		&tables.UserDetail{},
-		&tables.AccountRoot{},
-		&tables.AccountRootLoginLog{},
 		&tables.Area{},
 		&tables.UserPrivateMessage{},
 		&tables.UserPrivateMessageContent{},
+		&tables.AccountUserSignInLog{},
+		&tables.AccountUserCoin{},
+		&tables.AccountUserCoinLog{},
 	)
 }

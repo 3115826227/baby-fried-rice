@@ -1,11 +1,11 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/im/config"
+	"baby-fried-rice/internal/pkg/module/im/log"
 	"baby-fried-rice/internal/pkg/module/im/server"
 	"crypto/x509"
 	"fmt"
@@ -43,7 +43,7 @@ func initClient(serverName, addr string) (err error) {
 	if _, exist := clientMp[serverName][addr]; exist {
 		return nil
 	}
-	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Client.CertFile)
+	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Cert.Client.ClientCertFile)
 	if err != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func initClient(serverName, addr string) (err error) {
 }
 
 func GetUserClient() (user.DaoUserClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return nil, err
@@ -70,7 +70,7 @@ func GetUserClient() (user.DaoUserClient, error) {
 }
 
 func GetImClient() (im.DaoImClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Servers.ImDaoServer)
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.ImDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return nil, err

@@ -3,29 +3,29 @@ GOCGO=CGO_ENABLED=1 GO111MODULE=on go
 
 MICROSERVICES= \
 	cmd/gateway/gateway \
+	cmd/manage/manage \
 	cmd/userAccount/userAccount \
-	cmd/adminAccount/adminAccount \
-	cmd/rootAccount/rootAccount \
 	cmd/accountDao/accountDao \
 	cmd/spaceDao/spaceDao \
 	cmd/space/space \
 	cmd/imDao/imDao \
 	cmd/im/im \
-	cmd/connect/connect
+	cmd/connect/connect \
+	cmd/file/file \
+	cmd/shopDao/shopDao \
+	cmd/shop/shop \
+	cmd/smsDao/smsDao
 
 build: $(MICROSERVICES)
 
 cmd/gateway/gateway:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/gateway
 
+cmd/manage/manage:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/manage
+
 cmd/userAccount/userAccount:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/userAccount
-
-cmd/adminAccount/adminAccount:
-	$(GO) build $(GOFLAGS) -o $@ ./cmd/adminAccount
-
-cmd/rootAccount/rootAccount:
-	$(GO) build $(GOFLAGS) -o $@ ./cmd/rootAccount
 
 cmd/accountDao/accountDao:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/accountDao
@@ -45,6 +45,17 @@ cmd/im/im:
 cmd/connect/connect:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/connect
 
+cmd/file/file:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/file
+
+cmd/shopDao/shopDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/shopDao
+
+cmd/shop/shop:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/shop
+
+cmd/smsDao/smsDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/smsDao
 
 clean:
 	rm -f $(MICROSERVICES)

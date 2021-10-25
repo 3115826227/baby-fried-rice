@@ -1,0 +1,33 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/gateway.log"
+
+server:
+  httpserver:
+    name: "gateway"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18070
+
+cache:
+  redis:
+    maincache:
+      addr: "redis:6379"
+      password: "123456"
+      db: 9
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+rpc:
+  subservers:
+    manageserver: "manage"
+    useraccountserver: "user-account"
+    spaceserver: "space-service"
+    connectserver: "connect"
+    imserver: "im-service"
+    fileserver: "file"
+    shopserver: "shop-service"

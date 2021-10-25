@@ -1,0 +1,238 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+// 生成文件的包名
+package shop;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/shop";  // 声明生成的 go 文件所属的包
+
+// 定义商城接口
+service DaoShop {
+  // 商品列表查询
+  rpc CommodityQueryDao(ReqCommodityQueryDao) returns (RspCommodityQueryDao);
+  // 商品详情查询
+  rpc CommodityDetailQueryDao(ReqCommodityDetailQueryDao) returns (RspCommodityDetailQueryDao);
+
+  // 更新购物车商品信息
+  rpc CommodityCartUpdateDao (ReqCommodityCartUpdateDao) returns (google.protobuf.Empty);
+  // 选择购物车商品信息
+  rpc CommodityCartSelectDao (ReqCommodityCartSelectDao) returns (google.protobuf.Empty);
+  // 查询购物车
+  rpc CommodityCartQueryDao (ReqCommodityCartQueryDao) returns (RspCommodityCartQueryDao);
+  // 从购物车移除商品
+  rpc CommodityCartDeleteDao (ReqCommodityCartDeleteDao) returns (google.protobuf.Empty);
+
+  // 添加商品订单
+  rpc CommodityOrderAddDao (ReqCommodityOrderAddDao) returns (google.protobuf.Empty);
+  // 查询商品订单列表
+  rpc CommodityOrderQueryDao (ReqCommodityOrderQueryDao) returns (RspCommodityOrderQueryDao);
+  // 查询商品订单详情
+  rpc CommodityOrderDetailQueryDao (ReqCommodityOrderDetailQueryDao) returns (RspCommodityOrderDetailQueryDao);
+  // 更新订单状态
+  rpc CommodityOrderStatusUpdateDao (ReqCommodityOrderStatusUpdateDao) returns (google.protobuf.Empty);
+  // 删除订单
+  rpc CommodityOrderDeleteDao (ReqCommodityOrderDeleteDao) returns (google.protobuf.Empty);
+}
+
+// 商品列表查询
+message ReqCommodityQueryDao {
+  // 用户id
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  // 搜索关键字
+  string searchLike = 4;
+  // 商品类型
+  int64 commodityType = 5;
+}
+
+message RspCommodityQueryDao {
+  repeated CommodityQueryDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+// 商品基础信息
+message CommodityBaseQueryDao {
+  // 商品id
+  string id = 1;
+  // 商品名称
+  string name = 2;
+  // 商品标题
+  string title = 3;
+  // 商品描述
+  string describe = 4;
+  // 商品主图片
+  string mainImg = 5;
+}
+
+message CommodityQueryDao {
+  // 商品id
+  string id = 1;
+  // 商品名称
+  string name = 2;
+  // 商品标题
+  string title = 3;
+  // 商品描述
+  string describe = 4;
+  // 售卖方式 1-金额支付 2-积分兑换 3-积分参与抽奖
+  int64 sellType = 5;
+  // 商品价格
+  int64 price = 6;
+  // 积分兑换数量
+  int64 coin = 7;
+  // 商品主图片
+  string mainImg = 8;
+}
+
+// 商品详情查询
+message ReqCommodityDetailQueryDao {
+  string commodityId = 1;
+}
+
+message RspCommodityDetailQueryDao {
+  CommodityQueryDao commodity = 1;
+  // 商品更多的图片列表
+  repeated string images = 2;
+}
+
+// 购物车更新商品
+message ReqCommodityCartUpdateDao {
+  string accountId = 1;
+  // 更新的商品id
+  string commodityId = 2;
+  // 更新的商品数量
+  int64 updateCount = 3;
+}
+
+// 购物车选择商品
+message ReqCommodityCartSelectDao {
+  string accountId = 1;
+  // 被选择的商品id列表
+  repeated string selectedCommodityIds = 2;
+}
+
+// 购物车商品
+message CommodityCartDao {
+  // 商品信息
+  CommodityQueryDao commodity = 1;
+  // 商品数目
+  int64 count = 2;
+  // 勾选状态
+  bool selected = 3;
+}
+
+// 购物车查询
+message ReqCommodityCartQueryDao {
+  string accountId = 1;
+}
+
+// 删除购物车商品
+message ReqCommodityCartDeleteDao {
+  string accountId = 1;
+  string commodityId = 2;
+}
+
+message RspCommodityCartQueryDao {
+  string accountId = 1;
+  repeated CommodityCartDao list = 2;
+}
+
+// 添加商品订单
+message ReqCommodityOrderAddDao {
+  // 购买者用户id
+  string accountId = 1;
+  // 商品列表
+  repeated OrderCommodityAddDao orderCommodities = 2;
+  // 总支付金额
+  int64 totalPrice = 4;
+  // 总消耗积分
+  int64 totalCoin = 5;
+}
+
+message OrderCommodityAddDao {
+  // 商品id
+  string commodityId = 1;
+  // 支付方式
+  int64 paymentType = 2;
+  // 支付金额
+  int64 payedPrice = 3;
+  // 消耗积分
+  int64 payedCoin = 4;
+}
+
+// 查询商品订单列表
+message ReqCommodityOrderQueryDao {
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+message RspCommodityOrderQueryDao {
+  repeated CommodityOrderQueryDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+message CommodityOrderQueryDao {
+  // 订单基本信息
+  CommodityOrderBaseDao commodityOrder = 1;
+  // 商品id列表
+  repeated OrderCommodityDao commodities = 2;
+}
+
+message CommodityOrderBaseDao {
+  // 订单id
+  string id = 1;
+  // 购买者用户id
+  string accountId = 2;
+  // 支付方式
+  int64 paymentType = 4;
+  // 总支付金额
+  int64 totalPrice = 5;
+  // 消耗积分
+  int64 totalCoin = 6;
+  // 订单状态
+  int64 status = 7;
+  // 订单创建时间
+  int64 createTimestamp = 8;
+  // 订单更新时间
+  int64 updateTimestamp = 9;
+}
+
+// 查询商品订单详情
+message ReqCommodityOrderDetailQueryDao {
+  // 订单id
+  string id = 1;
+  // 购买者用户id
+  string accountId = 2;
+}
+
+message RspCommodityOrderDetailQueryDao {
+  // 订单基本信息
+  CommodityOrderBaseDao commodityOrder = 1;
+  // 商品id详情
+  repeated OrderCommodityDao commodityDetails = 2;
+}
+
+message OrderCommodityDao {
+  CommodityQueryDao commodity = 1;
+  int64 paymentType = 2;
+  int64 payedPrice = 3;
+  int64 payedCoin = 4;
+}
+
+// 更新订单状态
+message ReqCommodityOrderStatusUpdateDao {
+  string accountId = 1;
+  string id = 2;
+  int64 orderStatus = 3;
+}
+
+// 删除订单
+message ReqCommodityOrderDeleteDao {
+  string accountId = 1;
+  string id = 2;
+}

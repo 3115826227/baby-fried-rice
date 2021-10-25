@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/cache"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
@@ -37,14 +38,14 @@ func UserLoginHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
 		return
 	}
 	var resp *user.RspDaoUserLogin
 	resp, err = userClient.UserDaoLogin(context.Background(), reqLogin)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
 		return
 	}
 
@@ -68,6 +69,7 @@ func UserLoginHandle(c *gin.Context) {
 	go func() {
 		var userMeta = &handle.UserMeta{
 			AccountId: resp.User.AccountId,
+			Username:  resp.User.Username,
 			Platform:  "pc",
 		}
 		if err = cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString()); err != nil {
@@ -165,6 +167,8 @@ func UserDetailHandle(c *gin.Context) {
 		Gender:     resp.Detail.Gender,
 		Age:        resp.Detail.Age,
 		Phone:      resp.Detail.Phone,
+		Coin:       resp.Detail.Coin,
+		IsOfficial: resp.Detail.IsOfficial,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }
@@ -235,7 +239,14 @@ func UserPwdUpdateHandle(c *gin.Context) {
 
 // 查看他人用户信息
 func UserQueryHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
 	accountId := c.Query("account_id")
+	if accountId == "" {
+		err := fmt.Errorf("account_id can't null")
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
@@ -250,6 +261,24 @@ func UserQueryHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	var imClient im.DaoImClient
+	imClient, err = grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var imReq = im.ReqIsFriendDao{
+		Origin:    userMeta.AccountId,
+		AccountId: accountId,
+	}
+	var imResp *im.RspIsFriendDao
+	imResp, err = imClient.FriendIsDao(context.Background(), &imReq)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
 	var detailRsp = rsp.UserDetailResp{
 		AccountId:  resp.Detail.AccountId,
 		Describe:   resp.Detail.Describe,
@@ -258,6 +287,9 @@ func UserQueryHandle(c *gin.Context) {
 		SchoolId:   resp.Detail.SchoolId,
 		Gender:     resp.Detail.Gender,
 		Age:        resp.Detail.Age,
+		IsFriend:   imResp.IsFriend,
+		Remark:     imResp.Remark,
+		IsOfficial: resp.Detail.IsOfficial,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }

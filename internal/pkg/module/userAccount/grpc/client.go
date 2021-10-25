@@ -1,10 +1,13 @@
 package grpc
 
 import (
-	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/shop"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
+	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"baby-fried-rice/internal/pkg/module/userAccount/server"
 	"crypto/x509"
 	"fmt"
@@ -42,7 +45,7 @@ func initClient(serverName, addr string) (err error) {
 	if _, exist := clientMp[serverName][addr]; exist {
 		return nil
 	}
-	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Client.CertFile)
+	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Cert.Client.ClientCertFile)
 	if err != nil {
 		return
 	}
@@ -60,10 +63,37 @@ func initClient(serverName, addr string) (err error) {
 }
 
 func GetUserClient() (user.DaoUserClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Servers.AccountDaoServer)
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return nil, err
 	}
 	return user.NewDaoUserClient(cli.GetRpcClient()), nil
+}
+
+func GetShopClient() (shop.DaoShopClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.ShopDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return shop.NewDaoShopClient(cli.GetRpcClient()), nil
+}
+
+func GetPrivateMessageClient() (privatemessage.DaoPrivateMessageClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return privatemessage.NewDaoPrivateMessageClient(cli.GetRpcClient()), nil
+}
+
+func GetImClient() (im.DaoImClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.ImDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return im.NewDaoImClient(cli.GetRpcClient()), nil
 }

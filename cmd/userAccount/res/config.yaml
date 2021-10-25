@@ -3,15 +3,39 @@ log:
   logpath:
 
 server:
-  addr: "localhost"
-  port: 18071
+  rpcserver:
+    name: "user-account"
+    addr: "0.0.0.0"
+    serial: 1
+    port: 18071
+    register: "http://127.0.0.1:18071"
 
-client:
-  accountdao:
-    addr: "localhost"
-    port: 18061
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
 
-redis:
-  redisurl: "localhost:6379"
-  redispassword: "123456"
-  redisdb: 9
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    shopdaoserver: "shop-dao"
+    imdaoserver: "im-dao"
+
+messagequeue:
+  consumtopics:
+    usercoin:
+      topic: "user_coin"
+      channel: "user_coin_channel"
+  nsq:
+    cluster: "127.0.0.1:4150"

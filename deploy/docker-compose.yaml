@@ -83,51 +83,155 @@ services:
     ports:
       - "18070:8080"
     volumes:
-      - "./cmd/gateway/res:/go/src/baby-fried-rice/module/gateway/res"
-      - "./cmd/gateway/logs:/baby/logs"
+      - "./backend/gateway/res:/go/src/baby-fried-rice/module/gateway/res"
+      - "./backend/gateway/logs:/baby/logs"
     restart: always
+    depends_on:
+      - redis
+      - etcd
   baby-account-dao:
     image: baby-account-dao
     container_name: baby-account-dao
     ports:
       - "18061:8080"
     volumes:
-      - "./cmd/accountDao/res:/go/src/baby-fried-rice/module/accountDao/res"
-      - "./cmd/accountDao/logs:/baby/logs"
+      - "./backend/accountDao/res:/go/src/baby-fried-rice/module/accountDao/res"
+      - "./backend/accountDao/logs:/baby/logs"
     restart: always
+    depends_on:
+      - mysql
+      - redis
+      - etcd
   baby-user-account:
     image: baby-user-account
     container_name: baby-user-account
     ports:
       - "18071:8080"
     volumes:
-      - "./cmd/userAccount/res:/go/src/baby-fried-rice/module/userAccount/res"
-      - "./cmd/userAccount/logs:/baby/logs"
+      - "./backend/userAccount/res:/go/src/baby-fried-rice/module/userAccount/res"
+      - "./backend/userAccount/logs:/baby/logs"
     restart: always
+    depends_on:
+      - baby-account-dao
+      - etcd
   baby-space-dao:
     image: baby-space-dao
     container_name: baby-space-dao
     ports:
       - "18062:8080"
     volumes:
-      - "./cmd/spaceDao/res:/go/src/baby-fried-rice/module/spaceDao/res"
-      - "./cmd/spaceDao/logs:/baby/logs"
+      - "./backend/spaceDao/res:/go/src/baby-fried-rice/module/spaceDao/res"
+      - "./backend/spaceDao/logs:/baby/logs"
     restart: always
+    depends_on:
+      - mysql
+      - etcd
   baby-space:
     image: baby-space
     container_name: baby-space
     ports:
       - "18074:8080"
     volumes:
-      - "./cmd/space/res:/go/src/baby-fried-rice/module/space/res"
-      - "./cmd/space/logs:/baby/logs"
+      - "./backend/space/res:/go/src/baby-fried-rice/module/space/res"
+      - "./backend/space/logs:/baby/logs"
     restart: always
+    depends_on:
+      - baby-space-dao
+      - etcd
+      - nsqd
+  baby-im-dao:
+    image: baby-im-dao
+    container_name: baby-im-dao
+    ports:
+      - "18063:8080"
+    volumes:
+      - "./backend/imDao/res:/go/src/baby-fried-rice/module/imDao/res"
+      - "./backend/imDao/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd
+  baby-im:
+    image: baby-im
+    container_name: baby-im
+    ports:
+      - "18076:8080"
+    volumes:
+      - "./backend/im/res:/go/src/baby-fried-rice/module/im/res"
+      - "./backend/im/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - baby-im-dao
+      - etcd
   baby-connect:
     image: baby-connect
     container_name: baby-connect
     ports:
       - "18075:8080"
     volumes:
-      - "./cmd/connect/res:/go/src/baby-fried-rice/module/connect/res"
-      - "./cmd/connect/logs:/baby/logs"
+      - "./backend/connect/res:/go/src/baby-fried-rice/module/connect/res"
+      - "./backend/connect/logs:/baby/logs"
     restart: always
+    depends_on:
+      - nsqd
+      - etcd
+  baby-file:
+    image: baby-file
+    container_name: baby-file
+    ports:
+      - "18050:8080"
+    volumes:
+      - "./backend/file/res:/go/src/baby-fried-rice/module/file/res"
+      - "./backend/file/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd
+  baby-shop:
+    image: baby-shop
+    container_name: baby-shop
+    ports:
+      - "18077:8080"
+    volumes:
+      - "./backend/shop/res:/go/src/baby-fried-rice/module/shop/res"
+      - "./backend/shop/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - baby-shop-dao
+      - etcd
+  baby-shop-dao:
+    image: baby-shop-dao
+    container_name: baby-shop-dao
+    ports:
+      - "18064:8080"
+    volumes:
+      - "./backend/shopDao/res:/go/src/baby-fried-rice/module/shopDao/res"
+      - "./backend/shopDao/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd
+  baby-sms-dao:
+    image: baby-sms-dao
+    container_name: baby-sms-dao
+    ports:
+      - "18065:8080"
+    volumes:
+      - "./backend/smsDao/res:/go/src/baby-fried-rice/module/smsDao/res"
+      - "./backend/smsDao/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd
+  baby-manage:
+    image: baby-manage
+    container_name: baby-manage
+    ports:
+      - "18073:8080"
+    volumes:
+      - "./backend/manage/res:/go/src/baby-fried-rice/module/manage/res"
+      - "./backend/manage/logs:/baby/logs"
+    restart: always
+    depends_on:
+      - mysql
+      - etcd

@@ -12,7 +12,7 @@ var (
 
 func GetRegisterClient() interfaces.RegisterClient {
 	if client == nil {
-		if err := InitRegisterClient(config.GetConfig().Etcd); err != nil {
+		if err := InitRegisterClient(config.GetConfig().Register.ETCD.Cluster); err != nil {
 			panic(err)
 		}
 	}
