@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/module/manage/cache"
 	"baby-fried-rice/internal/pkg/module/manage/db"
+	"baby-fried-rice/internal/pkg/module/manage/log"
 )
 
 type UserQueryParam struct {
@@ -32,8 +33,8 @@ func GetUsers(param UserQueryParam) (details []tables.AccountUserDetail, total i
 	return
 }
 
-func GetUsersByIds(ids []string) (details []tables.AccountUserDetail, err error) {
-	details = make([]tables.AccountUserDetail, 0)
+func GetUsersByIds(ids []string) (details map[string]tables.AccountUserDetail, err error) {
+	details = make(map[string]tables.AccountUserDetail, 0)
 	for _, id := range ids {
 		var detail tables.AccountUserDetail
 		if detail, err = cache.GetUserDetail(id); err != nil {
@@ -41,7 +42,25 @@ func GetUsersByIds(ids []string) (details []tables.AccountUserDetail, err error)
 				return
 			}
 		}
-		details = append(details, detail)
+		details[detail.AccountID] = detail
 	}
 	return
+}
+
+func IsDuplicateAccountID(accountID string) bool {
+	var count int64 = 0
+	if err := db.GetAccountDB().GetDB().Model(&tables.AccountUser{}).Where("account_id = ?", accountID).Count(&count).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return true
+	}
+	return count != 0
+}
+
+func IsDuplicateLoginNameByUser(loginName string) bool {
+	var count int64 = 0
+	if err := db.GetAccountDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return true
+	}
+	return count != 0
 }

@@ -15,6 +15,8 @@ var (
 	accountClient interfaces.DB
 	shopClient    interfaces.DB
 	smsClient     interfaces.DB
+	spaceClient   interfaces.DB
+	imClient      interfaces.DB
 )
 
 func initAdmin() {
@@ -68,6 +70,14 @@ func GetSmsDB() interfaces.DB {
 	return smsClient
 }
 
+func GetSpaceDB() interfaces.DB {
+	return spaceClient
+}
+
+func GetImDB() interfaces.DB {
+	return imClient
+}
+
 func InitDB() (err error) {
 	var conf = config.GetConfig()
 	accountClient, err = db.NewClientDB(conf.Database.SubDatabase.AccountDatabase.GetMysqlUrl(), log.Logger)
@@ -101,6 +111,14 @@ func InitDB() (err error) {
 		&tables.SendMessageTemplate{},
 	); err != nil {
 		panic(err)
+	}
+	spaceClient, err = db.NewClientDB(conf.Database.SubDatabase.SpaceDatabase.GetMysqlUrl(), log.Logger)
+	if err != nil {
+		return
+	}
+	imClient, err = db.NewClientDB(conf.Database.SubDatabase.ImDatabase.GetMysqlUrl(), log.Logger)
+	if err != nil {
+		return
 	}
 	initSmsTemplate()
 	return

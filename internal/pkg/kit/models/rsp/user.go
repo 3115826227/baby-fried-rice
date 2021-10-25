@@ -9,6 +9,7 @@ type User struct {
 	Username   string `json:"username"`
 	HeadImgUrl string `json:"head_img_url"`
 	Remark     string `json:"remark"`
+	IsOfficial bool   `json:"is_official"`
 }
 
 type UserDataResp struct {
@@ -35,6 +36,7 @@ type UserDetailResp struct {
 	Coin       int64  `json:"coin"`
 	IsFriend   bool   `json:"is_friend"`
 	Remark     string `json:"remark"`
+	IsOfficial bool   `json:"is_official"`
 }
 
 // 后台管理用户信息

@@ -11,6 +11,7 @@ type UserBaseInfo struct {
 	AccountId  string `json:"account_id"`
 	HeadImgUrl string `json:"head_img_url"`
 	Username   string `json:"username"`
+	IsOfficial bool   `json:"is_official"`
 }
 
 type WSMessageNotify struct {
@@ -34,20 +35,17 @@ type WSMessage struct {
 	WSMessageType im.SessionMessageType `json:"ws_message_type"`
 	// 发送者
 	Send UserBaseInfo `json:"send"`
-	// 空间消息
-	Space *Space `json:"space,omitempty"`
-	// 会话消息
+	// 空间消息 主要是推送
+	Space *rsp.SpaceResp `json:"space,omitempty"`
+	// 会话消息 既有接收也有推送
 	SessionMessage *SessionMessage `json:"session_message,omitempty"`
-	// 私信消息
+	// 私信消息 主要是推送
 	PrivateMessage rsp.UserPrivateMessageDetailResp `json:"private_message,omitempty"`
 }
 
 func (message *WSMessage) ToString() string {
 	data, _ := json.Marshal(message)
 	return string(data)
-}
-
-type Space struct {
 }
 
 type SessionMessage struct {
@@ -59,7 +57,4 @@ type SessionMessage struct {
 	Session rsp.Session `json:"session"`
 	// 新会话消息信息
 	Message rsp.Message `json:"message"`
-}
-
-type PrivateMessage struct {
 }

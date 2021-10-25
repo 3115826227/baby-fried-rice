@@ -1,0 +1,32 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/space.log"
+
+server:
+  httpserver:
+    name: "space-service"
+    addr: "0.0.0.0"
+    serial: 1
+    port: 8080
+    register: "http://127.0.0.1:18074"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    spacedaoserver: "space-dao"
+    commentdaoserver: "space-dao"
+
+messagequeue:
+  publishtopics:
+    websocketnotify:  "websocket_notify"
+  nsq:
+    cluster: "nsq:4150"

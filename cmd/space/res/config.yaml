@@ -22,10 +22,11 @@ rpc:
       clientcertfile: "cert/server.pem"
   subservers:
     accountdaoserver: "account-dao"
-    shopdaoserver: "shop-dao"
+    spacedaoserver: "space-dao"
+    commentdaoserver: "space-dao"
 
 messagequeue:
   publishtopics:
-    websocket_notify:  "baby/websocket-notify"
+    websocketnotify:  "websocket_notify"
   nsq:
     cluster: "127.0.0.1:4150"

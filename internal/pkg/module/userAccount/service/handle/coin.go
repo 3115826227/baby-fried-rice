@@ -8,7 +8,6 @@ import (
 	"baby-fried-rice/internal/pkg/module/userAccount/grpc"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
@@ -17,6 +16,7 @@ import (
 	"time"
 )
 
+// 积分日志列表查询
 func CoinLogHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	pageReq, err := handle.PageHandle(c)
@@ -58,44 +58,42 @@ func CoinLogHandle(c *gin.Context) {
 	handle.SuccessListResp(c, "", list, resp.Total, resp.Page, resp.PageSize)
 }
 
+// 积分日志删除
 func DeleteCoinLogHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	idsStr := strings.Split(c.Query("ids"), ",")
-	if len(idsStr) == 0 {
-		err := fmt.Errorf("id list can't null")
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
-		return
-	}
-	var ids = make([]int64, 0)
-	for _, idStr := range idsStr {
-		id, err := strconv.Atoi(idStr)
+	idStrList := strings.Split(c.Query("ids"), ",")
+	if len(idStrList) != 0 {
+		var ids = make([]int64, 0)
+		for _, idStr := range idStrList {
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+				return
+			}
+			ids = append(ids, int64(id))
+		}
+		userClient, err := grpc.GetUserClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 			return
 		}
-		ids = append(ids, int64(id))
-	}
-	userClient, err := grpc.GetUserClient()
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var req = &user.ReqUserCoinLogDeleteDao{
-		AccountId: userMeta.AccountId,
-		Ids:       ids,
-	}
-	_, err = userClient.UserCoinLogDeleteDao(context.Background(), req)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
+		var req = &user.ReqUserCoinLogDeleteDao{
+			AccountId: userMeta.AccountId,
+			Ids:       ids,
+		}
+		_, err = userClient.UserCoinLogDeleteDao(context.Background(), req)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			return
+		}
 	}
 	handle.SuccessResp(c, "", nil)
 }
 
+// 积分排名查询
 func CoinRankHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	userClient, err := grpc.GetUserClient()
@@ -123,6 +121,7 @@ func CoinRankHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", response)
 }
 
+// 积分排行版
 func CoinRankBoardHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {

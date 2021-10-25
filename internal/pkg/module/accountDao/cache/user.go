@@ -94,8 +94,11 @@ func GetUserByIds(ids []string) (details []tables.AccountUserDetail, err error) 
 	}
 	for _, resp := range resps {
 		var detail tables.AccountUserDetail
-		err = json.Unmarshal([]byte(resp.(string)), &detail)
-		if err != nil {
+		var data []byte
+		if data, err = json.Marshal(resp); err != nil {
+			return
+		}
+		if err = json.Unmarshal(data, &detail); err != nil {
 			return
 		}
 		details = append(details, detail)

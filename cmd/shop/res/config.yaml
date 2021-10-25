@@ -26,6 +26,6 @@ rpc:
 
 messagequeue:
   publishtopics:
-    usercoin:  "baby/user-coin"
+    usercoin:  "user_coin"
   nsq:
     cluster: "127.0.0.1:4150"

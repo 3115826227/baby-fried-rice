@@ -1,0 +1,31 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/shop.log"
+
+server:
+  httpserver:
+    name: "shop-service"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 8080
+    register: "http://127.0.0.1:18077"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    shopdaoserver: "shop-dao"
+
+messagequeue:
+  publishtopics:
+    usercoin:  "user_coin"
+  nsq:
+    cluster: "nsq:4150"

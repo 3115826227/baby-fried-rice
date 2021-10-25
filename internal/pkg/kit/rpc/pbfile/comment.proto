@@ -1,0 +1,288 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package comment;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment";  // 声明生成的 go 文件所属的包
+
+// 定义评论接口
+service DaoComment {
+  // 浏览记录添加
+  rpc VisitAddDao (ReqVisitAddDao) returns (RspVisitAddDao);
+  // 评论添加
+  rpc CommentAddDao (ReqCommentAddDao)  returns (RspCommentAddDao);
+  // 评论查询
+  rpc CommentQueryDao (ReqCommentQueryDao) returns (RspCommentQueryDao);
+  // 评论回复列表查询
+  rpc CommentReplyQueryDao (ReqCommentReplyQueryDao) returns (RspCommentReplyQueryDao);
+  // 个人评论查询
+  rpc CommentPersonQueryDao (ReqCommentPersonQueryDao) returns (RspCommentPersonQueryDao);
+  // 删除评论
+  rpc CommentDeleteDao (ReqCommentDeleteDao) returns (RspCommentDeleteDao);
+  // 业务下的评论清空（业务删除的时候调用）
+  rpc CommentClearDao (ReqCommentClearDao) returns (google.protobuf.Empty);
+  // 操作添加 (点赞/取消点赞)
+  rpc OperatorAddDao (ReqOperatorAddDao) returns (RspOperatorAddDao);
+  // 操作查询
+  rpc OperatorQueryDao (ReqOperatorQueryDao) returns (RspOperatorQueryDao);
+}
+
+enum BizType
+{
+  Null = 0;
+  Space = 1;
+  Knowledge = 2;
+  Blog = 3;
+}
+
+// 浏览记录添加请求
+message ReqVisitAddDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 浏览用户
+  string accountId = 3;
+}
+
+// 浏览记录添加返回
+message RspVisitAddDao {
+  // 添加结果，true表示未访问已添加成功，false表示已访问添加重复
+  bool result = 1;
+}
+
+// 评论添加
+message ReqCommentAddDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 上一级id
+  string parentId = 4;
+  // 评论楼层
+  int64 floor = 5;
+  // 评论内容
+  string content = 6;
+  // 评论者
+  string origin = 7;
+}
+
+// 评论添加返回信息
+message RspCommentAddDao {
+  // 评论id
+  string id = 1;
+}
+
+// 评论信息
+message CommentDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 评论id
+  string id = 3;
+  // 评论内容
+  string content = 5;
+  // 评论者
+  string origin = 6;
+  // 楼层
+  int64 floor = 7;
+  // 评论时间
+  int64 createTimestamp = 8;
+  // 回复数
+  int64 replyTotal = 9;
+  // 点赞数
+  int64 likeTotal = 10;
+  // 回复 默认只展示4条
+  repeated CommentReplyDao reply = 11;
+  // 访问者是否已点赞
+  bool originLiked = 12;
+}
+
+// 评论回复列表查询请求
+message ReqCommentReplyQueryDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 回复上级id
+  string parentId = 3;
+  // 查询者
+  string origin = 4;
+  // 页数 可选，默认值1
+  int64 page = 5;
+  // 页面条数 可选，默认值10
+  int64 pageSize = 6;
+}
+
+// 评论回复列表查询返回
+message RspCommentReplyQueryDao {
+  repeated CommentReplyDao list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+// 评论回复信息
+message CommentReplyDao {
+  // 评论id
+  string id = 1;
+  // 上一级id
+  string parentId = 2;
+  // 评论内容
+  string content = 3;
+  // 评论者
+  string origin = 4;
+  // 评论时间
+  int64 createTimestamp = 5;
+  // 点赞数
+  int64 likeTotal = 6;
+  // 回复
+  repeated CommentReplyDao reply = 7;
+  // 访问者是否已点赞
+  bool originLiked = 8;
+}
+
+// 个人评论列表查询请求
+message ReqCommentPersonQueryDao {
+  // 业务id 可选
+  string bizId = 1;
+  // 业务类型 可选
+  BizType bizType = 2;
+  // 操作者 必填
+  string origin = 3;
+  // 页数 可选，默认值1
+  int64 page = 4;
+  // 页面条数 可选，默认值10
+  int64 pageSize = 5;
+}
+
+// 个人评论信息
+message CommentPersonDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 评论id
+  string id = 3;
+  // 评论内容
+  string content = 5;
+  // 楼层
+  int64 floor = 7;
+  // 评论时间
+  int64 createTimestamp = 8;
+}
+
+// 个人评论列表查询返回
+message RspCommentPersonQueryDao {
+  repeated CommentPersonDao list = 1;
+  uint64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+// 评论查询请求
+message ReqCommentQueryDao {
+  // 业务id 必填
+  string bizId = 1;
+  // 业务类型 必填
+  BizType bizType = 2;
+  // 操作者 必填
+  string origin = 3;
+  // 页数 可选，默认值1
+  int64 page = 6;
+  // 页面条数 可选，默认值10
+  int64 pageSize = 7;
+}
+
+// 评论查询返回
+message RspCommentQueryDao {
+  repeated CommentDao list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+// 评论删除请求
+message ReqCommentDeleteDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 评论id
+  string id = 3;
+  // 操作者
+  string origin = 4;
+}
+
+// 评论删除返回
+message RspCommentDeleteDao {
+  // 影响行数，若评论下有子评论，则会一并删除
+  int64 total = 1;
+}
+
+// 业务下的评论清空
+message ReqCommentClearDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+}
+
+enum OperatorType
+{
+  // 默认
+  Default = 0;
+  // 点赞
+  Like = 1;
+  // 取消点赞
+  CancelLike = 2;
+}
+
+// 操作请求
+message ReqOperatorAddDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 操作的宿主id
+  string hostId = 3;
+  // 操作者
+  string origin = 4;
+  // 操作方式
+  OperatorType optType = 5;
+}
+
+// 操作返回
+message RspOperatorAddDao {
+  // 操作结果
+  bool result = 1;
+}
+
+// 操作查询请求
+message ReqOperatorQueryDao {
+  int64 page = 1;
+  int64 pageSize = 2;
+  OperatorDao params = 3;
+}
+
+// 操作查询结果
+message RspOperatorQueryDao {
+  repeated  OperatorDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+message OperatorDao {
+  // 业务id
+  string bizId = 1;
+  // 业务类型
+  BizType bizType = 2;
+  // 操作的宿主id
+  string hostId = 3;
+  // 操作者
+  string origin = 4;
+  // 操作方式
+  OperatorType optType = 5;
+}

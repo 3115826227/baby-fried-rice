@@ -168,6 +168,7 @@ func UserDetailHandle(c *gin.Context) {
 		Age:        resp.Detail.Age,
 		Phone:      resp.Detail.Phone,
 		Coin:       resp.Detail.Coin,
+		IsOfficial: resp.Detail.IsOfficial,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }
@@ -243,7 +244,7 @@ func UserQueryHandle(c *gin.Context) {
 	if accountId == "" {
 		err := fmt.Errorf("account_id can't null")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
@@ -288,6 +289,7 @@ func UserQueryHandle(c *gin.Context) {
 		Age:        resp.Detail.Age,
 		IsFriend:   imResp.IsFriend,
 		Remark:     imResp.Remark,
+		IsOfficial: resp.Detail.IsOfficial,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }

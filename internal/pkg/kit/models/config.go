@@ -34,6 +34,7 @@ type Conf struct {
 
 			AccountDaoServer string `json:"account_dao_server"`
 			SpaceDaoServer   string `json:"space_dao_server"`
+			CommentDaoServer string `json:"comment_dao_server"`
 			ImDaoServer      string `json:"im_dao_server"`
 			ShopDaoServer    string `json:"shop_dao_server"`
 			SmsDaoServer     string `json:"sms_dao_server"`
@@ -81,6 +82,8 @@ type Conf struct {
 			AccountDatabase Mysql `json:"account_database"`
 			ShopDatabase    Mysql `json:"shop_database"`
 			SmsDatabase     Mysql `json:"sms_database"`
+			SpaceDatabase   Mysql `json:"space_database"`
+			ImDatabase      Mysql `json:"im_database"`
 		} `json:"sub_database"`
 	}
 

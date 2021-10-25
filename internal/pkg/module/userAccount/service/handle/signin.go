@@ -13,6 +13,7 @@ import (
 	"strconv"
 )
 
+// 用户签到
 func SignInHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	userClient, err := grpc.GetUserClient()
@@ -36,6 +37,7 @@ func SignInHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", response)
 }
 
+// 用户签到日志查询
 func SignInLogHandle(c *gin.Context) {
 	var year, month, day int
 	var err error

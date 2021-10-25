@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/space/config"
@@ -67,6 +68,15 @@ func GetSpaceClient() (space.DaoSpaceClient, error) {
 		return nil, err
 	}
 	return space.NewDaoSpaceClient(cli.GetRpcClient()), nil
+}
+
+func GetCommentClient() (comment.DaoCommentClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.CommentDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return comment.NewDaoCommentClient(cli.GetRpcClient()), nil
 }
 
 func GetUserClient() (user.DaoUserClient, error) {

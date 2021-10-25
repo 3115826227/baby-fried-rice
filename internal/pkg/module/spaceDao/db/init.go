@@ -28,7 +28,10 @@ func InitDB(mysqlUrl string) (err error) {
 	}
 	return client.InitTables(
 		&tables.Space{},
-		&tables.SpaceOperatorRelation{},
-		&tables.SpaceCommentRelation{},
+		&tables.SpaceDetail{},
+		&tables.VisitedRelation{},
+		&tables.OperatorRelation{},
+		&tables.CommentRelation{},
+		&tables.CommentDetail{},
 	)
 }

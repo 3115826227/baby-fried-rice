@@ -1,7 +1,8 @@
 package tables
 
 import (
-	"time"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 )
 
 // 空间动态
@@ -10,64 +11,104 @@ type Space struct {
 
 	// 空间动态发布人
 	Origin string `gorm:"column:origin"`
-	// 空间动态内容 动态内容不可编辑，存储html格式
-	Content string `gorm:"column:content"`
-	// 空间动态类型 1-公开 2-仅好友可见 3-仅好友可见且部分人不可见 4-指定人可见 5-私有仅自己可见
-	VisitorType int32 `gorm:"column:visitor_type"`
+	// 空间动态类型 0-公开 1-仅好友可见 2-仅好友可见且部分人不可见 3-指定人可见 4-私有仅自己可见
+	VisitorType space.SpaceVisitorType `gorm:"column:visitor_type"`
+	// 浏览数
+	VisitTotal int64 `gorm:"column:visit_total"`
+	// 点赞数
+	LikeTotal int64 `gorm:"column:like_total"`
+	// 评论数
+	CommentTotal int64 `gorm:"column:comment_total"`
+	// 楼层数
+	FloorTotal int64 `gorm:"column:floor_total"`
+	// 审核状态 0-未审核 1-审核通过 2-审核不通过
+	AuditStatus int64 `gorm:"column:audit_status"`
 }
 
 func (table *Space) TableName() string {
 	return "space"
 }
 
-func (table *Space) Get() interface{} {
-	return *table
+// 空间动态内容
+type SpaceDetail struct {
+	SpaceID string `gorm:"column:space_id"`
+	// 文字内容
+	Content string `gorm:"column:content"`
+	// 图片地址列表，用','分割
+	Images string `gorm:"column:images"`
 }
 
-// 空间动态操作关系
-type SpaceOperatorRelation struct {
-	// 空间操作id(动态/动态评论)
-	OperatorId string `gorm:"column:operator_id;unique_index:space_origin_operator"`
-	// 操作类型 1-点赞
-	OperatorType int32 `gorm:"column:operator_type;unique_index:space_origin_operator"`
+func (table *SpaceDetail) TableName() string {
+	return "space_detail"
+}
+
+// 用户浏览记录表
+type VisitedRelation struct {
+	// 业务id
+	BizID string `gorm:"column:biz_id;unique_index:biz_type_account"`
+	// 业务类型
+	BizType comment.BizType `gorm:"column:biz_type;unique_index:biz_type_account"`
+	// 浏览用户
+	AccountId string `gorm:"column:account_id;unique_index:biz_type_account"`
+	// 浏览时间点
+	VisitTimestamp int64 `gorm:"column:visit_timestamp"`
+}
+
+func (table *VisitedRelation) TableName() string {
+	return "visited_rel"
+}
+
+// 操作关系
+type OperatorRelation struct {
+	// 业务id
+	BizID string `gorm:"column:biz_id;unique_index:biz_type_host_origin_operator"`
+	// 业务类型
+	BizType comment.BizType `gorm:"column:biz_type;unique_index:biz_type_host_origin_operator"`
+	// 宿主Id
+	HostID string `gorm:"host_id;unique_index:biz_type_host_origin_operator"`
+	// 操作类型
+	OperatorType comment.OperatorType `gorm:"column:operator_type;unique_index:biz_type_host_origin_operator"`
 	// 操作人
-	Origin string `gorm:"column:origin;unique_index:space_origin_operator"`
-	// 操作对象 1-空间动态 2-空间动态评论
-	OperatorObject int32 `gorm:"column:operator_object;"`
-	// 空间动态id
-	SpaceId string `gorm:"column:space_id" json:"space_id"`
+	Origin string `gorm:"column:origin;unique_index:biz_type_host_origin_operator"`
 	// 操作时间
-	CreatedAt time.Time `gorm:"column:create_time" json:"created_at"`
+	CreatedTimestamp int64 `gorm:"column:create_timestamp"`
 }
 
-func (table *SpaceOperatorRelation) TableName() string {
-	return "space_operator_rel"
+func (table *OperatorRelation) TableName() string {
+	return "operator_rel"
 }
 
-func (table *SpaceOperatorRelation) Get() interface{} {
-	return *table
-}
-
-// 空间动态评论关系
-type SpaceCommentRelation struct {
+// 评论关系
+type CommentRelation struct {
 	CommonField
 
-	// 空间动态id
-	SpaceId string `gorm:"column:space_id"`
+	// 业务id
+	BizID string `gorm:"column:biz_id"`
+	// 业务类型
+	BizType comment.BizType `gorm:"column:biz_type"`
+	// 评论上一级id
+	ParentId string `gorm:"column:parent_id"`
+	// 楼层
+	Floor int64 `gorm:"column:floor"`
+	// 点赞数
+	LikeTotal int64 `gorm:"column:like_total"`
+	// 回复数
+	ReplyTotal int64 `gorm:"column:reply_total"`
 	// 操作人
 	Origin string `gorm:"column:origin"`
-	// 评论上一级id
-	ParentId string `gorm:"parent_id"`
-	// 评论内容
-	Comment string `gorm:"comment"`
-	// 评论类型 1-公开，2-私有
-	CommentType int32 `gorm:"comment_type"`
 }
 
-func (table *SpaceCommentRelation) TableName() string {
-	return "space_comment_rel"
+func (table *CommentRelation) TableName() string {
+	return "comment_rel"
 }
 
-func (table *SpaceCommentRelation) Get() interface{} {
-	return *table
+// 空间动态评论内容
+type CommentDetail struct {
+	CommentID string `gorm:"column:comment_id;pk"`
+	// 评论内容，仅支持文字评论
+	Content string `gorm:"column:content"`
+}
+
+func (table *CommentDetail) TableName() string {
+	return "comment_detail"
 }

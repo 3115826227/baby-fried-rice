@@ -19,8 +19,8 @@ register:
 messagequeue:
   consumetopics:
     deletefile:
-      topic: "baby-delete-file"
-      channel: "baby-delete-file-channel"
+      topic: "delete_file"
+      channel: "delete_file_channel"
   nsq:
     cluster: 127.0.0.1:4150
 

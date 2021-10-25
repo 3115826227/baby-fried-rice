@@ -13,6 +13,13 @@ type UserRegisterReq struct {
 	Phone    string `json:"phone" binding:"required"`    //手机号
 }
 
+// 管理平台添加用户
+type AddUserReq struct {
+	UserRegisterReq
+	// 是否为官方用户
+	IsOfficial bool `json:"is_official"`
+}
+
 type UserDetailUpdateReq struct {
 	HeadImgUrl string `json:"head_img_url"`
 	Describe   string `json:"describe"`

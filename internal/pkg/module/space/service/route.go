@@ -14,7 +14,6 @@ func Register(engine *gin.Engine) {
 	app.DELETE("/space", handle.SpaceDeleteHandle)
 
 	app.POST("/operator", handle.SpaceOptAddHandle)
-	app.DELETE("/operator", handle.SpaceOptCancelHandle)
 	app.POST("/comment", handle.SpaceCommentAddHandle)
 	app.DELETE("/comment", handle.SpaceCommentDeleteHandle)
 }

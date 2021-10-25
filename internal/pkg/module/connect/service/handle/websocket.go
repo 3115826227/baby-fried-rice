@@ -65,6 +65,7 @@ func handleWrite() {
 	}
 }
 
+// 消费MQ，推送给前端
 func runConsume() {
 	for {
 		value, err := mq.Consume()
@@ -107,7 +108,6 @@ func WebSocketHandle(c *gin.Context) {
 			case constant.SessionMessageMessage:
 				handleSessionMessage(msg, userMeta.AccountId)
 			}
-		case constant.SpaceMessageNotify:
 		default:
 			continue
 		}
@@ -115,20 +115,21 @@ func WebSocketHandle(c *gin.Context) {
 }
 
 func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
-	imClient, err := grpc.GetClientGRPC(config.GetConfig().Rpc.SubServers.ImDaoServer)
+	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	accountClient, err := grpc.GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	// 从accountDao服务获取消息发送者的用户名和头像
 	var userResp *user.RspDaoUserDetail
-	userResp, err = user.NewDaoUserClient(accountClient.GetRpcClient()).
-		UserDaoDetail(context.Background(), &user.ReqDaoUserDetail{AccountId: accountId})
+	userResp, err = userClient.UserDaoDetail(context.Background(),
+		&user.ReqDaoUserDetail{AccountId: accountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -139,8 +140,8 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 	msg.Timestamp = time.Now().Unix()
 	// 从imDao服务中获取会话中的所有用户id
 	var resp *im.RspSessionDetailQueryDao
-	resp, err = im.NewDaoImClient(imClient.GetRpcClient()).
-		SessionDetailQueryDao(context.Background(), &im.ReqSessionDetailQueryDao{SessionId: msg.WSMessage.SessionMessage.Message.SessionId})
+	resp, err = imClient.SessionDetailQueryDao(context.Background(),
+		&im.ReqSessionDetailQueryDao{SessionId: msg.WSMessage.SessionMessage.Message.SessionId})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -178,8 +179,7 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 		Content:       msg.WSMessage.SessionMessage.Message.Content,
 		SendTimestamp: msg.Timestamp,
 	}
-	_, err = im.NewDaoImClient(imClient.GetRpcClient()).
-		SessionMessageAddDao(context.Background(), req)
+	_, err = imClient.SessionMessageAddDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return

@@ -69,17 +69,7 @@ func (service *PrivateMessageService) PrivateMessageQueryDao(ctx context.Context
 	}
 	var list = make([]*privatemessage.PrivateMessageQueryDao, 0)
 	for _, msg := range messages {
-		var pmd = &privatemessage.PrivateMessageQueryDao{
-			Id:              msg.MessageId,
-			SendId:          msg.SendId,
-			ReceiveId:       msg.ReceiveId,
-			MessageType:     msg.MessageType,
-			MessageSendType: msg.MessageSendType,
-			Title:           msg.MessageTitle,
-			CreateTime:      msg.ReceiveTime.String(),
-			Status:          msg.MessageStatus,
-		}
-		list = append(list, pmd)
+		list = append(list, privateMessageModelConvertPb(msg))
 	}
 	resp = &privatemessage.RspPrivateMessageQueryDao{
 		List:     list,
@@ -97,17 +87,21 @@ func (service *PrivateMessageService) PrivateMessageDetailDao(ctx context.Contex
 		return
 	}
 	resp = &privatemessage.RspPrivateMessageDetailDao{
-		PrivateMessage: &privatemessage.PrivateMessageQueryDao{
-			Id:              msg.MessageId,
-			SendId:          msg.SendId,
-			ReceiveId:       msg.ReceiveId,
-			MessageType:     msg.MessageType,
-			MessageSendType: msg.MessageSendType,
-			Title:           msg.MessageTitle,
-			CreateTime:      msg.ReceiveTime.String(),
-			Status:          msg.MessageStatus,
-		},
-		Content: detail.Content,
+		PrivateMessage: privateMessageModelConvertPb(msg),
+		Content:        detail.Content,
 	}
 	return
+}
+
+func privateMessageModelConvertPb(msg tables.UserPrivateMessage) *privatemessage.PrivateMessageQueryDao {
+	return &privatemessage.PrivateMessageQueryDao{
+		Id:              msg.MessageId,
+		SendId:          msg.SendId,
+		ReceiveId:       msg.ReceiveId,
+		MessageType:     msg.MessageType,
+		MessageSendType: msg.MessageSendType,
+		Title:           msg.MessageTitle,
+		CreateTime:      msg.ReceiveTime.String(),
+		Status:          msg.MessageStatus,
+	}
 }

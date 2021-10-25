@@ -56,6 +56,8 @@ type AccountUserDetail struct {
 	Addr       string `gorm:"column:addr" json:"addr"`
 	Hometown   string `gorm:"column:hometown" json:"hometown"`
 	Ethnic     string `gorm:"column:ethnic" json:"ethnic"`
+	// 是否为官方账号
+	IsOfficial bool `gorm:"column:is_official" json:"is_official"`
 }
 
 func (table *AccountUserDetail) TableName() string {

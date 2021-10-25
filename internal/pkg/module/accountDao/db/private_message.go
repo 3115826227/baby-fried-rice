@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// 用户端仅支持一对一私信发送，不支持组发送和全局发送
 func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (string, error) {
 	var pmID = handle.GenerateSerialNumberByLen(constant.PrivateMessageIDDefaultLength)
 	var now = time.Now()
@@ -34,9 +35,11 @@ func SendPrivateMessage(pm requests.UserSendPrivateMessageReq) (string, error) {
 		}
 		beans = append(beans, &rpm)
 	case constant.SendGroup:
+		return pmID, errors.New("your have no permission to send private message to group")
 	case constant.SendGlobal:
+		return pmID, errors.New("your have no permission to send private message to global")
 	default:
-		return pmID, errors.New("send private smsDao type is invalid")
+		return pmID, errors.New("send private message type is invalid")
 	}
 	return pmID, GetDB().CreateMulti(beans...)
 }

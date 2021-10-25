@@ -35,7 +35,7 @@ rpc:
 messagequeue:
   consumtopics:
     usercoin:
-      topic: "baby/user-coin"
-      channel: "baby/user-coin-channel"
+      topic: "user_coin"
+      channel: "user_coin_channel"
   nsq:
     cluster: "127.0.0.1:4150"

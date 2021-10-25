@@ -8,41 +8,55 @@ option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/space";  //
 // 定义用户接口
 service DaoSpace {
   // 空间动态添加
-  rpc SpaceAddDao(ReqSpaceAddDao) returns (google.protobuf.Empty);
+  rpc SpaceAddDao(ReqSpaceAddDao) returns (RspSpaceAddDao);
   // 空间动态删除
   rpc SpaceDeleteDao(ReqSpaceDeleteDao) returns (google.protobuf.Empty);
   // 空间动态查询
-  rpc SpacesQueryDao(ReqSpacesQueryDao) returns (RspSpacesQueryDao);
-  // 空间动态操作添加
-  rpc SpaceOptAddDao(ReqSpaceOptAddDao) returns (google.protobuf.Empty);
-  // 空间动态操作取消
-  rpc SpaceOptCancelDao(ReqSpaceOptCancelDao) returns (google.protobuf.Empty);
-  // 空间动态评论添加
-  rpc SpaceCommentAddDao(ReqSpaceCommentAddDao) returns (google.protobuf.Empty);
-  // 空间动态评论删除
-  rpc SpaceCommentDeleteDao(ReqSpaceCommentDeleteDao) returns (google.protobuf.Empty);
+  rpc SpaceQueryDao(ReqSpaceQueryDao) returns (RspSpaceQueryDao);
+  // 空间动态信息更新，仅更新部分字段，比如浏览，评论，点赞
+  rpc SpaceIncrUpdateDao (ReqSpaceIncrUpdateDao) returns (google.protobuf.Empty);
 }
 
-// 空间动态添加
+enum SpaceVisitorType
+{
+  // 公开
+  Public = 0;
+  // 仅好友可见
+  OnlyVisibleFriend = 1;
+  // 部分好友可见
+  PartVisibleFriend = 2;
+  // 好友中指定部分不可见
+  PartInvisibleFriend = 3;
+  // 私有仅自己可见
+  Private = 4;
+}
+
+// 空间动态添加请求
 message ReqSpaceAddDao {
   // 操作人
   string origin = 1;
   // 动态内容
   string content = 2;
+  // 动态图片地址列表
+  repeated string images = 3;
   // 访问类型
-  int32 visitorType = 3;
+  SpaceVisitorType visitorType = 4;
 }
 
-message ReqSpaceDeleteDao {
+// 空间动态添加返回
+message RspSpaceAddDao {
   string id = 1;
-  string origin = 2;
 }
 
-message ReqSpacesQueryDao {
+// 空间动态查询请求
+message ReqSpaceQueryDao {
   common.CommonSearchRequest commonSearchReq = 1;
+  string spaceId = 2;
+  string origin = 3;
 }
 
-message RspSpacesQueryDao {
+// 空间动态查询返回
+message RspSpaceQueryDao {
   repeated SpaceQueryDao spaces = 1;
   int64 page = 2;
   int64 pageSize = 3;
@@ -56,94 +70,42 @@ message SpaceQueryDao {
   string origin = 2;
   // 空间动态内容
   string content = 3;
+  // 空间动态图片地址列表
+  repeated string images = 4;
   // 访问类型
-  int32 visitorType = 4;
-  // 创建时间
-  string createTime = 5;
-  // 空间动态其他信息
-  SpaceOtherDao other = 6;
-}
-
-// 空间动态其他信息
-message SpaceOtherDao {
-  // 空间动态id
-  string id = 1;
+  SpaceVisitorType visitorType = 5;
   // 访问量
-  int64 visited = 2;
+  int64 visitTotal = 6;
   // 点赞数
-  int64 liked = 3;
-  // 评论数
-  int64 commented = 4;
-  // 点赞列表，仅显示前30条
-  repeated string likes = 5;
-  // 评论列表
-  repeated SpaceCommentDao comments = 6;
+  int64 likeTotal = 7;
+  // 评论总数
+  int64 commentTotal = 8;
+  // 楼层总数
+  int64 floorTotal = 9;
+  // 创建时间
+  int64 createTime = 10;
+  // 访问者是否已点赞
+  bool originLiked = 11;
 }
 
-// 空间动态操作添加
-message ReqSpaceOptAddDao {
-  // 空间动态或者评论操作id
-  string operatorId = 1;
+// 空间动态更新请求
+message ReqSpaceIncrUpdateDao {
   // 空间动态id
-  string spaceId = 2;
-  // 空间动态操作对象
-  int32 operatorObject = 3;
-  // 空间动态操作类型
-  int32 operatorType = 4;
-  // 操作者
-  string origin = 5;
+  string id = 1;
+  // 增量浏览数
+  int64 visitIncrement = 2;
+  // 增量评论数，为负即为删除评论情况
+  int64 commentIncrement = 3;
+  // 增量点赞数，为负即为取消点赞情况
+  int64 likeIncrement = 4;
+  // 增量楼层数
+  int64 floorIncrement = 5;
 }
 
-// 空间动态操作取消
-message ReqSpaceOptCancelDao {
+// 空间动态删除请求参数
+message ReqSpaceDeleteDao {
   // 空间动态id
-  string spaceId = 1;
-  // 空间动态或者评论操作id
-  string operatorId = 2;
-  // 操作者
-  string origin = 3;
-}
-
-// 空间动态评论添加
-message ReqSpaceCommentAddDao {
-  // 空间id
-  string spaceId = 1;
-  // 上一级操作id
-  string parentId = 2;
-  // 评论内容
-  string comment = 3;
-  // 评论类型
-  int32 commentType = 4;
-  // 评论者
-  string origin = 5;
-}
-
-// 空间动态评论信息
-message SpaceCommentDao {
-  // 空间评论操作ID
   string id = 1;
-  // 空间id
-  string spaceId = 2;
-  // 评论内容
-  string content = 3;
-  // 评论类型
-  int32 commentType = 4;
-  // 评论者
-  string origin = 5;
-  // 评论时间
-  string createTime = 6;
-  // 点赞人数
-  int64 liked = 7;
-  // 回复列表
-  repeated SpaceCommentDao replyList = 8;
-}
-
-// 空间动态评论删除
-message ReqSpaceCommentDeleteDao {
-  // 评论id
-  string id = 1;
-  // 空间id
-  string spaceId = 2;
-  // 操作者
-  string origin = 3;
+  // 操作者id
+  string origin = 2;
 }

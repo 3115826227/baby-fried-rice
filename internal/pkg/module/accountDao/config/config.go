@@ -8,10 +8,6 @@ import (
 	"io/ioutil"
 )
 
-const (
-	DefaultUserEncryMd5 = "md5"
-)
-
 var (
 	config models.Conf
 )

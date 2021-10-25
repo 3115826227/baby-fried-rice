@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func SetUserMeta() gin.HandlerFunc {
@@ -14,7 +15,7 @@ func SetUserMeta() gin.HandlerFunc {
 		schoolId := header.Get(handle.HeaderSchoolId)
 		platform := header.Get(handle.HeaderPlatform)
 		reqId := header.Get(handle.HeaderReqId)
-		isSuper := header.Get(handle.HeaderIsSuper)
+		isOfficial, _ := strconv.ParseBool(header.Get(handle.HeaderIsOfficial))
 
 		if accountId == "" {
 			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -24,12 +25,12 @@ func SetUserMeta() gin.HandlerFunc {
 		}
 
 		userMeta := handle.UserMeta{
-			AccountId: accountId,
-			Username:  username,
-			SchoolId:  schoolId,
-			ReqId:     reqId,
-			Platform:  platform,
-			IsSuper:   isSuper,
+			AccountId:  accountId,
+			Username:   username,
+			SchoolId:   schoolId,
+			ReqId:      reqId,
+			Platform:   platform,
+			IsOfficial: isOfficial,
 		}
 
 		context.Set(handle.GinContextKeyUserMeta, &userMeta)

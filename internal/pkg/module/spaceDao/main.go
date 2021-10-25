@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/rpc"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/module/spaceDao/cache"
 	"baby-fried-rice/internal/pkg/module/spaceDao/config"
@@ -33,7 +34,7 @@ func init() {
 		panic(err)
 	}
 	// 初始化缓存
-	if err := cache.InitCache(conf.Cache.Redis.MainCache,  log.Logger); err != nil {
+	if err := cache.InitCache(conf.Cache.Redis.MainCache, log.Logger); err != nil {
 		panic(err)
 	}
 	srv := etcd.NewServerETCD(conf.Register.ETCD.Cluster, log.Logger)
@@ -60,6 +61,7 @@ func ServerRun() {
 	svr := rpc.NewServerGRPC(fmt.Sprintf("%v:%v", conf.Server.RPCServer.Addr, conf.Server.RPCServer.Port),
 		log.Logger, &cert)
 	space.RegisterDaoSpaceServer(svr.GetRpcServer(), &application.SpaceService{})
+	comment.RegisterDaoCommentServer(svr.GetRpcServer(), &application.SpaceService{})
 	if err = svr.Run(); err != nil {
 		panic(err)
 	}

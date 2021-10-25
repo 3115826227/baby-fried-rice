@@ -50,6 +50,10 @@ var PermissionErrResponse = gin.H{
 	"message": ErrCodeM[ErrCodePermissionError],
 }
 
+var (
+	randSource = rand.NewSource(time.Now().UnixNano())
+)
+
 func SuccessResp(c *gin.Context, message string, data interface{}) {
 	if data == nil {
 		data = make(map[string]interface{})
@@ -88,12 +92,12 @@ func GenerateID() string {
 
 //生成八位数字
 func GenerateSerialNumber() string {
-	return fmt.Sprintf("1%08v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
+	return fmt.Sprintf("1%08v", rand.New(randSource).Int31n(1000000))
 }
 
 //生成十二位数字
 func GenerateSerialNumberByLen(len int) string {
-	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(int32(10*len)))
+	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(randSource).Int31n(int32(10*len)))
 }
 
 /*

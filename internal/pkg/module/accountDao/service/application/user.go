@@ -7,7 +7,6 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
-	"baby-fried-rice/internal/pkg/module/accountDao/config"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
@@ -36,6 +35,7 @@ func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDa
 			Id:         detail.AccountID,
 			Username:   detail.Username,
 			HeadImgUrl: detail.HeadImgUrl,
+			IsOfficial: detail.IsOfficial,
 		})
 	}
 	resp = &user.RspUserDaoById{Users: users}
@@ -60,7 +60,7 @@ func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUs
 	accountUser.AccountId = accountID
 	accountUser.LoginName = req.Login.LoginName
 	accountUser.Password = handle.EncodePassword(accountID, req.Login.Password)
-	accountUser.EncodeType = config.DefaultUserEncryMd5
+	accountUser.EncodeType = constant.DefaultUserEncryMd5
 	accountUser.CreatedAt = now
 	accountUser.UpdatedAt = now
 
@@ -185,6 +185,7 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 			Phone:      detail.Phone,
 			Describe:   detail.Describe,
 			Coin:       coin.Coin,
+			IsOfficial: detail.IsOfficial,
 		},
 	}
 	return
@@ -192,6 +193,7 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 
 func (service *UserService) UserDaoDetailUpdate(ctx context.Context, req *user.ReqDaoUserDetailUpdate) (empty *emptypb.Empty, err error) {
 	var detail = tables.AccountUserDetail{
+		AccountID:  req.Detail.AccountId,
 		Username:   req.Detail.Username,
 		SchoolId:   req.Detail.SchoolId,
 		Gender:     req.Detail.Gender,
@@ -291,11 +293,13 @@ func (service *UserService) UserCoinLogAddDao(ctx context.Context, req *user.Req
 	if req.Coin > 0 {
 		newCoinTotal += req.Coin
 	}
+	var now = time.Now()
 	// 更新新的总积分和总获取积分
 	if err = tx.Model(&tables.AccountUserCoin{}).Where("account_id = ?",
 		req.AccountId).Updates(map[string]interface{}{
-		"coin":       newCoin,
-		"coin_total": newCoinTotal,
+		"coin":             newCoin,
+		"coin_total":       newCoinTotal,
+		"update_timestamp": now.Unix(),
 	}).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -310,7 +314,7 @@ func (service *UserService) UserCoinLogAddDao(ctx context.Context, req *user.Req
 		AccountID: req.AccountId,
 		Coin:      req.Coin,
 		CoinType:  constant.CoinType(req.CoinType),
-		Timestamp: time.Now().Unix(),
+		Timestamp: now.Unix(),
 	}
 	if err = tx.Create(&coinLog).Error; err != nil {
 		log.Logger.Error(err.Error())
@@ -407,7 +411,7 @@ func (service *UserService) UserCoinRankBoardQueryDao(ctx context.Context, empty
 func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUserSignInDao) (resp *user.RspUserSignInDao, err error) {
 	var (
 		latestSignInLog tables.AccountUserSignInLog       // 最近一条签到日志
-		signInCoin      constant.RewardCoinBySignedInType //推算出来的签到积分奖励
+		signInCoin      constant.RewardCoinBySignedInType // 推算出来的签到积分奖励
 	)
 	// 查出最近一条签到日志
 	if latestSignInLog, err = query.GetUserLatestSignIn(req.AccountId); err != nil {
@@ -457,22 +461,23 @@ func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUser
 		}
 		tx.Commit()
 	}()
+	var now = time.Now()
 	var newCoin, newCoinTotal = userCoin.Coin + int64(signInCoin), userCoin.CoinTotal + int64(signInCoin)
 	// 更新积分
 	if err = tx.Model(&tables.AccountUserCoin{}).Where("account_id = ?", req.AccountId).Updates(map[string]interface{}{
-		"coin":       newCoin,
-		"coin_total": newCoinTotal,
+		"coin":             newCoin,
+		"coin_total":       newCoinTotal,
+		"update_timestamp": now.Unix(),
 	}).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var now = time.Now().Unix()
 	// 添加积分日志
 	var coinLog = tables.AccountUserCoinLog{
 		AccountID: req.AccountId,
 		Coin:      int64(signInCoin),
 		CoinType:  constant.SignInCoinType,
-		Timestamp: now,
+		Timestamp: now.Unix(),
 	}
 	if err = tx.Create(&coinLog).Error; err != nil {
 		log.Logger.Error(err.Error())
@@ -483,7 +488,7 @@ func (service *UserService) UserSignInDao(ctx context.Context, req *user.ReqUser
 		AccountId:  req.AccountId,
 		Coin:       signInCoin,
 		SignInType: constant.NormalSignInType,
-		Timestamp:  now,
+		Timestamp:  now.Unix(),
 	}
 	if err = tx.Create(&signInLog).Error; err != nil {
 		log.Logger.Error(err.Error())

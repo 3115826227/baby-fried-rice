@@ -29,8 +29,7 @@ func readConfig() (err error) {
 }
 
 func init() {
-	var err error
-	if err = readConfig(); err != nil {
+	if err := readConfig(); err != nil {
 		panic(err)
 	}
 }

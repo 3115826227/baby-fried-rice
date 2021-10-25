@@ -92,15 +92,11 @@ func UserLoginLogHandle(c *gin.Context) {
 	for _, l := range logs {
 		ids = append(ids, l.AccountId)
 	}
-	var details []tables.AccountUserDetail
-	if details, err = query.GetUsersByIds(ids); err != nil {
+	var idsMap = make(map[string]tables.AccountUserDetail)
+	if idsMap, err = query.GetUsersByIds(ids); err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
-	}
-	var idsMap = make(map[string]tables.AccountUserDetail)
-	for _, d := range details {
-		idsMap[d.AccountID] = d
 	}
 	var list = make([]interface{}, 0)
 	for _, l := range logs {

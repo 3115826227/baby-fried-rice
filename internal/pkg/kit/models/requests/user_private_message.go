@@ -4,11 +4,11 @@ import "baby-fried-rice/internal/pkg/kit/constant"
 
 type UserSendPrivateMessageReq struct {
 	SendId          string                          `json:"send_id"`
-	ReceiveId       string                          `json:"receive_id"`
-	MessageSendType constant.SendPrivateMessageType `json:"message_send_type"`
+	ReceiveId       string                          `json:"receive_id; binding:required"`
+	MessageSendType constant.SendPrivateMessageType `json:"message_send_type; binding:required"`
 	MessageType     int32                           `json:"message_type"`
-	MessageTitle    string                          `json:"message_title"`
-	MessageContent  string                          `json:"message_content"`
+	MessageTitle    string                          `json:"message_title; binding:required"`
+	MessageContent  string                          `json:"message_content; binding:required"`
 }
 
 type UserPrivateMessagesReq struct {
@@ -18,6 +18,5 @@ type UserPrivateMessagesReq struct {
 }
 
 type UpdatePrivateMessageStatusReq struct {
-	AccountId  string   `json:"account_id"`
 	MessageIds []string `json:"message_ids"`
 }

@@ -26,6 +26,7 @@ func IsDuplicateAccountID(accountID string) bool {
 
 }
 
+// 校验用户登录名是否重复
 func IsDuplicateLoginNameByUser(loginName string) bool {
 	var count int64 = 0
 	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {

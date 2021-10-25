@@ -1,0 +1,31 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/im.log"
+
+server:
+  httpserver:
+    name: "im-service"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 8080
+    register: "http://127.0.0.1:18076"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    imdaoserver: "im-dao"
+
+messagequeue:
+  publishtopics:
+    websocketnotify: "websocket_notify"
+  nsq:
+    cluster: "nsq:4150"

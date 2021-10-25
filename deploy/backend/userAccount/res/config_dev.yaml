@@ -1,0 +1,41 @@
+log:
+  loglevel: "debug"
+  logpath: "/baby/logs/user_account.log"
+
+server:
+  rpcserver:
+    name: "user-account"
+    addr: "0.0.0.0"
+    serial: 1
+    port: 8080
+    register: "http://127.0.0.1:18071"
+
+cache:
+  redis:
+    maincache:
+      addr: "redis:26379"
+      password: "123456"
+      db: 9
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://etcd:2379"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    shopdaoserver: "shop-dao"
+    imdaoserver: "im-dao"
+
+messagequeue:
+  consumtopics:
+    usercoin:
+      topic: "user_coin"
+      channel: "user_coin_channel"
+  nsq:
+    cluster: "nsq:4150"
