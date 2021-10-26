@@ -14,7 +14,7 @@ register:
   healthyrolltime: 3000
   etcd:
     cluster:
-      - "http://127.0.0.1:23791"
+      - "http://etcd:2379"
 
 messagequeue:
   consumetopics:
