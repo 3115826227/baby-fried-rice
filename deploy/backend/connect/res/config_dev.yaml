@@ -26,7 +26,7 @@ rpc:
     spacedaoserver: "space-dao"
 
 messagequeue:
-  publishtopics:
+  consumetopics:
     websocketnotify:  "websocket_notify"
   nsq:
     cluster: "nsq:4150"

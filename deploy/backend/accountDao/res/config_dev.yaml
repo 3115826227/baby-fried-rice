@@ -9,7 +9,6 @@ server:
     addr: "0.0.0.0"
     port: 8080
     register: "http://127.0.0.1:18061"
-    httpport: 17061
 
 rpc:
   cert:
