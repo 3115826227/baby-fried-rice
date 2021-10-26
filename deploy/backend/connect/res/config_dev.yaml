@@ -27,6 +27,8 @@ rpc:
 
 messagequeue:
   consumetopics:
-    websocketnotify:  "websocket_notify"
+    websocketnotify:
+      topic: "websocket_notify"
+      channel: "websocket_notify_channel"
   nsq:
     cluster: "nsq:4150"
