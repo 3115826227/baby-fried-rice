@@ -13,10 +13,12 @@ import (
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"strings"
+	"sync"
 )
 
 var (
-	clientMp = make(map[string]map[string]*Client)
+	clientMap = make(map[string]map[string]*Client)
+	locker    sync.RWMutex
 )
 
 type Client struct {
@@ -24,26 +26,34 @@ type Client struct {
 }
 
 func GetClientGRPC(serverName string) (*rpc.ClientGRPC, error) {
-	if _, ok := clientMp[serverName]; !ok {
-		clientMp[serverName] = make(map[string]*Client)
+	locker.RLock()
+	srvMap, ok := clientMap[serverName]
+	if !ok {
+		srvMap = make(map[string]*Client)
 	}
+	locker.RUnlock()
 	addr, err := server.GetRegisterClient().GetServer(serverName)
 	if err != nil {
 		err = errors.Wrap(err, fmt.Sprintf("failed to get server %v", serverName))
 		return nil, err
 	}
 	addr = strings.Split(addr, "//")[1]
-	if err = initClient(serverName, addr); err != nil {
+	client, exist := srvMap[addr]
+	if exist {
+		return client.c, nil
+	}
+	if client, err = initClient(addr); err != nil {
 		err = errors.Wrap(err, fmt.Sprintf("failed to init rpc client %v %v", serverName, addr))
 		return nil, err
 	}
-	return clientMp[serverName][addr].c, nil
+	srvMap[addr] = client
+	locker.Lock()
+	clientMap[serverName] = srvMap
+	locker.Unlock()
+	return client.c, nil
 }
 
-func initClient(serverName, addr string) (err error) {
-	if _, exist := clientMp[serverName][addr]; exist {
-		return nil
-	}
+func initClient(addr string) (client *Client, err error) {
 	b, err := ioutil.ReadFile(config.GetConfig().Rpc.Cert.Client.ClientCertFile)
 	if err != nil {
 		return
@@ -52,13 +62,12 @@ func initClient(serverName, addr string) (err error) {
 	if !cp.AppendCertsFromPEM(b) {
 		return
 	}
-	c, err := rpc.NewClientGRPC(addr, log.Logger, cp)
+	var c *rpc.ClientGRPC
+	c, err = rpc.NewClientGRPC(addr, log.Logger, cp)
 	if err != nil {
 		return
 	}
-	client := &Client{c: c}
-	clientMp[serverName][addr] = client
-	return nil
+	return &Client{c: c}, nil
 }
 
 func GetSpaceClient() (space.DaoSpaceClient, error) {

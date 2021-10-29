@@ -3,20 +3,25 @@ package query
 import (
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 	"baby-fried-rice/internal/pkg/module/spaceDao/db"
 )
 
 type SpaceQueryParams struct {
-	Page     int64
-	PageSize int64
-	SpaceId  string
-	Origin   string
+	Page        int64
+	PageSize    int64
+	SpaceId     string
+	Origin      string
+	VisitorType space.SpaceVisitorType
 }
 
 func SpaceQuery(params SpaceQueryParams) (spaces []tables.Space, err error) {
 	var template = db.GetDB().GetDB()
 	if params.SpaceId != "" {
 		template = template.Where("id = ?", params.SpaceId)
+	}
+	if params.VisitorType != space.SpaceVisitorType_Public {
+		template = template.Where("visitor_type = ?", params.VisitorType)
 	}
 	template = template.Where("audit_status != 2").Order("create_time desc")
 	if params.Page != 0 && params.PageSize != 0 {

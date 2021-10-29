@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
@@ -184,5 +185,45 @@ func GetUserLatestSignIn(accountId string) (signInLog tables.AccountUserSignInLo
 		}
 		go cache.SetUserSignInLatestLog(signInLog)
 	}
+	return
+}
+
+type CommunicationQueryParams struct {
+	CommunicationType user.CommunicationType
+	Page              int64
+	PageSize          int64
+}
+
+func GetCommunication(params CommunicationQueryParams) (communications []tables.Communication, total int64, err error) {
+	var (
+		offset = int((params.Page - 1) * params.PageSize)
+		limit  = int(params.PageSize)
+	)
+	var template = db.GetDB().GetDB().Model(&tables.Communication{}).Where("'delete' = 0")
+	if params.CommunicationType != user.CommunicationType_DefaultCommunication {
+		template = template.Where("communication_type = ?", params.CommunicationType)
+	}
+	if err = template.Count(&total).Error; err != nil {
+		return
+	}
+	err = template.Offset(offset).Limit(limit).Order("id").Find(&communications).Error
+	return
+}
+
+func GetCommunicationDetail(id int64, origin string) (communication tables.Communication, detail tables.CommunicationDetail, err error) {
+	if err = db.GetDB().GetDB().Where("id = ? and origin = ? and 'delete' = 0",
+		id, origin).First(&communication).Error; err != nil {
+		return
+	}
+	if err = db.GetDB().GetObject(map[string]interface{}{
+		"communication_id": id,
+	}, &detail); err != nil {
+		return
+	}
+	return
+}
+
+func GetIteratorVersion() (versions []tables.IterativeVersion, err error) {
+	err = db.GetDB().GetDB().Where("status = 1").Order("version").Find(&versions).Error
 	return
 }

@@ -12,6 +12,7 @@ type CommentQueryParams struct {
 	BizId    string          `json:"biz_id"`
 	BizType  comment.BizType `json:"biz_type"`
 	HostId   string          `json:"host_id"`
+	Floor    int64           `json:"floor"`
 	ParentId string          `json:"parent_id"`
 	Origin   string          `json:"origin"`
 }
@@ -30,7 +31,23 @@ func CommentQuery(params CommentQueryParams) (comments []tables.CommentRelation,
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}
-	err = template.Offset(offset).Limit(limit).Order("floor desc").Find(&comments).Error
+	err = template.Offset(offset).Limit(limit).Order("create_time").Find(&comments).Error
+	return
+}
+
+// 根据时间顺序查询回复列表
+func ReplyQuery(params CommentQueryParams) (replies []tables.CommentRelation, total int64, err error) {
+	var (
+		offset = int((params.Page - 1) * params.PageSize)
+		limit  = int(params.PageSize)
+	)
+	var template = db.GetDB().GetDB().Model(&tables.CommentRelation{})
+	template = template.Where("biz_id = ? and biz_type = ? and floor = ? and parent_id != ''",
+		params.BizId, params.BizType, params.Floor)
+	if err = template.Count(&total).Error; err != nil {
+		return
+	}
+	err = template.Offset(offset).Limit(limit).Order("create_time").Find(&replies).Error
 	return
 }
 

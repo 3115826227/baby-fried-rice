@@ -2,6 +2,7 @@ package rsp
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 )
 
 type User struct {
@@ -30,7 +31,7 @@ type UserDetailResp struct {
 	HeadImgUrl string `json:"head_img_url"`
 	Username   string `json:"username"`
 	SchoolId   string `json:"school_id"`
-	Gender     bool   `json:"gender"`
+	Gender     int32  `json:"gender"`
 	Age        int64  `json:"age"`
 	Phone      string `json:"phone,"`
 	Coin       int64  `json:"coin"`
@@ -45,7 +46,7 @@ type UserBackendResp struct {
 	HeadImgUrl   string `json:"head_img_url"`
 	Username     string `json:"username"`
 	SchoolId     string `json:"school_id"`
-	Gender       bool   `json:"gender"`
+	Gender       int32  `json:"gender"`
 	Age          int64  `json:"age"`
 	Phone        string `json:"phone"`
 	RegisterTime int64  `json:"register_time"`
@@ -134,4 +135,27 @@ type UserLoginLogResp struct {
 	LoginCount     int    `json:"login_count"`
 	IP             string `json:"ip"`
 	LoginTimestamp int64  `json:"login_timestamp"`
+}
+
+type UserCommunicationResp struct {
+	Id                int64                  `json:"id"`
+	Title             string                 `json:"title"`
+	CommunicationType user.CommunicationType `json:"communication_type"`
+	CreateTimestamp   int64                  `json:"create_timestamp"`
+	UpdateTimestamp   int64                  `json:"update_timestamp"`
+	Reply             bool                   `json:"reply"`
+}
+
+type UserCommunicationDetailResp struct {
+	UserCommunicationResp
+	Content        string   `json:"content"`
+	Images         []string `json:"images"`
+	ReplyContent   string   `json:"reply_content"`
+	ReplyTimestamp int64    `json:"reply_timestamp"`
+}
+
+type IteratorVersionResp struct {
+	Version   string `json:"version"`
+	Content   string `json:"content"`
+	Timestamp int64  `json:"timestamp"`
 }

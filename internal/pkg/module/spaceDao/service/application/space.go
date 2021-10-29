@@ -142,13 +142,17 @@ func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSp
 			Id:           s.ID,
 			Origin:       s.Origin,
 			Content:      detailMap[s.ID].Content,
-			Images:       strings.Split(detailMap[s.ID].Images, ","),
 			VisitorType:  s.VisitorType,
 			VisitTotal:   s.VisitTotal,
 			LikeTotal:    s.LikeTotal,
 			CommentTotal: s.CommentTotal,
 			FloorTotal:   s.FloorTotal,
 			CreateTime:   s.CreatedAt.Unix(),
+		}
+		if detailMap[s.ID].Images != "" {
+			querySpace.Images = strings.Split(detailMap[s.ID].Images, ",")
+		} else {
+			querySpace.Images = make([]string, 0)
 		}
 		if _, exist := likeMap[s.ID]; exist {
 			querySpace.OriginLiked = true
@@ -220,8 +224,19 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 		BizID:    req.BizId,
 		BizType:  req.BizType,
 		ParentId: req.ParentId,
-		Floor:    req.Floor,
 		Origin:   req.Origin,
+	}
+	if req.ParentId != "" {
+		var parentComment tables.CommentRelation
+		if err = db.GetDB().GetObject(map[string]interface{}{
+			"biz_id":   req.BizId,
+			"biz_type": req.BizType,
+			"id":       req.ParentId,
+		}, &parentComment); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		s.Floor = parentComment.Floor
 	}
 	s.CreatedAt = time.Now()
 	s.UpdatedAt = s.CreatedAt
@@ -251,6 +266,48 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 }
 
 func CommentReplyQuery(params query.CommentQueryParams) (replies []*comment.CommentReplyDao, total int64, err error) {
+	var comments []tables.CommentRelation
+	if comments, total, err = query.ReplyQuery(params); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var ids = make([]string, 0)
+	for _, c := range comments {
+		ids = append(ids, c.ID)
+	}
+	var detailMap map[string]tables.CommentDetail
+	if detailMap, err = query.CommentDetailQuery(ids); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var optMap map[string]tables.OperatorRelation
+	var optParams = query.OperatorLikedQueryParams{
+		BizId:   params.BizId,
+		HostIds: ids,
+		Origin:  params.Origin,
+	}
+	if optMap, err = query.OperatorLikedQuery(optParams); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	for _, c := range comments {
+		var reply = &comment.CommentReplyDao{
+			Id:              c.ID,
+			ParentId:        c.ParentId,
+			Content:         detailMap[c.ID].Content,
+			Origin:          c.Origin,
+			CreateTimestamp: c.CreatedAt.Unix(),
+			LikeTotal:       c.LikeTotal,
+		}
+		if _, exist := optMap[c.ID]; exist {
+			reply.OriginLiked = true
+		}
+		replies = append(replies, reply)
+	}
+	return
+}
+
+func CommentReplyRecursionQuery(params query.CommentQueryParams) (replies []*comment.CommentReplyDao, total int64, err error) {
 	var comments []tables.CommentRelation
 	var commentTotal int64
 	if comments, commentTotal, err = query.CommentQuery(params); err != nil {
@@ -285,7 +342,7 @@ func CommentReplyQuery(params query.CommentQueryParams) (replies []*comment.Comm
 		params.ParentId = c.ID
 		var childReplies []*comment.CommentReplyDao
 		var replyTotal int64
-		if childReplies, replyTotal, err = CommentReplyQuery(params); err != nil {
+		if childReplies, replyTotal, err = CommentReplyRecursionQuery(params); err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
@@ -328,14 +385,14 @@ func (service *SpaceService) CommentQueryDao(ctx context.Context, req *comment.R
 	var replyTotalMap = make(map[string]int64)
 	for _, c := range comments {
 		ids = append(ids, c.ID)
-		// 递归调用查询回复列表
+		// 查询回复列表
 		var replyParams = query.CommentQueryParams{
 			Page:     1,
 			PageSize: 4,
 			BizId:    req.BizId,
 			BizType:  req.BizType,
-			ParentId: c.ID,
 			Origin:   req.Origin,
+			Floor:    c.Floor,
 		}
 		var replies []*comment.CommentReplyDao
 		var replyTotal int64
@@ -398,12 +455,20 @@ func (service *SpaceService) CommentReplyQueryDao(ctx context.Context, req *comm
 		BizType:  req.BizType,
 		Origin:   req.Origin,
 		ParentId: req.ParentId,
+		Floor:    req.Floor,
 	}
 	var replies []*comment.CommentReplyDao
 	var total int64
-	if replies, total, err = CommentReplyQuery(replyParams); err != nil {
-		log.Logger.Error(err.Error())
-		return
+	if req.Recursion {
+		if replies, total, err = CommentReplyRecursionQuery(replyParams); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	} else {
+		if replies, total, err = CommentReplyRecursionQuery(replyParams); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	resp = &comment.RspCommentReplyQueryDao{
 		List:     replies,

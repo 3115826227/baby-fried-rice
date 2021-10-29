@@ -21,7 +21,7 @@ func GetIterativeVersion(param IterativeVersionQueryParam) (ivs []tables.Iterati
 		offset = int((param.Page - 1) * param.PageSize)
 		limit  = int(param.PageSize)
 	)
-	template := db.GetShopDB().GetDB().Model(&tables.CommodityOrder{})
+	template := db.GetAccountDB().GetDB().Model(&tables.IterativeVersion{})
 	if param.LikeVersion != "" {
 		template = template.Where("version like ?%", param.LikeVersion)
 	}

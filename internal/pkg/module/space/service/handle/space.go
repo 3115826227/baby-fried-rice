@@ -20,6 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -56,8 +57,10 @@ func SpaceAddHandle(c *gin.Context) {
 	var reqSpace = &space.ReqSpaceAddDao{
 		Origin:      userMeta.AccountId,
 		Content:     req.Content,
-		Images:      req.Images,
 		VisitorType: req.VisitorType,
+	}
+	if len(req.Images) != 0 {
+		reqSpace.Images = req.Images
 	}
 	var resp *space.RspSpaceAddDao
 	resp, err = client.SpaceAddDao(context.Background(), reqSpace)
@@ -117,7 +120,7 @@ func SpaceAddHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", resp.Id)
 }
 
-func findUsers(comments []*rsp.CommentResp) (ids []string) {
+func findCommentUsers(comments []*rsp.CommentResp) (ids []string) {
 	var idsMap = make(map[string]rsp.User)
 	for _, c := range comments {
 		commentIdsMap := c.FindUserIds()
@@ -131,8 +134,28 @@ func findUsers(comments []*rsp.CommentResp) (ids []string) {
 	return
 }
 
+func findReplyUsers(replies []*rsp.ReplyResp) (ids []string) {
+	var idsMap = make(map[string]rsp.User)
+	for _, reply := range replies {
+		replyIdsMap := reply.FindUserIds()
+		for id, u := range replyIdsMap {
+			idsMap[id] = u
+		}
+	}
+	for id := range idsMap {
+		ids = append(ids, id)
+	}
+	return
+}
+
 // 空间动态列表查询
 func SpacesQueryHandle(c *gin.Context) {
+	visitorType, err := strconv.Atoi(c.Query("visitor_type"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
 	req, err := handle.PageHandle(c)
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
@@ -153,7 +176,7 @@ func SpacesQueryHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	var resp *space.RspSpaceQueryDao
 	resp, err = spaceClient.SpaceQueryDao(context.Background(),
-		&space.ReqSpaceQueryDao{CommonSearchReq: searchReq, Origin: userMeta.AccountId})
+		&space.ReqSpaceQueryDao{CommonSearchReq: searchReq, Origin: userMeta.AccountId, VisitorType: space.SpaceVisitorType(visitorType)})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -193,6 +216,7 @@ func SpacesQueryHandle(c *gin.Context) {
 	commentClient, err = grpc.GetCommentClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
 	list := make([]rsp.SpaceResp, 0)
@@ -200,8 +224,8 @@ func SpacesQueryHandle(c *gin.Context) {
 		var spe = rsp.SpaceResp{
 			Id:           s.Id,
 			Content:      s.Content,
-			Images:       s.Images,
 			VisitorType:  s.VisitorType,
+			Images:       s.Images,
 			Origin:       idsMap[s.Origin],
 			CreateTime:   s.CreateTime,
 			VisitTotal:   s.VisitTotal,
@@ -217,34 +241,12 @@ func SpacesQueryHandle(c *gin.Context) {
 			Page:     1,
 			PageSize: 5,
 		}
-		var commentResp *comment.RspCommentQueryDao
-		if commentResp, err = commentClient.CommentQueryDao(context.Background(), &commentReq); err != nil {
+		var comments []*rsp.CommentResp
+		comments, _, err = commentQueryHandle(commentReq)
+		if err != nil {
 			log.Logger.Error(err.Error())
+			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 			return
-		}
-		var comments = make([]*rsp.CommentResp, 0)
-		for _, cmmt := range commentResp.List {
-			comments = append(comments, rsp.CommentRpcConvertResponse(cmmt))
-		}
-		var commentIds = findUsers(comments)
-		if userResp, err = userClient.
-			UserDaoById(context.Background(),
-				&user.ReqUserDaoById{Ids: commentIds}); err != nil {
-			log.Logger.Error(err.Error())
-			return
-		}
-		var commentIdsMap = make(map[string]rsp.User)
-		for _, u := range userResp.Users {
-			commentIdsMap[u.Id] = rsp.User{
-				AccountID:  u.Id,
-				Username:   u.Username,
-				HeadImgUrl: u.HeadImgUrl,
-				IsOfficial: u.IsOfficial,
-			}
-		}
-		for index, cmmt := range comments {
-			cmmt.SetUser(commentIdsMap)
-			comments[index] = cmmt
 		}
 		spe.Comments = comments
 		list = append(list, spe)
@@ -442,6 +444,177 @@ func SpaceCommentAddHandle(c *gin.Context) {
 		return
 	}
 	handle.SuccessResp(c, "", resp.Id)
+}
+
+func commentQueryHandle(req comment.ReqCommentQueryDao) (comments []*rsp.CommentResp, total int64, err error) {
+	var commentClient comment.DaoCommentClient
+	commentClient, err = grpc.GetCommentClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var commentResp *comment.RspCommentQueryDao
+	if commentResp, err = commentClient.CommentQueryDao(context.Background(), &req); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	total = commentResp.Total
+	for _, cmmt := range commentResp.List {
+		comments = append(comments, rsp.CommentRpcConvertResponse(cmmt))
+	}
+	var commentIds = findCommentUsers(comments)
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var userResp *user.RspUserDaoById
+	if userResp, err = userClient.
+		UserDaoById(context.Background(),
+			&user.ReqUserDaoById{Ids: commentIds}); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var commentIdsMap = make(map[string]rsp.User)
+	for _, u := range userResp.Users {
+		commentIdsMap[u.Id] = rsp.User{
+			AccountID:  u.Id,
+			Username:   u.Username,
+			HeadImgUrl: u.HeadImgUrl,
+			IsOfficial: u.IsOfficial,
+		}
+	}
+	for index, cmmt := range comments {
+		cmmt.SetUser(commentIdsMap)
+		comments[index] = cmmt
+	}
+	return
+}
+
+func commentReplyQueryHandle(req comment.ReqCommentReplyQueryDao) (replies []*rsp.ReplyResp, total int64, err error) {
+	var commentClient comment.DaoCommentClient
+	commentClient, err = grpc.GetCommentClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var replyResp *comment.RspCommentReplyQueryDao
+	if replyResp, err = commentClient.CommentReplyQueryDao(context.Background(), &req); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	total = replyResp.Total
+	for _, reply := range replyResp.List {
+		replies = append(replies, rsp.ReplyRpcConvertResponse(reply))
+	}
+	var commentIds = findReplyUsers(replies)
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var userResp *user.RspUserDaoById
+	if userResp, err = userClient.
+		UserDaoById(context.Background(),
+			&user.ReqUserDaoById{Ids: commentIds}); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var commentIdsMap = make(map[string]rsp.User)
+	for _, u := range userResp.Users {
+		commentIdsMap[u.Id] = rsp.User{
+			AccountID:  u.Id,
+			Username:   u.Username,
+			HeadImgUrl: u.HeadImgUrl,
+			IsOfficial: u.IsOfficial,
+		}
+	}
+	for index, reply := range replies {
+		reply.SetUser(commentIdsMap)
+		replies[index] = reply
+	}
+	return
+}
+
+// 空间更多评论查询
+func CommentQueryHandle(c *gin.Context) {
+	bizId := c.Query("biz_id")
+	bizType, err := strconv.Atoi(c.Query("biz_type"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	pageReq, err := handle.PageHandle(c)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	userMeta := handle.GetUserMeta(c)
+	var req = comment.ReqCommentQueryDao{
+		BizId:    bizId,
+		BizType:  comment.BizType(bizType),
+		Origin:   userMeta.AccountId,
+		Page:     pageReq.Page,
+		PageSize: pageReq.PageSize,
+	}
+	var list []interface{}
+	comments, total, err := commentQueryHandle(req)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	for _, cmmt := range comments {
+		list = append(list, cmmt)
+	}
+	handle.SuccessListResp(c, "", list, total, pageReq.Page, pageReq.PageSize)
+}
+
+// 空间评论更多回复查询
+func CommentReplyQueryHandle(c *gin.Context) {
+	floor, err := strconv.Atoi(c.Query("floor"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	bizId := c.Query("biz_id")
+	bizType, err := strconv.Atoi(c.Query("biz_type"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	pageReq, err := handle.PageHandle(c)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	userMeta := handle.GetUserMeta(c)
+	var req = comment.ReqCommentReplyQueryDao{
+		BizId:    bizId,
+		BizType:  comment.BizType(bizType),
+		Floor:    int64(floor),
+		Origin:   userMeta.AccountId,
+		Page:     pageReq.Page,
+		PageSize: pageReq.PageSize,
+	}
+	var list []interface{}
+	replies, total, err := commentReplyQueryHandle(req)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	for _, reply := range replies {
+		list = append(list, reply)
+	}
+	handle.SuccessListResp(c, "", list, total, pageReq.Page, pageReq.PageSize)
 }
 
 // 空间动态评论删除

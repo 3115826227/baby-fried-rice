@@ -3,6 +3,7 @@ package etcd
 import (
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"context"
+	"fmt"
 	"github.com/coreos/etcd/clientv3"
 	"math/rand"
 	"time"
@@ -64,6 +65,10 @@ func genRand(num int) int {
 func (client *ClientETCD) GetServer(serverName string) (string, error) {
 	servers, err := client.list(serverName)
 	if err != nil {
+		return "", err
+	}
+	if len(servers) == 0 {
+		err = fmt.Errorf("no %v server register", serverName)
 		return "", err
 	}
 	return servers[genRand(len(servers))], nil
