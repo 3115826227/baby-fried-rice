@@ -1100,9 +1100,11 @@ func (service *IMService) FriendQueryDao(ctx context.Context, req *im.ReqFriendQ
 		ids = append(ids, f.Friend)
 	}
 	var statusMap map[string]im.OnlineStatusType
-	if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
-		log.Logger.Error(err.Error())
-		return
+	if len(ids) != 0 {
+		if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	var list = make([]*im.FriendDao, 0)
 	for _, f := range friends {
