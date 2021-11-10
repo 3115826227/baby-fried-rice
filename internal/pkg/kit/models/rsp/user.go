@@ -2,15 +2,17 @@ package rsp
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 )
 
 type User struct {
-	AccountID  string `json:"account_id"`
-	Username   string `json:"username"`
-	HeadImgUrl string `json:"head_img_url"`
-	Remark     string `json:"remark"`
-	IsOfficial bool   `json:"is_official"`
+	AccountID  string              `json:"account_id"`
+	Username   string              `json:"username"`
+	HeadImgUrl string              `json:"head_img_url"`
+	Remark     string              `json:"remark"`
+	IsOfficial bool                `json:"is_official"`
+	OnlineType im.OnlineStatusType `json:"online_type,omitempty"`
 }
 
 type UserDataResp struct {

@@ -88,8 +88,8 @@ func sendOperatorNotify(client im.DaoImClient, operatorId int64, accountId strin
 			return
 		}
 		var u = respUser.Users[0]
-		notify.WSMessage.Send = models.UserBaseInfo{
-			AccountId:  u.Id,
+		notify.WSMessage.Send = rsp.User{
+			AccountID:  u.Id,
 			HeadImgUrl: u.HeadImgUrl,
 			Username:   u.Username,
 		}
@@ -203,13 +203,26 @@ func OperatorConfirmHandle(c *gin.Context) {
 		switch od.OptType {
 		case im.OptType_AddFriend:
 			// 请求添加好友验证通过
+			var remark string
+			remark, err = GetUsername(od.Origin)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				return
+			}
 			var reqFriend = im.ReqFriendAddDao{
 				Origin:     od.Origin,
 				AccountId:  od.Receive,
 				OperatorId: od.Id,
+				Remark:     remark,
+				OriRemark:  userMeta.Username,
 			}
 			_, err = imClient.FriendAddDao(context.Background(), &reqFriend)
 			if err != nil {
+				log.Logger.Error(err.Error())
+				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				return
+			}
+			if err = addFriendSession(od.Origin, remark, od.Receive, userMeta.Username, imClient); err != nil {
 				log.Logger.Error(err.Error())
 				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 				return
@@ -371,6 +384,27 @@ func OperatorDeleteHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+func GetUsername(accountId string) (username string, err error) {
+	userClient, err := grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var resp *user.RspUserDaoById
+	resp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{accountId}})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if len(resp.Users) != 1 {
+		err = constant.QueryUserByIdDaoError
+		log.Logger.Error(err.Error())
+		return
+	}
+	username = resp.Users[0].Username
+	return
+}
+
 // 添加好友
 func FriendAddHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
@@ -385,26 +419,12 @@ func FriendAddHandle(c *gin.Context) {
 		remark = req.Remark
 	} else {
 		// 获取用户名
-		userClient, err := grpc.GetUserClient()
+		var err error
+		remark, err = GetUsername(req.AccountId)
 		if err != nil {
-			log.Logger.Error(err.Error())
 			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 			return
 		}
-		var resp *user.RspUserDaoById
-		resp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{req.AccountId}})
-		if err != nil {
-			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-			return
-		}
-		if len(resp.Users) != 1 {
-			err = constant.QueryUserByIdDaoError
-			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-			return
-		}
-		remark = resp.Users[0].Username
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
@@ -420,7 +440,7 @@ func FriendAddHandle(c *gin.Context) {
 	}
 	_, err = imClient.FriendAddDao(context.Background(), reqFriend)
 	if err != nil {
-		if err == constant.NeedApplyAddFriendError {
+		if err.Error() == fmt.Sprintf("rpc error: code = Unknown desc = %v", constant.NeedApplyAddFriendError.Error()) {
 			// 需要发出好友申请
 			handle.ErrorResp(c, http.StatusOK, handle.CodeNeedApplyAddFriend, handle.CodeNeedApplyAddFriendMsg)
 			return
@@ -431,30 +451,36 @@ func FriendAddHandle(c *gin.Context) {
 		}
 	}
 	// 好友添加成功后，创建会话，给会话成员发送会话通知
-	var joins = []*im.JoinRemarkDao{
-		{
-			AccountId: userMeta.AccountId,
-			Remark:    userMeta.Username,
-		}, {
-			AccountId: req.AccountId,
-			Remark:    remark,
-		},
-	}
-	var reqSession = &im.ReqSessionAddDao{
-		SessionType: im.SessionType_DoubleSession,
-		Origin:      userMeta.AccountId,
-		Joins:       joins,
-		Level:       im.SessionLevel_SessionBaseLevel,
-	}
-	var respSession *im.RspSessionAddDao
-	respSession, err = imClient.SessionAddDao(context.Background(), reqSession)
-	if err != nil {
+	if err = addFriendSession(userMeta.AccountId, userMeta.Username, req.AccountId, remark, imClient); err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	go sendSessionNotify(respSession.SessionId, im.SessionType_DoubleSession, joins)
 	handle.SuccessResp(c, "", nil)
+}
+
+func addFriendSession(origin, remark, friend, friendRemark string, imClient im.DaoImClient) error {
+	var joins = []*im.JoinRemarkDao{
+		{
+			AccountId: origin,
+			Remark:    remark,
+		}, {
+			AccountId: friend,
+			Remark:    friendRemark,
+		},
+	}
+	var reqSession = &im.ReqSessionAddDao{
+		SessionType: im.SessionType_DoubleSession,
+		Origin:      origin,
+		Joins:       joins,
+		Level:       im.SessionLevel_SessionBaseLevel,
+	}
+	respSession, err := imClient.SessionAddDao(context.Background(), reqSession)
+	if err != nil {
+		return err
+	}
+	go sendSessionNotify(respSession.SessionId, im.SessionType_DoubleSession, joins)
+	return nil
 }
 
 // 好友列表查询
@@ -487,10 +513,11 @@ func FriendQueryHandle(c *gin.Context) {
 	var list = make([]rsp.Friend, 0)
 	for _, f := range resp.List {
 		var friend = rsp.Friend{
-			AccountId: f.AccountId,
-			Remark:    f.Remark,
-			BlackList: f.BlackList,
-			Timestamp: f.Timestamp,
+			AccountId:  f.AccountId,
+			Remark:     f.Remark,
+			BlackList:  f.BlackList,
+			Timestamp:  f.Timestamp,
+			OnlineType: f.OnlineType,
 		}
 		list = append(list, friend)
 	}
@@ -676,8 +703,8 @@ func SessionCreateWebRTC(c *gin.Context) {
 				WSMessageNotifyType: constant.SessionMessageNotify,
 				Receive:             u.AccountId,
 				WSMessage: models.WSMessage{
-					WSMessageType: im.SessionMessageType_InviteMessage,
-					Send:          userMeta.GetUserBaseInfo(),
+					WSMessageType: im.SessionNotifyType_InviteNotify,
+					Send:          userMeta.GetUser(),
 					SessionMessage: &models.SessionMessage{
 						SessionMessageType: constant.SessionMessageMessage,
 						Message: rsp.Message{

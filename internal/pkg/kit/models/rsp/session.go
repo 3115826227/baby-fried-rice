@@ -2,10 +2,6 @@ package rsp
 
 import "baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 
-type SessionsResp struct {
-	Sessions []Session `json:"sessions"`
-}
-
 type Session struct {
 	// 会话id
 	SessionId int64 `json:"session_id"`
@@ -13,6 +9,25 @@ type Session struct {
 	SessionType im.SessionType `json:"session_type"`
 	// 会话名称
 	Name string `json:"name"`
+	// 会话等级
+	Level im.SessionLevel `json:"level"`
+	// 会话创建者
+	Origin string `json:"origin"`
+	// 用户状态
+	Users []User `json:"users"`
+	// 对方正在输入
+	Inputting bool `json:"inputting"`
+}
+
+type SessionDialog struct {
+	// 会话id
+	SessionId int64 `json:"session_id"`
+	// 会话类型
+	SessionType im.SessionType `json:"session_type"`
+	// 会话名称
+	Name string `json:"name"`
+	// 会话等级
+	Level im.SessionLevel `json:"level"`
 	// 未读消息数
 	Unread int64 `json:"unread"`
 	// 最近一条消息
@@ -55,6 +70,8 @@ type Message struct {
 	SendTimestamp int64 `json:"send_timestamp"`
 	// 读取状态
 	ReadStatus bool `json:"read_status"`
+	// 消息已读用户数
+	ReadUserTotal int64 `json:"read_user_total"`
 }
 
 type Messages []Message
@@ -76,6 +93,20 @@ type SessionMessageResp struct {
 	Messages []Message `json:"messages"`
 	Page     int64     `json:"page"`
 	PageSize int64     `json:"page_size"`
+}
+
+// 已读消息
+type ReadMessage struct {
+	// 已读消息id
+	MessageId int64 `json:"message_id"`
+	// 已读消息用户
+	User string `json:"user"`
+}
+
+type MessageReadUsers struct {
+	MessageId   int64  `json:"message_id"`
+	ReadUsers   []User `json:"read_users"`
+	UnreadUsers []User `json:"unread_users"`
 }
 
 type UserManageResp struct {
@@ -100,6 +131,8 @@ type Friend struct {
 	BlackList bool `json:"black_list"`
 	// 成为好友的时间
 	Timestamp int64 `json:"timestamp"`
+	// 在线类型
+	OnlineType im.OnlineStatusType `json:"online_type"`
 }
 
 type Friends []Friend

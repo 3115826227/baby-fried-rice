@@ -11,6 +11,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 	"strings"
 	"time"
 )
@@ -37,9 +38,6 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 			tx.Rollback()
 			return
 		}
-		resp = &space.RspSpaceAddDao{
-			Id: s.ID,
-		}
 		tx.Commit()
 	}()
 	if err = tx.Create(&s).Error; err != nil {
@@ -54,6 +52,9 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 	if err = tx.Create(&detail).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
+	}
+	resp = &space.RspSpaceAddDao{
+		Id: s.ID,
 	}
 	return
 }
@@ -80,28 +81,6 @@ func (service *SpaceService) SpaceDeleteDao(ctx context.Context, req *space.ReqS
 	empty = new(emptypb.Empty)
 	return
 }
-
-// 评论列表转换成递归类型
-//func CommentConvert(commentLikedMap map[string]int64, relations []tables.SpaceCommentRelation, parentId string) (comments []*space.SpaceCommentDao) {
-//	comments = make([]*space.SpaceCommentDao, 0)
-//	for _, rel := range relations {
-//		if rel.ParentId != parentId {
-//			continue
-//		}
-//		var comment = &space.SpaceCommentDao{
-//			Id:          rel.ID,
-//			SpaceId:     rel.SpaceId,
-//			Content:     rel.Comment,
-//			CommentType: rel.CommentType,
-//			Origin:      rel.Origin,
-//			CreateTime:  rel.CreatedAt.Unix(),
-//			Liked:       commentLikedMap[rel.ID],
-//			ReplyList:   CommentConvert(commentLikedMap, relations, rel.ID),
-//		}
-//		comments = append(comments, comment)
-//	}
-//	return
-//}
 
 // 空间动态列表查询
 func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSpaceQueryDao) (resp *space.RspSpaceQueryDao, err error) {
@@ -172,7 +151,7 @@ func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSp
 // 动态空间增量更新
 func (service *SpaceService) SpaceIncrUpdateDao(ctx context.Context, req *space.ReqSpaceIncrUpdateDao) (empty *emptypb.Empty, err error) {
 	var s tables.Space
-	if err = db.GetDB().GetObject(map[string]interface{}{"id": req.Id}, &s); err != nil {
+	if s, err = query.GetSpace(req.Id); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -191,12 +170,7 @@ func (service *SpaceService) SpaceIncrUpdateDao(ctx context.Context, req *space.
 // 浏览记录添加
 func (service *SpaceService) VisitAddDao(ctx context.Context, req *comment.ReqVisitAddDao) (resp *comment.RspVisitAddDao, err error) {
 	var exist bool
-	exist, err = db.GetDB().ExistObject(map[string]interface{}{
-		"biz_id":     req.BizId,
-		"biz_type":   req.BizType,
-		"account_id": req.AccountId,
-	}, &tables.VisitedRelation{})
-	if err != nil {
+	if exist, err = query.VisitedExist(req.BizId, req.BizType, req.AccountId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -225,6 +199,7 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 		BizType:  req.BizType,
 		ParentId: req.ParentId,
 		Origin:   req.Origin,
+		Floor:    req.Floor,
 	}
 	if req.ParentId != "" {
 		var parentComment tables.CommentRelation
@@ -247,7 +222,6 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 			tx.Rollback()
 			return
 		}
-		resp = &comment.RspCommentAddDao{Id: s.ID}
 		tx.Commit()
 	}()
 	if err = db.GetDB().CreateObject(&s); err != nil {
@@ -262,6 +236,7 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 		log.Logger.Error(err.Error())
 		return
 	}
+	resp = &comment.RspCommentAddDao{Id: s.ID}
 	return
 }
 
@@ -484,6 +459,43 @@ func (service *SpaceService) CommentPersonQueryDao(ctx context.Context, req *com
 	return
 }
 
+func commentDeleteDao(tx *gorm.DB, req *comment.ReqCommentDeleteDao) (total int64, err error) {
+	var template = tx.Where("biz_id = ? and biz_type = ? and parent_id = ?",
+		req.BizId, req.BizType, req.Id)
+	if req.Origin != "" {
+		template = template.Where("origin = ?", req.Origin)
+	}
+	var relations []tables.CommentRelation
+	if err = template.Find(&relations).Error; err != nil {
+		return
+	}
+	var ids = make([]string, 0)
+	for _, rel := range relations {
+		ids = append(ids, rel.ID)
+	}
+	if err = template.Delete(&tables.CommentRelation{}).Error; err != nil {
+		return
+	}
+	if err = tx.Where("comment_id in (?)", ids).Delete(&tables.CommentDetail{}).Error; err != nil {
+		return
+	}
+	total = int64(len(ids))
+	for _, id := range ids {
+		var childReq = &comment.ReqCommentDeleteDao{
+			BizId:   req.BizId,
+			BizType: req.BizType,
+			Id:      id,
+		}
+		var count int64
+		count, err = commentDeleteDao(tx, childReq)
+		if err != nil {
+			return
+		}
+		total += count
+	}
+	return
+}
+
 // 评论删除
 func (service *SpaceService) CommentDeleteDao(ctx context.Context, req *comment.ReqCommentDeleteDao) (resp *comment.RspCommentDeleteDao, err error) {
 	var tx = db.GetDB().GetDB().Begin()
@@ -494,18 +506,13 @@ func (service *SpaceService) CommentDeleteDao(ctx context.Context, req *comment.
 		}
 		tx.Commit()
 	}()
-	// 删除评论
-	if err = tx.Where("biz_id = ? and biz_type = ? and id = ? and origin = ?",
-		req.BizId, req.BizType, req.Id, req.Origin).Delete(&tables.CommentRelation{}).Error; err != nil {
+	var total int64
+	total, err = commentDeleteDao(tx, req)
+	if err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if err = tx.Where("comment_id = ?", req.Id).Delete(&tables.CommentDetail{}).Error; err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
-	// todo 级联删除子评论
-	// todo 删除和该评论有关的操作
+	resp = &comment.RspCommentDeleteDao{Total: total}
 	return
 }
 

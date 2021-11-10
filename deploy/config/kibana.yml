@@ -1,0 +1,4 @@
+# 访问ES的url，根据自己的配置修改
+elasticsearch.hosts: "http://elasticsearch:9200"
+server.name: kibana
+server.host: "0"

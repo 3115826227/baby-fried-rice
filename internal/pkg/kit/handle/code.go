@@ -12,6 +12,8 @@ const (
 
 	CodeNeedOriginAuditSession = 20021
 	CodeNeedInviteJoinSession  = 20022
+
+	CodeSessionOriginPermission = 20031
 )
 
 const (
@@ -26,4 +28,6 @@ const (
 
 	CodeNeedOriginAuditSessionMsg = "会话加入请求已发送，请耐心等待审核确认"
 	CodeNeedInviteJoinSessionMsg  = "会话创建者已设置会话加入权限，请您联系会话创建者邀请您，才能加入该会话"
+
+	CodeSessionOriginPermissionMsg = "只有会话创建才有该权限"
 )

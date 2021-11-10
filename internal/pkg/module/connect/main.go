@@ -4,6 +4,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/etcd"
 	"baby-fried-rice/internal/pkg/kit/interfaces"
 	"baby-fried-rice/internal/pkg/kit/models"
+	"baby-fried-rice/internal/pkg/module/connect/cache"
 	"baby-fried-rice/internal/pkg/module/connect/config"
 	"baby-fried-rice/internal/pkg/module/connect/log"
 	"baby-fried-rice/internal/pkg/module/connect/server"
@@ -23,6 +24,10 @@ func init() {
 	conf = config.GetConfig()
 	// 初始化日志
 	if err := log.InitLog(conf.Server.HTTPServer.Name, conf.Log.LogLevel, conf.Log.LogPath); err != nil {
+		panic(err)
+	}
+	// 初始化缓存
+	if err := cache.InitCache(conf.Cache.Redis.MainCache, log.Logger); err != nil {
 		panic(err)
 	}
 	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster); err != nil {

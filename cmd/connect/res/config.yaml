@@ -16,6 +16,13 @@ register:
     cluster:
       - "http://127.0.0.1:23791"
 
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
+
 rpc:
   cert:
     client:

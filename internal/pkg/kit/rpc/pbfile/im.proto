@@ -13,8 +13,16 @@ service DaoIm {
   rpc SessionUpdateDao (ReqSessionUpdateDao) returns (google.protobuf.Empty);
   // 会话备注修改
   rpc SessionRemarkUpdateDao (ReqSessionRemarkUpdateDao) returns (google.protobuf.Empty);
+  // 设置对话框会话
+  rpc SessionDialogSetDao (ReqSessionDialogDao) returns (google.protobuf.Empty);
+  // 删除对话框会话
+  rpc SessionDialogDeleteDao (ReqSessionDialogDao) returns (google.protobuf.Empty);
+  // 查询会话对话框列表
+  rpc SessionDialogQueryDao (ReqSessionDialogQueryDao) returns (RspSessionDialogQueryDao);
   // 查询会话列表
   rpc SessionQueryDao (ReqSessionQueryDao) returns (RspSessionQueryDao);
+  // 根据好友查询双人会话
+  rpc SessionByFriendQueryDao (ReqSessionByFriendQueryDao) returns (RspSessionByFriendQueryDao);
   // 查询会话详细信息
   rpc SessionDetailQueryDao (ReqSessionDetailQueryDao) returns (RspSessionDetailQueryDao);
   // 加入会话
@@ -31,10 +39,14 @@ service DaoIm {
   rpc SessionMessageAddDao (ReqSessionMessageAddDao) returns (google.protobuf.Empty);
   // 会话消息查询
   rpc SessionMessageQueryDao (ReqSessionMessageQueryDao) returns (RspSessionMessageQueryDao);
+  // 会话消息已读用户列表查询
+  rpc SessionMessageReadUsersQueryDao (ReqSessionMessageReadUsersQueryDao) returns (RspSessionMessageReadUsersQueryDao);
   // 会话消息读取状态更新
   rpc SessionMessageReadStatusUpdateDao (ReqSessionMessageReadStatusUpdateDao) returns (google.protobuf.Empty);
   // 会话消息删除
   rpc SessionMessageDeleteDao (ReqSessionMessageDeleteDao) returns (google.protobuf.Empty);
+  // 会话消息撤回
+  rpc SessionMessageWithDrawnDao (ReqSessionMessageWithDrawnDao) returns (google.protobuf.Empty);
   // 会话消息清空
   rpc SessionMessageFlushDao (ReqSessionMessageFlushDao) returns (google.protobuf.Empty);
 
@@ -149,18 +161,50 @@ message ReqSessionQueryDao {
   string origin = 4;
   // 查询者
   string accountId = 5;
-  // 按照最新消息时间排序
-  bool latestMessageTimeOrderBy = 6;
+  // 会话名称模糊查询
+  string nameLike = 6;
 }
 
 message RspSessionQueryDao {
   repeated SessionQueryDao sessions = 1;
-  int64 page = 2;
-  int64 pageSize = 3;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
 }
 
 // 会话信息
 message SessionQueryDao {
+  // 会话id
+  int64 sessionId = 1;
+  // 会话类型
+  SessionType sessionType = 2;
+  // 会话名
+  string name = 3;
+  // 会话等级
+  SessionLevel level = 4;
+  // 创建者
+  string origin = 5;
+}
+
+message ReqSessionDialogDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+}
+
+message ReqSessionDialogQueryDao {
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+message RspSessionDialogQueryDao {
+  repeated SessionDialogQueryDao sessions = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+message SessionDialogQueryDao {
   // 会话id
   int64 sessionId = 1;
   // 会话类型
@@ -174,6 +218,17 @@ message SessionQueryDao {
   // 最近一条消息内容
   SessionMessageDao latest = 6;
 }
+
+
+message ReqSessionByFriendQueryDao {
+  string accountId = 1;
+  string friend = 2;
+}
+
+message RspSessionByFriendQueryDao {
+  int64 sessionId = 1;
+}
+
 
 // 会话详细信息
 message SessionDetailQueryDao {
@@ -198,6 +253,7 @@ message SessionDetailQueryDao {
 message JoinRemarkDao {
   string accountId = 1;
   string remark = 2;
+  OnlineStatusType onlineType = 3;
 }
 
 // 查询会话详情
@@ -270,6 +326,27 @@ message ReqSessionDeleteDao {
   int64 sessionId = 2;
 }
 
+// 会话通知类型
+enum SessionNotifyType
+{
+  // 默认通知
+  DefaultNotify = 0;
+  // 邀请消息
+  InviteNotify = 1;
+  // 回复消息
+  ReturnNotify = 2;
+  // 加入消息
+  JoinNotify = 3;
+  // 对方正在输入消息
+  InputtingMessage = 4;
+  // 用户在线状态消息
+  OnlineStatus = 5;
+  // 用户已读消息通知
+  UserReadMessage = 6;
+  // 用户撤回发送的消息
+  UserWithDrawn = 7;
+}
+
 // 会话消息类型
 enum  SessionMessageType
 {
@@ -279,12 +356,8 @@ enum  SessionMessageType
   FileMessage = 1;
   // 图片消息
   ImgMessage = 2;
-  // 邀请消息
-  InviteMessage = 3;
-  // 回复消息
-  ReturnMessage = 4;
-  // 加入消息
-  JoinMessage = 5;
+  // 已撤回消息
+  WithDrawnMessage = 3;
 }
 
 // 会话消息
@@ -305,6 +378,8 @@ message SessionMessageDao {
   int64 sendTimestamp = 7;
   // 读取状态 0-未读 1-已读
   bool readStatus = 8;
+  // 会话消息已读的用户数
+  int64 readUserTotal = 9;
 }
 
 // 会话消息添加
@@ -336,11 +411,32 @@ message RspSessionMessageQueryDao {
   int64 pageSize = 3;
 }
 
+// 会话消息已读用户列表查询
+message ReqSessionMessageReadUsersQueryDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+  int64 messageId = 3;
+}
+
+message RspSessionMessageReadUsersQueryDao {
+  int64 sessionId = 1;
+  int64 messageId = 2;
+  repeated string readUsers = 3;
+  repeated string unreadUsers = 4;
+}
+
 // 会话消息读取状态更新
 message ReqSessionMessageReadStatusUpdateDao {
   string accountId = 1;
   int64 sessionId = 2;
   repeated int64 messageIds = 3;
+}
+
+// 会话消息撤回
+message ReqSessionMessageWithDrawnDao {
+  string accountId = 1;
+  int64 sessionId = 2;
+  int64 messageId = 3;
 }
 
 // 会话消息删除
@@ -470,11 +566,21 @@ message RspFriendQueryDao {
   repeated FriendDao list = 1;
 }
 
+enum OnlineStatusType
+{
+  DefaultOnlineStatusType = 0;
+  Offline = 1;
+  PCOnline = 11;
+  AndroidPhoneOnline = 12;
+  IphoneOnline = 13;
+}
+
 message FriendDao {
   string accountId = 1;
   string remark = 2;
   bool blackList = 3;
   int64 timestamp = 4;
+  OnlineStatusType onlineType = 5;
 }
 
 // 好友黑名单操作

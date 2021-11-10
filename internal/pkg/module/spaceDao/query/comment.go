@@ -120,3 +120,11 @@ func OperatorLikedQuery(params OperatorLikedQueryParams) (optMap map[string]tabl
 	}
 	return
 }
+
+func VisitedExist(bizId string, bizType comment.BizType, accountId string) (exist bool, err error) {
+	return db.GetDB().ExistObject(map[string]interface{}{
+		"biz_id":     bizId,
+		"biz_type":   bizType,
+		"account_id": accountId,
+	}, &tables.VisitedRelation{})
+}

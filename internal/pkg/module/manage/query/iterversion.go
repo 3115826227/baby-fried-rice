@@ -12,6 +12,7 @@ func GetIterativeVersionByVersion(version string) (iv tables.IterativeVersion, e
 
 type IterativeVersionQueryParam struct {
 	LikeVersion string
+	Status      *bool
 	Page        int64
 	PageSize    int64
 }
@@ -24,6 +25,9 @@ func GetIterativeVersion(param IterativeVersionQueryParam) (ivs []tables.Iterati
 	template := db.GetAccountDB().GetDB().Model(&tables.IterativeVersion{})
 	if param.LikeVersion != "" {
 		template = template.Where("version like ?%", param.LikeVersion)
+	}
+	if param.Status != nil {
+		template = template.Where("status = ?", param.Status)
 	}
 	if err = template.Count(&total).Error; err != nil {
 		return

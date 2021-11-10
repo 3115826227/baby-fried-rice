@@ -32,9 +32,9 @@ func (notify *WSMessageNotify) ToString() string {
 
 type WSMessage struct {
 	// 消息类型
-	WSMessageType im.SessionMessageType `json:"ws_message_type"`
+	WSMessageType im.SessionNotifyType `json:"ws_message_type"`
 	// 发送者
-	Send UserBaseInfo `json:"send"`
+	Send rsp.User `json:"send"`
 	// 空间消息 主要是推送
 	Space *rsp.SpaceResp `json:"space,omitempty"`
 	// 会话消息 既有接收也有推送
@@ -57,4 +57,6 @@ type SessionMessage struct {
 	Session rsp.Session `json:"session"`
 	// 新会话消息信息
 	Message rsp.Message `json:"message"`
+	// 已读消息
+	ReadMessages []rsp.ReadMessage `json:"read_messages"`
 }
