@@ -39,10 +39,23 @@ service DaoUser {
   rpc UserCoinRankQueryDao(ReqUserCoinRankQueryDao) returns (RspUserCoinRankQueryDao);
   // 查询用户积分排行榜
   rpc UserCoinRankBoardQueryDao(google.protobuf.Empty) returns (RspUserCoinRankBoardQueryDao);
+
   // 用户签到
   rpc UserSignInDao(ReqUserSignInDao) returns (RspUserSignInDao);
   // 用户签到记录查询
   rpc UserSignInLogQueryDao(ReqUserSignInLogQueryDao) returns (RspUserSignInLogQueryDao);
+
+  // 用户添加沟通信息
+  rpc UserCommunicationAddDao (ReqUserCommunicationAddDao) returns (RspUserCommunicationAddDao);
+  // 用户查询沟通信息列表
+  rpc UserCommunicationQueryDao (ReqUserCommunicationQueryDao) returns (RspUserCommunicationQueryDao);
+  // 用户查询沟通信息详情
+  rpc UserCommunicationDetailQueryDao (ReqUserCommunicationDetailQueryDao) returns (RspUserCommunicationDetailQueryDao);
+  // 用户删除沟通信息
+  rpc UserCommunicationDeleteDao (ReqUserCommunicationDeleteDao) returns (google.protobuf.Empty);
+
+  // 查询系统迭代版本列表
+  rpc IteratorVersionQueryDao (google.protobuf.Empty) returns (RspIteratorVersionQueryDao);
 }
 
 message ReqUserDaoById {
@@ -63,7 +76,7 @@ message UserDao {
 message ReqUserRegister  {
   ReqPasswordLogin login = 1;
   string username = 2;
-  bool gender = 3;
+  int32 gender = 3;
   string phone = 4;
 }
 
@@ -84,7 +97,7 @@ message RspDaoUser {
   string loginName = 2;
   string username = 3;
   string schoolId = 4;
-  bool gender = 5;
+  int32 gender = 5;
   int64  age = 6;
   string phone = 7;
 }
@@ -99,7 +112,7 @@ message DaoUserDetail {
   string headImgUrl = 2;
   string username = 3;
   string schoolId = 4;
-  bool gender = 5;
+  int32 gender = 5;
   int64  age = 6;
   string phone = 7;
   string describe = 8;
@@ -236,4 +249,87 @@ message UserSignInLogQueryDao {
   int64 timestamp = 2;
   int64 coin = 3;
   int64 signInType = 4;
+}
+
+enum CommunicationType
+{
+  DefaultCommunication = 0;
+  // 建议
+  SuggestCommunication = 1;
+  // 问题
+  ProblemCommunication = 2;
+  // 缺陷
+  DefectCommunication = 3;
+}
+
+// 用户沟通信息添加请求
+message ReqUserCommunicationAddDao {
+  string accountId = 1;
+  string title = 2;
+  CommunicationType communicationType = 3;
+  string content = 4;
+  string images = 5;
+}
+
+// 用户沟通信息添加返回
+message RspUserCommunicationAddDao {
+  int64 id = 1;
+}
+
+// 用户沟通信息列表查询请求
+message ReqUserCommunicationQueryDao {
+  string origin = 1;
+  CommunicationType communicationType = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+message UserCommunicationDao {
+  int64 id = 1;
+  string origin = 2;
+  string title = 3;
+  CommunicationType communicationType = 4;
+  int64 createTimestamp = 5;
+  int64 updateTimestamp = 6;
+  bool reply = 7;
+}
+
+// 用户沟通信息列表查询返回
+message RspUserCommunicationQueryDao {
+  repeated UserCommunicationDao list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+// 用户沟通信息详情查询请求
+message ReqUserCommunicationDetailQueryDao {
+  int64 id = 1;
+  string origin = 2;
+}
+
+// 用户沟通信息详情查询返回
+message RspUserCommunicationDetailQueryDao {
+  UserCommunicationDao communication = 1;
+  string content = 2;
+  repeated string images = 3;
+  string replyContent = 4;
+  int64 replyTimestamp = 5;
+}
+
+// 用户删除沟通信息请求
+message ReqUserCommunicationDeleteDao {
+  int64 id = 1;
+  string origin = 2;
+}
+
+message IteratorVersionDao {
+  string version = 1;
+  string content = 2;
+  int64 timestamp = 3;
+}
+
+// 系统版本迭代查询返回
+message RspIteratorVersionQueryDao {
+  repeated IteratorVersionDao list = 1;
 }

@@ -9,6 +9,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/mq/nsq"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
+	"baby-fried-rice/internal/pkg/module/connect/cache"
 	"baby-fried-rice/internal/pkg/module/connect/config"
 	"baby-fried-rice/internal/pkg/module/connect/grpc"
 	"baby-fried-rice/internal/pkg/module/connect/log"
@@ -91,20 +92,32 @@ func WebSocketHandle(c *gin.Context) {
 	}
 	closeChan := make(chan bool, 1)
 	defer func() {
+		// 用户断开连接
+		if err = cache.UpdateUserOnlineStatus(userMeta.AccountId, im.OnlineStatusType_Offline); err != nil {
+			log.Logger.Error(err.Error())
+		}
 		closeChan <- true
 		conn.Close()
 	}()
 	log.Logger.Info(userMeta.AccountId + " connect success")
 	ConnectionMap[userMeta.AccountId] = conn
+	if err = cache.UpdateUserOnlineStatus(userMeta.AccountId, im.OnlineStatusType_PCOnline); err != nil {
+		log.Logger.Error(err.Error())
+	}
 	for {
 		var msg models.WSMessageNotify
 		if err = conn.ReadJSON(&msg); err != nil {
 			log.Logger.Error(err.Error())
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+				return
+			}
 			continue
 		}
 		switch msg.WSMessageNotifyType {
 		case constant.SessionMessageNotify:
 			switch msg.WSMessage.SessionMessage.SessionMessageType {
+			case constant.SessionMessage:
+				handleSession(msg, userMeta.AccountId)
 			case constant.SessionMessageMessage:
 				handleSessionMessage(msg, userMeta.AccountId)
 			}
@@ -112,6 +125,55 @@ func WebSocketHandle(c *gin.Context) {
 			continue
 		}
 	}
+}
+
+// 会话通知消息
+func handleSession(msg models.WSMessageNotify, accountId string) {
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var notify models.WSMessageNotify
+	switch msg.WSMessage.WSMessageType {
+	case im.SessionNotifyType_InputtingMessage:
+		// 对方正在输入
+		notify = msg
+		for _, u := range notify.WSMessage.SessionMessage.Session.Users {
+			if u.AccountID != accountId {
+				notify.Receive = u.AccountID
+			}
+		}
+	case im.SessionNotifyType_OnlineStatus:
+		// 获取会话中用户在线状态
+		var resp *im.RspSessionDetailQueryDao
+		resp, err = imClient.SessionDetailQueryDao(context.Background(), &im.ReqSessionDetailQueryDao{
+			SessionId: msg.WSMessage.SessionMessage.Session.SessionId,
+		})
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		notify = models.WSMessageNotify{
+			WSMessageNotifyType: msg.WSMessageNotifyType,
+			Receive:             accountId,
+			WSMessage:           msg.WSMessage,
+			Timestamp:           msg.Timestamp,
+		}
+		var users = make([]rsp.User, 0)
+		for _, u := range resp.Joins {
+			users = append(users, rsp.User{
+				AccountID:  u.AccountId,
+				Remark:     u.Remark,
+				OnlineType: u.OnlineType,
+			})
+		}
+		notify.WSMessage.SessionMessage.Session = rsp.Session{
+			SessionId: resp.SessionId,
+			Users:     users,
+		}
+	}
+	writeChan <- notify
 }
 
 func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
@@ -134,7 +196,7 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 		log.Logger.Error(err.Error())
 		return
 	}
-	msg.WSMessage.Send.AccountId = userResp.Detail.AccountId
+	msg.WSMessage.Send.AccountID = userResp.Detail.AccountId
 	msg.WSMessage.Send.Username = userResp.Detail.Username
 	msg.WSMessage.Send.HeadImgUrl = userResp.Detail.HeadImgUrl
 	msg.Timestamp = time.Now().Unix()
@@ -166,15 +228,12 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 			Content:       msg.WSMessage.SessionMessage.Message.Content,
 			SendTimestamp: msg.Timestamp,
 		}
-		switch notify.WSMessage.WSMessageType {
-
-		}
 		writeChan <- notify
 	}
 	// 将会话消息发给imDao服务存入数据库中
 	var req = &im.ReqSessionMessageAddDao{
-		MessageType:   msg.WSMessage.WSMessageType,
-		Send:          msg.WSMessage.Send.AccountId,
+		MessageType:   msg.WSMessage.SessionMessage.Message.MessageType,
+		Send:          msg.WSMessage.Send.AccountID,
 		SessionId:     msg.WSMessage.SessionMessage.Message.SessionId,
 		Content:       msg.WSMessage.SessionMessage.Message.Content,
 		SendTimestamp: msg.Timestamp,

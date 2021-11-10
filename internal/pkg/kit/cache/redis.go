@@ -91,3 +91,19 @@ func (c *redisCache) HGetAll(key string) (map[string]string, error) {
 func (c *redisCache) HDel(key string, field ...string) error {
 	return c.rds.HDel(key, field...).Err()
 }
+
+func (c *redisCache) ZSet(key string, member ...redis.Z) error {
+	return c.rds.ZAdd(key, member...).Err()
+}
+
+func (c *redisCache) ZRange(key string, start, stop int64) ([]string, error) {
+	return c.rds.ZRange(key, start, stop).Result()
+}
+
+func (c *redisCache) ZRevRange(key string, start, stop int64) ([]string, error) {
+	return c.rds.ZRevRange(key, start, stop).Result()
+}
+
+func (c *redisCache) ZRem(key string, members ...interface{}) error {
+	return c.rds.ZRem(key, members...).Err()
+}

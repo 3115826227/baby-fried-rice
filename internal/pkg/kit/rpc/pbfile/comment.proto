@@ -57,6 +57,8 @@ message ReqCommentAddDao {
   string bizId = 1;
   // 业务类型
   BizType bizType = 2;
+  // 评论id
+  string commentId = 3;
   // 上一级id
   string parentId = 4;
   // 评论楼层
@@ -113,6 +115,10 @@ message ReqCommentReplyQueryDao {
   int64 page = 5;
   // 页面条数 可选，默认值10
   int64 pageSize = 6;
+  // 评论楼层
+  int64 floor = 7;
+  // 是否递归展示
+  bool recursion = 8;
 }
 
 // 评论回复列表查询返回

@@ -53,6 +53,7 @@ message ReqSpaceQueryDao {
   common.CommonSearchRequest commonSearchReq = 1;
   string spaceId = 2;
   string origin = 3;
+  SpaceVisitorType visitor_type = 4;
 }
 
 // 空间动态查询返回

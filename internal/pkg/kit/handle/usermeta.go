@@ -2,6 +2,7 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/models"
+	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 )
@@ -57,6 +58,14 @@ func GetUserMeta(c *gin.Context) *UserMeta {
 func (meta *UserMeta) GetUserBaseInfo() models.UserBaseInfo {
 	return models.UserBaseInfo{
 		AccountId:  meta.AccountId,
+		Username:   meta.Username,
+		IsOfficial: meta.IsOfficial,
+	}
+}
+
+func (meta *UserMeta) GetUser() rsp.User {
+	return rsp.User{
+		AccountID:  meta.AccountId,
 		Username:   meta.Username,
 		IsOfficial: meta.IsOfficial,
 	}

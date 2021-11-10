@@ -1,5 +1,7 @@
 package requests
 
+import "baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
+
 type PasswordLoginReq struct {
 	LoginName string `json:"login_name" binding:"required"` // 账号名称
 	Password  string `json:"password" binding:"required"`   // 密码
@@ -9,7 +11,7 @@ type PasswordLoginReq struct {
 type UserRegisterReq struct {
 	PasswordLoginReq
 	Username string `json:"username" binding:"required"` //昵称
-	Gender   bool   `json:"gender" binding:"required"`   //性别
+	Gender   int32  `json:"gender" binding:"required"`   //性别
 	Phone    string `json:"phone" binding:"required"`    //手机号
 }
 
@@ -24,7 +26,7 @@ type UserDetailUpdateReq struct {
 	HeadImgUrl string `json:"head_img_url"`
 	Describe   string `json:"describe"`
 	Username   string `json:"username"`
-	Gender     bool   `json:"gender"`
+	Gender     int32  `json:"gender"`
 	Phone      string `json:"phone"`
 	Age        int64  `json:"age"`
 }
@@ -37,4 +39,11 @@ type UserPwdUpdateReq struct {
 type UserCoinGiveawayReq struct {
 	Coin int64    `json:"coin"`
 	Ids  []string `json:"ids"`
+}
+
+type UserCommunicationAddReq struct {
+	Title             string                 `json:"title"`
+	CommunicationType user.CommunicationType `json:"communication_type"`
+	Content           string                 `json:"content"`
+	Images            []string               `json:"images"`
 }

@@ -15,17 +15,19 @@ type ReqQuerySpaces struct {
 	PageCommonReq
 }
 
-type ReqAddSpaceOpt struct {
+type ReqAddOpt struct {
 	OperatorId   string               `json:"operator_id"`
-	SpaceId      string               `json:"space_id"`
+	BizId        string               `json:"biz_id"`
+	BizType      comment.BizType      `json:"biz_type"`
 	OperatorType comment.OperatorType `json:"operator_type"`
 }
 
-type ReqAddSpaceComment struct {
-	SpaceId     string `json:"space_id"`
-	ParentId    string `json:"parent_id"`
-	Comment     string `json:"comment"`
-	CommentType int64  `json:"comment_type"`
+type ReqAddComment struct {
+	BizId       string          `json:"biz_id"`
+	BizType     comment.BizType `json:"biz_type"`
+	ParentId    string          `json:"parent_id"`
+	Comment     string          `json:"comment"`
+	CommentType int64           `json:"comment_type"`
 }
 
 // 空间信息审核状态更新

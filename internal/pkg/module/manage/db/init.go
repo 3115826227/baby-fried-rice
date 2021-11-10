@@ -88,6 +88,8 @@ func InitDB() (err error) {
 		&tables.AccountAdmin{},
 		&tables.AccountAdminLoginLog{},
 		&tables.IterativeVersion{},
+		&tables.Communication{},
+		&tables.CommunicationDetail{},
 	); err != nil {
 		panic(err)
 	}

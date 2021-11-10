@@ -13,7 +13,10 @@ func Register(engine *gin.Engine) {
 	app.POST("/space", handle.SpaceAddHandle)
 	app.DELETE("/space", handle.SpaceDeleteHandle)
 
-	app.POST("/operator", handle.SpaceOptAddHandle)
-	app.POST("/comment", handle.SpaceCommentAddHandle)
-	app.DELETE("/comment", handle.SpaceCommentDeleteHandle)
+	common := engine.Group("/api/common", middleware.SetUserMeta())
+	common.POST("/operator", handle.OptAddHandle)
+	common.POST("/comment", handle.CommentAddHandle)
+	common.GET("/comment", handle.CommentQueryHandle)
+	common.GET("/comment/reply", handle.CommentReplyQueryHandle)
+	common.DELETE("/comment", handle.CommentDeleteHandle)
 }

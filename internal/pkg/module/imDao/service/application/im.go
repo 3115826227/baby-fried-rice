@@ -4,10 +4,13 @@ import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/module/imDao/cache"
 	"baby-fried-rice/internal/pkg/module/imDao/db"
 	"baby-fried-rice/internal/pkg/module/imDao/log"
+	"baby-fried-rice/internal/pkg/module/imDao/query"
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 	"time"
@@ -38,7 +41,7 @@ func checkFriend(origin string, users ...string) (err error) {
 func checkUserLimit(session tables.Session, joins int) (err error) {
 	// 查询会话当前人数
 	var count int64
-	if err = db.GetDB().GetDB().Model(&tables.SessionUserRelation{}).Where("session_id = ?", session.ID).Count(&count).Error; err != nil {
+	if count, err = query.GetSessionUserCount(session.ID); err != nil {
 		return
 	}
 	// 判断人数是否超过限制
@@ -95,6 +98,12 @@ func (service *IMService) SessionAddDao(ctx context.Context, req *im.ReqSessionA
 		log.Logger.Error(err.Error())
 		return
 	}
+	for _, user := range req.Joins {
+		if err = cache.SetSessionDialog(user.AccountId, session.ID); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	}
 	resp = &im.RspSessionAddDao{
 		SessionId: session.ID,
 	}
@@ -128,35 +137,55 @@ func (service *IMService) SessionRemarkUpdateDao(ctx context.Context, req *im.Re
 	return
 }
 
-// 查询会话列表
-func (service *IMService) SessionQueryDao(ctx context.Context, req *im.ReqSessionQueryDao) (resp *im.RspSessionQueryDao, err error) {
-	var relations []tables.SessionUserRelation
-	if err = db.GetDB().GetDB().Model(&tables.SessionUserRelation{}).Where("user_id = ?", req.AccountId).Find(&relations).Error; err != nil {
+// 更新对话框的会话
+func (service *IMService) SessionDialogSetDao(ctx context.Context, req *im.ReqSessionDialogDao) (empty *emptypb.Empty, err error) {
+	if err = cache.SetSessionDialog(req.AccountId, req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var sessionIds = make([]int64, 0)
-	for _, rel := range relations {
-		sessionIds = append(sessionIds, rel.SessionID)
+	empty = new(emptypb.Empty)
+	return
+}
+
+// 删除对话框的会话
+func (service *IMService) SessionDialogDeleteDao(ctx context.Context, req *im.ReqSessionDialogDao) (empty *emptypb.Empty, err error) {
+	if err = cache.DeleteSessionDialog(req.AccountId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
+	return
+}
+
+// 查询会话对话框列表
+func (service *IMService) SessionDialogQueryDao(ctx context.Context, req *im.ReqSessionDialogQueryDao) (resp *im.RspSessionDialogQueryDao, err error) {
+	var total int64
+	var sessionIds []int64
+	if sessionIds, total, err = cache.GetSessionDialog(req.AccountId, req.Page, req.PageSize); err != nil {
+		log.Logger.Error(err.Error())
+		return
 	}
 	var sessions []tables.Session
-	if err = db.GetDB().GetDB().Where("id in (?)", sessionIds).Find(&sessions).Error; err != nil {
+	if sessions, err = query.GetSessionsByIds(sessionIds); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var sessionDaos = make([]*im.SessionQueryDao, 0)
+	var sessionDaoMap = make(map[int64]*im.SessionDialogQueryDao)
+	var sessionDaos = make([]*im.SessionDialogQueryDao, 0)
 	for _, session := range sessions {
-		if err = db.GetDB().GetDB().Where("session_id = ?", session.ID).Find(&relations).Error; err != nil {
-			log.Logger.Error(err.Error())
-			return
-		}
-		sessionDao := &im.SessionQueryDao{
+		sessionDao := &im.SessionDialogQueryDao{
 			SessionId:   session.ID,
 			SessionType: session.SessionType,
 			Name:        session.Name,
 			Level:       session.Level,
 		}
 		if sessionDao.SessionType == im.SessionType_DoubleSession && session.Name == "" {
+			var relations []tables.SessionUserRelation
+			relations, err = query.GetRelationsById(session.ID)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
 			for _, rel := range relations {
 				if req.AccountId != rel.UserID {
 					sessionDao.Name = rel.Remark
@@ -170,18 +199,12 @@ func (service *IMService) SessionQueryDao(ctx context.Context, req *im.ReqSessio
 		err = template.Order("send_timestamp desc").First(&latestRel).Error
 		if err == nil {
 			var message tables.Message
-			if err = db.GetDB().GetObject(map[string]interface{}{
-				"session_id": latestRel.SessionID,
-				"id":         latestRel.MessageID,
-			}, &message); err != nil {
+			if message, err = query.GetMessage(latestRel.MessageID, latestRel.SessionID); err != nil {
 				log.Logger.Error(err.Error())
 				return
 			}
 			var rel tables.SessionUserRelation
-			if err = db.GetDB().GetObject(map[string]interface{}{
-				"session_id": message.SessionID,
-				"user_id":    message.Send,
-			}, &rel); err != nil {
+			if rel, err = query.GetRelationById(message.SessionID, message.Send); err != nil {
 				log.Logger.Error(err.Error())
 				return
 			}
@@ -212,11 +235,90 @@ func (service *IMService) SessionQueryDao(ctx context.Context, req *im.ReqSessio
 			}
 			err = nil
 		}
-		sessionDaos = append(sessionDaos, sessionDao)
+		sessionDaoMap[sessionDao.SessionId] = sessionDao
+	}
+	for _, sessionId := range sessionIds {
+		if sessionDao, exist := sessionDaoMap[sessionId]; exist {
+			sessionDaos = append(sessionDaos, sessionDao)
+		}
+	}
+	resp = &im.RspSessionDialogQueryDao{
+		Sessions: sessionDaos,
+		Total:    total,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}
+	return
+}
+
+// 查询会话列表
+func (service *IMService) SessionQueryDao(ctx context.Context, req *im.ReqSessionQueryDao) (resp *im.RspSessionQueryDao, err error) {
+	var relations []tables.SessionUserRelation
+	var total int64
+	var param = query.SessionRelationParam{
+		AccountId: req.AccountId,
+		NameLike:  req.NameLike,
+		Page:      req.CommonSearchReq.Page,
+		PageSize:  req.CommonSearchReq.PageSize,
+	}
+	if relations, total, err = query.GetSessionRelations(param); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var sessionIds = make([]int64, 0)
+	for _, rel := range relations {
+		sessionIds = append(sessionIds, rel.SessionID)
+	}
+	var sessions []tables.Session
+	if sessions, err = query.GetSessionsByIds(sessionIds); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var list = make([]*im.SessionQueryDao, 0)
+	for _, s := range sessions {
+		var session = &im.SessionQueryDao{
+			SessionId:   s.ID,
+			SessionType: s.SessionType,
+			Name:        s.Name,
+			Level:       s.Level,
+			Origin:      s.Origin,
+		}
+		if session.SessionType == im.SessionType_DoubleSession && session.Name == "" {
+			var sessionRelations []tables.SessionUserRelation
+			sessionRelations, err = query.GetRelationsById(s.ID)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
+			for _, rel := range sessionRelations {
+				if req.AccountId != rel.UserID {
+					session.Name = rel.Remark
+					break
+				}
+			}
+		}
+		list = append(list, session)
 	}
 	resp = &im.RspSessionQueryDao{
-		Sessions: sessionDaos,
+		Sessions: list,
+		Total:    total,
+		Page:     req.CommonSearchReq.Page,
+		PageSize: req.CommonSearchReq.PageSize,
 	}
+	return
+}
+
+// 根据好友查询会话
+func (service *IMService) SessionByFriendQueryDao(ctx context.Context, req *im.ReqSessionByFriendQueryDao) (resp *im.RspSessionByFriendQueryDao, err error) {
+	var sessionId int64
+	if sessionId, err = query.GetFriendSession(req.AccountId, req.Friend); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = cache.SetSessionDialog(req.AccountId, sessionId); err != nil {
+		log.Logger.Error(err.Error())
+	}
+	resp = &im.RspSessionByFriendQueryDao{SessionId: sessionId}
 	return
 }
 
@@ -224,18 +326,28 @@ func (service *IMService) SessionQueryDao(ctx context.Context, req *im.ReqSessio
 func (service *IMService) SessionDetailQueryDao(ctx context.Context, req *im.ReqSessionDetailQueryDao) (resp *im.RspSessionDetailQueryDao, err error) {
 	var relations []tables.SessionUserRelation
 	var session tables.Session
-	if err = db.GetDB().GetObject(map[string]interface{}{"id": req.SessionId}, &session); err != nil {
+	if session, err = query.GetSessionById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if err = db.GetDB().GetDB().Where("session_id = ?", req.SessionId).Find(&relations).Error; err != nil {
+	if relations, err = query.GetRelationsById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
+	}
+	var ids = make([]string, 0)
+	for _, rel := range relations {
+		ids = append(ids, rel.UserID)
+	}
+	var statusMap map[string]im.OnlineStatusType
+	if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
+		log.Logger.Error(err.Error())
+		return
 	}
 	var joins = make([]*im.JoinRemarkDao, 0)
 	for _, rel := range relations {
 		joins = append(joins, &im.JoinRemarkDao{
-			AccountId: rel.UserID,
-			Remark:    rel.Remark,
+			AccountId:  rel.UserID,
+			Remark:     rel.Remark,
+			OnlineType: statusMap[rel.UserID],
 		})
 	}
 	if session.SessionType == im.SessionType_DoubleSession && session.Name == "" {
@@ -262,7 +374,7 @@ func (service *IMService) SessionDetailQueryDao(ctx context.Context, req *im.Req
 // 加入会话
 func (service *IMService) SessionJoinDao(ctx context.Context, req *im.ReqSessionJoinDao) (empty *emptypb.Empty, err error) {
 	var session tables.Session
-	if err = db.GetDB().GetObject(map[string]interface{}{"id": req.SessionId}, &session); err != nil {
+	if session, err = query.GetSessionById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -312,6 +424,10 @@ func (service *IMService) SessionJoinDao(ctx context.Context, req *im.ReqSession
 		log.Logger.Error(err.Error())
 		return
 	}
+	if err = cache.SetSessionDialog(req.AccountId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	empty = new(emptypb.Empty)
 	return
 }
@@ -323,6 +439,10 @@ func (service *IMService) SessionLeaveDao(ctx context.Context, req *im.ReqSessio
 		log.Logger.Error(err.Error())
 		return
 	}
+	if err = cache.DeleteSessionDialog(req.AccountId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	empty = new(emptypb.Empty)
 	return
 }
@@ -330,10 +450,12 @@ func (service *IMService) SessionLeaveDao(ctx context.Context, req *im.ReqSessio
 // 邀请加入会话
 func (service *IMService) SessionInviteJoinDao(ctx context.Context, req *im.ReqSessionInviteJoinDao) (empty *emptypb.Empty, err error) {
 	var session tables.Session
-	if err = db.GetDB().GetObject(map[string]interface{}{
-		"id":     req.SessionId,
-		"origin": req.Origin,
-	}, &session); err != nil {
+	if session, err = query.GetSessionById(req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if session.Origin != req.Origin {
+		err = constant.UnOriginInviteJoinSessionError
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -350,6 +472,10 @@ func (service *IMService) SessionInviteJoinDao(ctx context.Context, req *im.ReqS
 		log.Logger.Error(err.Error())
 		return
 	}
+	if err = cache.SetSessionDialog(req.AccountId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	empty = new(emptypb.Empty)
 	return
 }
@@ -357,15 +483,34 @@ func (service *IMService) SessionInviteJoinDao(ctx context.Context, req *im.ReqS
 // 从会话中移除
 func (service *IMService) SessionRemoveDao(ctx context.Context, req *im.ReqSessionRemoveDao) (empty *emptypb.Empty, err error) {
 	var session tables.Session
-	if err = db.GetDB().GetObject(map[string]interface{}{
-		"id":     req.SessionId,
-		"origin": req.Origin,
-	}, &session); err != nil {
+	if session, err = query.GetSessionById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if err = db.GetDB().GetDB().Where("session_id = ? and user_id = ?",
+	if session.Origin != req.Origin {
+		err = constant.UnOriginInviteRemoveSessionError
+		log.Logger.Error(err.Error())
+		return
+	}
+	var tx = db.GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	if err = tx.Where("session_id = ? and user_id = ?",
 		session.ID, req.AccountId).Delete(&tables.SessionUserRelation{}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = tx.Where("session_id = ? and receive = ?", req.SessionId, req.AccountId).
+		Delete(&tables.MessageUserRelation{}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = cache.DeleteSessionDialog(req.AccountId, req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -375,33 +520,65 @@ func (service *IMService) SessionRemoveDao(ctx context.Context, req *im.ReqSessi
 // 删除会话
 func (service *IMService) SessionDeleteDao(ctx context.Context, req *im.ReqSessionDeleteDao) (empty *emptypb.Empty, err error) {
 	var session tables.Session
-	var exist bool
-	if exist, err = db.GetDB().ExistObject(map[string]interface{}{
-		"id": req.SessionId,
-	}, &session); err != nil {
+	if session, err = query.GetSessionById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if !exist {
-		err = errors.New("no session")
-		log.Logger.Error(err.Error())
-		return
-	}
+	var tx = db.GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
 	if session.Origin == req.AccountId {
-		// 创建者删除会话
-		if err = db.GetDB().DeleteObject(&tables.Session{ID: req.SessionId}); err != nil {
+		var relations []tables.SessionUserRelation
+		if relations, err = query.GetRelationsById(req.SessionId); err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
-		if err = db.GetDB().GetDB().Where("session_id = ?", req.SessionId).
+		// 创建者删除会话
+		if err = tx.Where("id = ?", req.SessionId).Delete(&tables.Session{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		if err = tx.Where("session_id = ?", req.SessionId).
 			Delete(&tables.SessionUserRelation{}).Error; err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
+		// 删除该会话的所有聊天数据
+		if err = tx.Where("session_id = ?", req.SessionId).
+			Delete(&tables.MessageUserRelation{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		if err = tx.Where("session_id = ?", req.SessionId).
+			Delete(&tables.Message{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		for _, rel := range relations {
+			if err = cache.DeleteSessionDialog(rel.UserID, rel.SessionID); err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
+		}
 	} else {
 		// 其他成员离开会话
-		if err = db.GetDB().GetDB().Where("session_id = ? and user_id = ?",
+		if err = tx.Where("session_id = ? and user_id = ?",
 			req.SessionId, req.AccountId).Delete(&tables.SessionUserRelation{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		// 删除该成员的该会话聊天关联数据
+		if err = tx.Where("session_id = ? and receive = ?", req.SessionId, req.AccountId).
+			Delete(&tables.MessageUserRelation{}).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		if err = cache.DeleteSessionDialog(req.AccountId, req.SessionId); err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
@@ -413,7 +590,7 @@ func (service *IMService) SessionDeleteDao(ctx context.Context, req *im.ReqSessi
 // 会话消息添加
 func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqSessionMessageAddDao) (empty *emptypb.Empty, err error) {
 	var relations []tables.SessionUserRelation
-	if err = db.GetDB().GetDB().Where("session_id = ?", req.SessionId).Find(&relations).Error; err != nil {
+	if relations, err = query.GetRelationsById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -445,6 +622,12 @@ func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqS
 		log.Logger.Error(err.Error())
 		return
 	}
+	for _, rel := range relations {
+		if err = cache.SetSessionDialog(rel.UserID, rel.SessionID); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	}
 	empty = new(emptypb.Empty)
 	return
 }
@@ -468,7 +651,7 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 		readMap[rel.MessageID] = rel.Read
 	}
 	var messages []tables.Message
-	if err = db.GetDB().GetDB().Where("session_id = ? and id in (?)", req.SessionId, messageIds).Find(&messages).Error; err != nil {
+	if messages, err = query.GetMessages(messageIds, req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -496,13 +679,23 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 			SendTimestamp: message.SendTimestamp,
 			ReadStatus:    readMap[message.ID],
 		}
+		// 撤回消息内容置空
+		if messageDao.MessageType == im.SessionMessageType_WithDrawnMessage {
+			messageDao.Content = ""
+		}
+		if message.Send == req.AccountId {
+			// 如果消息是查询者发送的，需要额外查询已读人数
+			var readUserTotal int64
+			if readUserTotal, err = query.GetMessageReadUserTotal(messageDao.MessageId, messageDao.SessionId, req.AccountId); err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
+			messageDao.ReadUserTotal = readUserTotal
+		}
 		messageDaos = append(messageDaos, messageDao)
 	}
 	for key, rel := range sendMap {
-		if err = db.GetDB().GetObject(map[string]interface{}{
-			"session_id": rel.SessionID,
-			"user_id":    rel.UserID,
-		}, &rel); err != nil {
+		if rel, err = query.GetRelationById(rel.SessionID, rel.UserID); err != nil {
 			log.Logger.Error(err.Error())
 			return
 		}
@@ -524,6 +717,49 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
+	}
+	return
+}
+
+func (service *IMService) SessionMessageReadUsersQueryDao(ctx context.Context, req *im.ReqSessionMessageReadUsersQueryDao) (resp *im.RspSessionMessageReadUsersQueryDao, err error) {
+	var msg tables.Message
+	if msg, err = query.GetMessage(req.MessageId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 非发送者不能查询
+	if msg.Send != req.AccountId {
+		err = fmt.Errorf("you are not the message's send, you can't query the message's read users")
+		log.Logger.Error(err.Error())
+		return
+	}
+	// 消息已经撤回也不能查询
+	if msg.MessageType == int32(im.SessionMessageType_WithDrawnMessage) {
+		err = fmt.Errorf("your sent message already with drawn")
+		log.Logger.Error(err.Error())
+		return
+	}
+	var relations []tables.MessageUserRelation
+	if relations, err = query.GetMessageRelation(req.MessageId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var readUsers, unreadUsers []string
+	for _, rel := range relations {
+		if req.AccountId == rel.Receive {
+			continue
+		}
+		if rel.Read {
+			readUsers = append(readUsers, rel.Receive)
+		} else {
+			unreadUsers = append(unreadUsers, rel.Receive)
+		}
+	}
+	resp = &im.RspSessionMessageReadUsersQueryDao{
+		SessionId:   req.SessionId,
+		MessageId:   req.MessageId,
+		ReadUsers:   readUsers,
+		UnreadUsers: unreadUsers,
 	}
 	return
 }
@@ -552,6 +788,31 @@ func (service *IMService) SessionMessageDeleteDao(ctx context.Context, req *im.R
 	return
 }
 
+// 会话消息撤回
+func (service *IMService) SessionMessageWithDrawnDao(ctx context.Context, req *im.ReqSessionMessageWithDrawnDao) (empty *emptypb.Empty, err error) {
+	var msg tables.Message
+	if msg, err = query.GetMessage(req.MessageId, req.SessionId); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if msg.Send != req.AccountId {
+		err = fmt.Errorf("you are not the message's send, you can't be with drawn the message ")
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = db.GetDB().GetDB().Model(tables.Message{}).
+		Where("id = ? and session_id = ?",
+			req.MessageId, req.SessionId).
+		Updates(map[string]interface{}{
+			"message_type": int32(im.SessionMessageType_WithDrawnMessage),
+		}).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
+	return
+}
+
 // 会话消息清空
 func (service *IMService) SessionMessageFlushDao(ctx context.Context, req *im.ReqSessionMessageFlushDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Model(tables.MessageUserRelation{}).
@@ -566,6 +827,15 @@ func (service *IMService) SessionMessageFlushDao(ctx context.Context, req *im.Re
 
 // 添加操作
 func (service *IMService) OperatorAddDao(ctx context.Context, req *im.ReqOperatorAddDao) (resp *im.RspOperatorAddDao, err error) {
+	var exist bool
+	if exist, err = query.ExistOperator(req.Origin, req.Receive, req.OptType); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if exist {
+		resp = &im.RspOperatorAddDao{}
+		return
+	}
 	var opt = tables.Operator{
 		Origin:       req.Origin,
 		Receive:      req.Receive,
@@ -608,6 +878,12 @@ func (service *IMService) OperatorConfirmDao(ctx context.Context, req *im.ReqOpe
 		req.OperatorId, req.AccountId).Update("confirm", confirm).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
+	}
+	if confirm == 1 {
+		if err = cache.SetSessionDialog(req.AccountId, opt.SessionId); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	empty = new(emptypb.Empty)
 	return
@@ -760,14 +1036,10 @@ func (service *IMService) FriendAddDao(ctx context.Context, req *im.ReqFriendAdd
 				return
 			}
 		} else {
-			err = errors.New("no permission join session")
+			err = constant.NeedApplyAddFriendError
 			log.Logger.Error(err.Error())
 			return
 		}
-	default:
-		err = constant.NeedApplyAddFriendError
-		log.Logger.Error(err.Error())
-		return
 	}
 	now := time.Now().Unix()
 	var beans = make([]interface{}, 0)
@@ -821,13 +1093,23 @@ func (service *IMService) FriendQueryDao(ctx context.Context, req *im.ReqFriendQ
 		log.Logger.Error(err.Error())
 		return
 	}
+	var ids = make([]string, 0)
+	for _, f := range friends {
+		ids = append(ids, f.Friend)
+	}
+	var statusMap map[string]im.OnlineStatusType
+	if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	var list = make([]*im.FriendDao, 0)
 	for _, f := range friends {
 		var friend = im.FriendDao{
-			AccountId: f.Friend,
-			Remark:    f.Remark,
-			BlackList: f.BlackList,
-			Timestamp: f.Timestamp,
+			AccountId:  f.Friend,
+			Remark:     f.Remark,
+			BlackList:  f.BlackList,
+			Timestamp:  f.Timestamp,
+			OnlineType: statusMap[f.Friend],
 		}
 		list = append(list, &friend)
 	}

@@ -10,6 +10,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/manage/query"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -81,6 +82,17 @@ func QueryIterativeVersionHandle(c *gin.Context) {
 		LikeVersion: c.Query("version"),
 		Page:        reqPage.Page,
 		PageSize:    reqPage.PageSize,
+	}
+	statusStr := c.Query("status")
+	if statusStr != "" {
+		var status bool
+		status, err = strconv.ParseBool(statusStr)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+			return
+		}
+		param.Status = &status
 	}
 	ivs, total, err = query.GetIterativeVersion(param)
 	if err != nil {

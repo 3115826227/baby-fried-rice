@@ -7,6 +7,8 @@ const (
 type WSMessageNotifyType int
 
 const (
+	// 心跳消息
+	HeartBeatMessageNotify = 0
 	// 私信消息通知
 	PrivateMessageNotify = 1
 	// 会话消息通知

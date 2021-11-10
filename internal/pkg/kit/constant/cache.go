@@ -12,4 +12,8 @@ const (
 	AccountUserCoinRankKey = "account:user:coin:rank"
 
 	AccountUserCommodityCartPrefix = "account:user:commodity:cart"
+
+	AccountUserOnlineStatusKey = "account:user:online:status"
+
+	AccountDialogSessionUserIDPrefix = "account:dialog:session:user:id"
 )

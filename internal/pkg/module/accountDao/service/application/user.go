@@ -16,6 +16,7 @@ import (
 	"github.com/go-redis/redis"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
+	"strings"
 	"time"
 )
 
@@ -538,5 +539,125 @@ func (service *UserService) UserSignInLogQueryDao(ctx context.Context, req *user
 		list = append(list, signInLog)
 	}
 	resp = &user.RspUserSignInLogQueryDao{List: list}
+	return
+}
+
+func (service *UserService) UserCommunicationAddDao(ctx context.Context, req *user.ReqUserCommunicationAddDao) (resp *user.RspUserCommunicationAddDao, err error) {
+	var tx = db.GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	var communication = tables.Communication{
+		Title:             req.Title,
+		Origin:            req.AccountId,
+		CommunicationType: req.CommunicationType,
+	}
+	var now = time.Now()
+	communication.CreatedAt, communication.UpdatedAt = now, now
+	if err = tx.Create(&communication).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var detail = tables.CommunicationDetail{
+		CommunicationId: communication.ID,
+		Content:         req.Content,
+		Images:          req.Images,
+	}
+	if err = tx.Create(&detail).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = &user.RspUserCommunicationAddDao{Id: detail.CommunicationId}
+	return
+}
+
+func (service *UserService) UserCommunicationQueryDao(ctx context.Context, req *user.ReqUserCommunicationQueryDao) (resp *user.RspUserCommunicationQueryDao, err error) {
+	var params = query.CommunicationQueryParams{
+		CommunicationType: req.CommunicationType,
+		Page:              req.Page,
+		PageSize:          req.PageSize,
+	}
+	var communications []tables.Communication
+	var total int64
+	if communications, total, err = query.GetCommunication(params); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var list = make([]*user.UserCommunicationDao, 0)
+	for _, communication := range communications {
+		list = append(list, &user.UserCommunicationDao{
+			Id:                communication.ID,
+			Origin:            communication.Origin,
+			Title:             communication.Title,
+			CommunicationType: communication.CommunicationType,
+			CreateTimestamp:   communication.CreatedAt.Unix(),
+			UpdateTimestamp:   communication.UpdatedAt.Unix(),
+			Reply:             communication.Reply,
+		})
+	}
+	resp = &user.RspUserCommunicationQueryDao{
+		List:     list,
+		Total:    total,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}
+	return
+}
+
+func (service *UserService) UserCommunicationDetailQueryDao(ctx context.Context, req *user.ReqUserCommunicationDetailQueryDao) (resp *user.RspUserCommunicationDetailQueryDao, err error) {
+	var communication tables.Communication
+	var detail tables.CommunicationDetail
+	communication, detail, err = query.GetCommunicationDetail(req.Id, req.Origin)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = &user.RspUserCommunicationDetailQueryDao{
+		Communication: &user.UserCommunicationDao{
+			Id:                communication.ID,
+			Origin:            communication.Origin,
+			Title:             communication.Title,
+			CommunicationType: communication.CommunicationType,
+			CreateTimestamp:   communication.CreatedAt.Unix(),
+			UpdateTimestamp:   communication.UpdatedAt.Unix(),
+			Reply:             communication.Reply,
+		},
+		Content:        detail.Content,
+		Images:         strings.Split(detail.Images, ","),
+		ReplyContent:   detail.ReplyContent,
+		ReplyTimestamp: detail.ReplyTimestamp,
+	}
+	return
+}
+
+func (service *UserService) UserCommunicationDeleteDao(ctx context.Context, req *user.ReqUserCommunicationDeleteDao) (empty *emptypb.Empty, err error) {
+	if err = db.GetDB().GetDB().Model(&tables.Communication{}).Where("id = ? and origin = ?", req.Id, req.Origin).Update("delete", true).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
+	return
+}
+
+func (service *UserService) IteratorVersionQueryDao(ctx context.Context, empty *emptypb.Empty) (resp *user.RspIteratorVersionQueryDao, err error) {
+	var versions []tables.IterativeVersion
+	versions, err = query.GetIteratorVersion()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var list = make([]*user.IteratorVersionDao, 0)
+	for _, v := range versions {
+		list = append(list, &user.IteratorVersionDao{
+			Version:   v.Version,
+			Content:   v.Content,
+			Timestamp: v.UpdateTimestamp,
+		})
+	}
+	resp = &user.RspIteratorVersionQueryDao{List: list}
 	return
 }

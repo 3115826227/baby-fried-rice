@@ -47,7 +47,7 @@ type AccountUserDetail struct {
 	SchoolId   string `gorm:"column:school_id" json:"school_id"`
 	Verify     bool   `gorm:"column:verify" json:"verify"`
 	Birthday   string `gorm:"column:birthday" json:"birthday"`
-	Gender     bool   `gorm:"column:gender" json:"gender"`
+	Gender     int32  `gorm:"column:gender" json:"gender"`
 	Age        int64  `gorm:"column:age" json:"age"`
 	HeadImgUrl string `gorm:"column:head_img_url"`
 	Phone      string `gorm:"column:phone" json:"phone"`

@@ -35,4 +35,13 @@ func Register(engine *gin.Engine) {
 	// 签到模块
 	user.GET("/sign_in", handle.SignInHandle)
 	user.GET("/sign_in/log", handle.SignInLogHandle)
+
+	// 沟通模块
+	user.POST("/communication", handle.AddCommunicationHandle)
+	user.GET("/communication", handle.CommunicationHandle)
+	user.GET("/communication/detail", handle.CommunicationDetailHandle)
+	user.DELETE("/communication", handle.DeleteCommunicationHandle)
+
+	// 系统版本
+	user.GET("/iter/version", handle.IteratorVersionHandle)
 }

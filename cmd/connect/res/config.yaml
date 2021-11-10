@@ -16,6 +16,13 @@ register:
     cluster:
       - "http://127.0.0.1:23791"
 
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
+
 rpc:
   cert:
     client:
@@ -26,7 +33,9 @@ rpc:
     spacedaoserver: "space-dao"
 
 messagequeue:
-  publishtopics:
-    websocketnotify:  "websocket_notify"
+  consumetopics:
+    websocketnotify:
+      topic: "websocket_notify"
+      channel: "websocket_notify_channel"
   nsq:
     cluster: "127.0.0.1:4150"

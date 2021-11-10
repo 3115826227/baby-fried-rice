@@ -6,6 +6,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/module/imDao/cache"
 	"baby-fried-rice/internal/pkg/module/imDao/config"
 	"baby-fried-rice/internal/pkg/module/imDao/db"
 	"baby-fried-rice/internal/pkg/module/imDao/log"
@@ -29,6 +30,10 @@ func init() {
 	}
 	// 初始化数据库
 	if err := db.InitDB(conf.Database.MainDatabase.GetMysqlUrl()); err != nil {
+		panic(err)
+	}
+	// 初始化缓存
+	if err := cache.InitCache(conf.Cache.Redis.MainCache, log.Logger); err != nil {
 		panic(err)
 	}
 	srv := etcd.NewServerETCD(conf.Register.ETCD.Cluster, log.Logger)

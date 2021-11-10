@@ -13,7 +13,7 @@ server:
 cache:
   redis:
     maincache:
-      addr: "redis:26379"
+      addr: "redis:6379"
       password: "123456"
       db: 9
 
@@ -33,7 +33,7 @@ rpc:
     imdaoserver: "im-dao"
 
 messagequeue:
-  consumtopics:
+  consumetopics:
     usercoin:
       topic: "user_coin"
       channel: "user_coin_channel"

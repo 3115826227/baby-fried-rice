@@ -1,10 +1,56 @@
 package requests
 
+import (
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"fmt"
+)
+
+// 创建会话请求参数
+type ReqAddSession struct {
+	// 会话等级
+	SessionLevel im.SessionLevel `json:"session_level"`
+	// 会话类型
+	SessionType im.SessionType `json:"session_type"`
+	// 会话加入权限
+	JoinPermissionType im.SessionJoinPermissionType `json:"join_permission_type"`
+	// 会话名称
+	Name string `json:"name"`
+	// 加入会话成员id列表
+	Joins []string `json:"joins"`
+}
+
+func (req *ReqAddSession) Validate() error {
+	// 加入成员重复校验
+	var joinMap = make(map[string]struct{})
+	for _, user := range req.Joins {
+		if _, exist := joinMap[user]; exist {
+			return fmt.Errorf("join persion can't repeat")
+		}
+		joinMap[user] = struct{}{}
+	}
+	// 会话类型非双人必须要添加名称
+	if req.SessionType != im.SessionType_DoubleSession && req.Name == "" {
+		return fmt.Errorf("multi persion's session must have a name")
+	}
+	// 加入会话的成员人数不能超过会话等级限制的人数
+	switch req.SessionLevel {
+	case im.SessionLevel_SessionBaseLevel:
+		if len(req.Joins) > 2 {
+			return fmt.Errorf("base level session can't exceed two persion")
+		}
+	case im.SessionLevel_SessionNormalLevel:
+		if len(req.Joins) > 2 {
+			return fmt.Errorf("base level session can't exceed twity persion")
+		}
+	}
+	return nil
+}
+
 // 会话信息更新请求参数
 type ReqUpdateSession struct {
-	SessionId          int64  `json:"session_id"`
-	JoinPermissionType int32  `json:"join_permission_type"`
-	Name               string `json:"name"`
+	SessionId          int64                        `json:"session_id"`
+	JoinPermissionType im.SessionJoinPermissionType `json:"join_permission_type"`
+	Name               string                       `json:"name"`
 }
 
 // 邀请加入会话请求参数

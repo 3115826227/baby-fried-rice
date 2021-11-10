@@ -74,7 +74,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 			WSMessageNotifyType: constant.PrivateMessageNotify,
 			Receive:             pmReq.ReceiveId,
 			WSMessage: models.WSMessage{
-				Send: userMeta.GetUserBaseInfo(),
+				Send: userMeta.GetUser(),
 				PrivateMessage: rsp.UserPrivateMessageDetailResp{
 					UserPrivateMessage: rsp.PrivateMessagePbConvertToRsp(pm, detail),
 					Content:            respDetail.Content,

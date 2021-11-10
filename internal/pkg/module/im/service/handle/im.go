@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/common"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/im/grpc"
@@ -14,21 +15,8 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 )
-
-// 创建会话请求参数
-type ReqAddSession struct {
-	// 会话等级
-	SessionLevel int64 `json:"session_level"`
-	// 会话类型
-	SessionType int32 `json:"session_type"`
-	// 会话加入权限
-	JoinPermissionType int32 `json:"join_permission_type"`
-	// 会话名称
-	Name string `json:"name"`
-	// 加入会话成员id列表
-	Joins []string `json:"joins"`
-}
 
 // SessionAddHandle 会话创建接口
 // @Summary 会话创建接口
@@ -44,7 +32,7 @@ type ReqAddSession struct {
 func SessionAddHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	var err error
-	var req ReqAddSession
+	var req requests.ReqAddSession
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
 		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
@@ -78,12 +66,12 @@ func SessionAddHandle(c *gin.Context) {
 		joins = append(joins, join)
 	}
 	var reqSession = &im.ReqSessionAddDao{
-		SessionType:        im.SessionType(req.SessionType),
-		JoinPermissionType: im.SessionJoinPermissionType(req.JoinPermissionType),
+		SessionType:        req.SessionType,
+		JoinPermissionType: req.JoinPermissionType,
 		Name:               req.Name,
 		Origin:             userMeta.AccountId,
 		Joins:              joins,
-		Level:              im.SessionLevel(req.SessionLevel),
+		Level:              req.SessionLevel,
 	}
 	_, err = imClient.SessionAddDao(context.Background(), reqSession)
 	if err != nil {
@@ -106,7 +94,24 @@ func SessionAddHandle(c *gin.Context) {
 // 会话列表查询
 func SessionQueryHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
-	imClient, err := grpc.GetImClient()
+	reqPage, err := handle.PageHandle(c)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var sessionId int
+	sessionIdStr := c.Query("session_id")
+	if sessionIdStr != "" {
+		sessionId, err = strconv.Atoi(sessionIdStr)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+			return
+		}
+	}
+	var imClient im.DaoImClient
+	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
@@ -114,6 +119,11 @@ func SessionQueryHandle(c *gin.Context) {
 	}
 	var reqSession = &im.ReqSessionQueryDao{
 		AccountId: userMeta.AccountId,
+		SessionId: int64(sessionId),
+		CommonSearchReq: &common.CommonSearchRequest{
+			Page:     reqPage.Page,
+			PageSize: reqPage.PageSize,
+		},
 	}
 	var resp *im.RspSessionQueryDao
 	resp, err = imClient.SessionQueryDao(context.Background(), reqSession)
@@ -122,12 +132,53 @@ func SessionQueryHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var sessions = make([]rsp.Session, 0)
+	var list = make([]interface{}, 0)
 	for _, s := range resp.Sessions {
-		var session = rsp.Session{
+		list = append(list, rsp.Session{
 			SessionId:   s.SessionId,
 			SessionType: s.SessionType,
 			Name:        s.Name,
+			Origin:      s.Origin,
+		})
+	}
+	handle.SuccessListResp(c, "", list, resp.Total, reqPage.Page, reqPage.PageSize)
+}
+
+// 对话框会话列表查询
+func SessionDialogQueryHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	reqPage, err := handle.PageHandle(c)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var imClient im.DaoImClient
+	imClient, err = grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var reqSession = &im.ReqSessionDialogQueryDao{
+		AccountId: userMeta.AccountId,
+		Page:      reqPage.Page,
+		PageSize:  reqPage.PageSize,
+	}
+	var resp *im.RspSessionDialogQueryDao
+	resp, err = imClient.SessionDialogQueryDao(context.Background(), reqSession)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var sessions = make([]interface{}, 0)
+	for _, s := range resp.Sessions {
+		var session = rsp.SessionDialog{
+			SessionId:   s.SessionId,
+			SessionType: s.SessionType,
+			Name:        s.Name,
+			Level:       s.Level,
 			Unread:      s.Unread,
 		}
 		if s.Latest != nil {
@@ -148,8 +199,58 @@ func SessionQueryHandle(c *gin.Context) {
 		}
 		sessions = append(sessions, session)
 	}
-	var res = rsp.SessionsResp{Sessions: sessions}
-	handle.SuccessResp(c, "", res)
+	handle.SuccessListResp(c, "", sessions, resp.Total, reqPage.Page, reqPage.PageSize)
+}
+
+// 根据好友查询会话
+func SessionByFriendQueryHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var reqSession = &im.ReqSessionByFriendQueryDao{
+		AccountId: userMeta.AccountId,
+		Friend:    c.Query("friend"),
+	}
+	var resp *im.RspSessionByFriendQueryDao
+	resp, err = imClient.SessionByFriendQueryDao(context.Background(), reqSession)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", resp.SessionId)
+}
+
+// 对话框会话删除
+func SessionDialogDeleteHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	sessionId, err := strconv.Atoi(c.Query("session_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var reqSession = &im.ReqSessionDialogDao{
+		AccountId: userMeta.AccountId,
+		SessionId: int64(sessionId),
+	}
+	_, err = imClient.SessionDialogDeleteDao(context.Background(), reqSession)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
 }
 
 func SessionDetailHandle(c *gin.Context) {
@@ -205,6 +306,7 @@ func SessionDetailHandle(c *gin.Context) {
 			Username:   userMap[u.AccountId].Username,
 			HeadImgUrl: userMap[u.AccountId].HeadImgUrl,
 			Remark:     u.Remark,
+			OnlineType: u.OnlineType,
 		}
 		joins = append(joins, join)
 	}
@@ -238,7 +340,7 @@ func SessionUpdateHandle(c *gin.Context) {
 	}
 	var reqSession = &im.ReqSessionUpdateDao{
 		SessionId:          req.SessionId,
-		JoinPermissionType: im.SessionJoinPermissionType(req.JoinPermissionType),
+		JoinPermissionType: req.JoinPermissionType,
 		Name:               req.Name,
 		AccountId:          userMeta.AccountId,
 	}
@@ -328,6 +430,22 @@ func SessionInviteHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	var resp *im.RspSessionDetailQueryDao
+	resp, err = imClient.SessionDetailQueryDao(context.Background(), &im.ReqSessionDetailQueryDao{
+		SessionId: req.SessionId,
+		AccountId: userMeta.AccountId,
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var session = rsp.Session{
+		SessionId:   resp.SessionId,
+		SessionType: resp.SessionType,
+		Name:        resp.Name,
+		Origin:      resp.Origin,
+	}
 	var reqSession = &im.ReqSessionInviteJoinDao{
 		Origin:    userMeta.AccountId,
 		SessionId: req.SessionId,
@@ -339,6 +457,7 @@ func SessionInviteHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	go sendInviteNotify(session, userMeta.GetUser(), req.AccountId)
 	handle.SuccessResp(c, "", nil)
 }
 
@@ -503,16 +622,146 @@ func SessionMessageQueryHandle(c *gin.Context) {
 			Content:       m.Content,
 			SendTimestamp: m.SendTimestamp,
 			ReadStatus:    m.ReadStatus,
+			ReadUserTotal: m.ReadUserTotal,
 		}
 		msgs = append(msgs, msg)
 	}
 	sort.Sort(rsp.Messages(msgs))
-	var res = rsp.SessionMessageResp{
+	var response = rsp.SessionMessageResp{
 		Messages: msgs,
 		Page:     req.Page,
 		PageSize: req.PageSize,
 	}
-	handle.SuccessResp(c, "", res)
+	go func() {
+		for _, msg := range msgs {
+			if msg.Send.AccountID != userMeta.AccountId {
+				var rm = []rsp.ReadMessage{{MessageId: msg.MessageId, User: userMeta.AccountId}}
+				sendMessageReadNotify(rm, msg.Send.AccountID)
+			}
+		}
+	}()
+	handle.SuccessResp(c, "", response)
+}
+
+// 会话消息用户读取列表查询
+func SessionMessageReadUsersQueryHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	sessionId, err := strconv.Atoi(c.Query("session_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var messageId int
+	if messageId, err = strconv.Atoi(c.Query("message_id")); err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var imClient im.DaoImClient
+	if imClient, err = grpc.GetImClient(); err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var resp *im.RspSessionMessageReadUsersQueryDao
+	resp, err = imClient.SessionMessageReadUsersQueryDao(context.Background(), &im.ReqSessionMessageReadUsersQueryDao{
+		AccountId: userMeta.AccountId,
+		SessionId: int64(sessionId),
+		MessageId: int64(messageId),
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var ids = append(resp.ReadUsers, resp.UnreadUsers...)
+	userClient, err := grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var userResp *user.RspUserDaoById
+	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var idsMap = make(map[string]rsp.User)
+	for _, u := range userResp.Users {
+		idsMap[u.Id] = rsp.User{
+			AccountID:  u.Id,
+			Username:   u.Username,
+			HeadImgUrl: u.HeadImgUrl,
+			IsOfficial: u.IsOfficial,
+		}
+	}
+	var readUsers, unreadUsers []rsp.User
+	for _, u := range resp.ReadUsers {
+		readUsers = append(readUsers, idsMap[u])
+	}
+	for _, u := range resp.UnreadUsers {
+		unreadUsers = append(unreadUsers, idsMap[u])
+	}
+	var response = rsp.MessageReadUsers{
+		MessageId:   resp.MessageId,
+		ReadUsers:   readUsers,
+		UnreadUsers: unreadUsers,
+	}
+	handle.SuccessResp(c, "", response)
+}
+
+// 会话消息撤回
+func SessionMessageWithDrawnHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	sessionId, err := strconv.Atoi(c.Query("session_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var messageId int
+	messageId, err = strconv.Atoi(c.Query("message_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var imClient im.DaoImClient
+	imClient, err = grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	_, err = imClient.SessionMessageWithDrawnDao(context.Background(), &im.ReqSessionMessageWithDrawnDao{
+		AccountId: userMeta.AccountId,
+		SessionId: int64(sessionId),
+		MessageId: int64(messageId),
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	var resp *im.RspSessionDetailQueryDao
+	resp, err = imClient.SessionDetailQueryDao(context.Background(), &im.ReqSessionDetailQueryDao{
+		SessionId: int64(sessionId),
+		AccountId: userMeta.AccountId,
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	go func() {
+		for _, u := range resp.Joins {
+			sendWithDrawnMessageNotify(rsp.Message{MessageId: int64(messageId)}, u.AccountId)
+		}
+	}()
+	handle.SuccessResp(c, "", nil)
 }
 
 // 会话消息已读状态更新
@@ -533,6 +782,45 @@ func SessionMessageReadStatusUpdateHandle(c *gin.Context) {
 	_, err = imClient.SessionMessageReadStatusUpdateDao(context.Background(), &im.ReqSessionMessageReadStatusUpdateDao{
 		AccountId: userMeta.AccountId,
 		SessionId: int64(sessionId),
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
+}
+
+// 会话消息删除
+func SessionMessageDeleteHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	sessionId, err := strconv.Atoi(c.Query("session_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	messageIdsStr := strings.Split(c.Query("message_ids"), ",")
+	var messageIds = make([]int64, 0)
+	for _, messageIdStr := range messageIdsStr {
+		var messageId int
+		if messageId, err = strconv.Atoi(messageIdStr); err != nil {
+			log.Logger.Error(err.Error())
+			c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+			return
+		}
+		messageIds = append(messageIds, int64(messageId))
+	}
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	_, err = imClient.SessionMessageDeleteDao(context.Background(), &im.ReqSessionMessageDeleteDao{
+		AccountId:  userMeta.AccountId,
+		SessionId:  int64(sessionId),
+		MessageIds: messageIds,
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())

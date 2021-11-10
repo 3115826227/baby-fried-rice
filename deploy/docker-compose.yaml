@@ -1,5 +1,25 @@
 version: "3"
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.0
+    container_name: "elasticsearch"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - "./data/es:/usr/share/elasticsearch/data:rw"
+      - "./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "./logs/es:/user/share/elasticsearch/logs:rw"
+      - "./plugins/ik:/usr/share/elasticsearch/plugins/ik"
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.3.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    volumes:
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    depends_on:
+      - "elasticsearch"
   redis:
     image: redis:latest
     container_name: baby-redis
@@ -20,6 +40,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "123456"
     volumes:
+      - "./config/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf"
       - "./data/db:/var/lib/mysql"
       - "./init:/docker-entrypoint-initdb.d/"
   etcd:
