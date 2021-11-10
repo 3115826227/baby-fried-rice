@@ -337,10 +337,12 @@ func (service *IMService) SessionDetailQueryDao(ctx context.Context, req *im.Req
 	for _, rel := range relations {
 		ids = append(ids, rel.UserID)
 	}
-	var statusMap map[string]im.OnlineStatusType
-	if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
-		log.Logger.Error(err.Error())
-		return
+	var statusMap = make(map[string]im.OnlineStatusType)
+	if len(ids) != 0 {
+		if statusMap, err = cache.GetUserOnlineStatus(ids); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
 	}
 	var joins = make([]*im.JoinRemarkDao, 0)
 	for _, rel := range relations {
