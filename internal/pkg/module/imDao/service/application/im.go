@@ -593,7 +593,7 @@ func (service *IMService) SessionDeleteDao(ctx context.Context, req *im.ReqSessi
 }
 
 // 会话消息添加
-func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqSessionMessageAddDao) (empty *emptypb.Empty, err error) {
+func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqSessionMessageAddDao) (resp *im.RspSessionMessageAddDao, err error) {
 	var relations []tables.SessionUserRelation
 	if relations, err = query.GetRelationsById(req.SessionId); err != nil {
 		log.Logger.Error(err.Error())
@@ -630,7 +630,10 @@ func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqS
 			return
 		}
 	}
-	empty = new(emptypb.Empty)
+	resp = &im.RspSessionMessageAddDao{
+		SessionId: req.SessionId,
+		MessageId: message.ID,
+	}
 	return
 }
 

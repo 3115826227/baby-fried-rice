@@ -63,9 +63,9 @@ func GetFriendSession(accountId, friend string) (sessionId int64, err error) {
 	var rows *sql.Rows
 	rows, err = db.GetDB().GetDB().Raw(`select a.session_id from baby_im_session_user_rel as a 
 inner join baby_im_session_user_rel as b 
-on a.user_id = ? and b.user_id = ? and a.session_id = b.session_id 
+on a.session_id = b.session_id
 left join baby_im_session as c 
-on a.session_id = c.id and c.session_type = 0`, accountId, friend).Rows()
+on a.session_id = c.id where a.user_id = ? and b.user_id = ? and c.session_type = 0`, accountId, friend).Rows()
 	if err != nil {
 		return
 	}

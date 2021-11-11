@@ -758,7 +758,14 @@ func SessionMessageWithDrawnHandle(c *gin.Context) {
 	}
 	go func() {
 		for _, u := range resp.Joins {
-			sendWithDrawnMessageNotify(rsp.Message{MessageId: int64(messageId)}, u.AccountId)
+			var msg = rsp.Message{
+				SessionId:   int64(sessionId),
+				MessageId:   int64(messageId),
+				MessageType: im.SessionMessageType_WithDrawnMessage,
+				Send:        userMeta.GetUser(),
+				Receive:     u.AccountId,
+			}
+			sendWithDrawnMessageNotify(msg, u.AccountId)
 		}
 	}()
 	handle.SuccessResp(c, "", nil)
