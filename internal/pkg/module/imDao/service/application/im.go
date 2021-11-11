@@ -228,12 +228,15 @@ func (service *IMService) SessionDialogQueryDao(ctx context.Context, req *im.Req
 			}
 			err = nil
 		}
-		if err = template.Where("`read` = 0").Count(&sessionDao.Unread).Error; err != nil {
-			if err != gorm.ErrRecordNotFound {
-				log.Logger.Error(err.Error())
-				return
-			}
-			err = nil
+		// 查询者自己发送出去的消息不能算到消息未读去
+		var msgTableName = (&tables.Message{}).TableName()
+		var relTableName = (&tables.MessageUserRelation{}).TableName()
+		var s = fmt.Sprintf(`select count(*) from %v as msg left join
+%v as rel on msg.id = rel.message_id where msg.send != '%v' and rel.session_id = %v and rel.receive = '%v' and rel.read = 0
+`, msgTableName, relTableName, req.AccountId, session.ID, req.AccountId)
+		if err = db.GetDB().GetDB().Raw(s).Scan(&sessionDao.Unread).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
 		}
 		sessionDaoMap[sessionDao.SessionId] = sessionDao
 	}
@@ -615,9 +618,6 @@ func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqS
 			Receive:       rel.UserID,
 			SendTimestamp: message.SendTimestamp,
 		}
-		if rel.UserID == message.Send {
-			msgRel.Read = true
-		}
 		beans = append(beans, &msgRel)
 	}
 	if err = db.GetDB().CreateMulti(beans...); err != nil {
@@ -663,6 +663,7 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	}
 	var messageDaos = make([]*im.SessionMessageDao, 0)
 	var sendMap = make(map[string]tables.SessionUserRelation)
+	var readMessageIds = make([]int64, 0)
 	for _, rel := range relations {
 		var message = messageMap[rel.MessageID]
 		sendMap[message.Send] = tables.SessionUserRelation{
@@ -684,15 +685,18 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 		// 撤回消息内容置空
 		if messageDao.MessageType == im.SessionMessageType_WithDrawnMessage {
 			messageDao.Content = ""
-		}
-		if message.Send == req.AccountId {
-			// 如果消息是查询者发送的，需要额外查询已读人数
-			var readUserTotal int64
-			if readUserTotal, err = query.GetMessageReadUserTotal(messageDao.MessageId, messageDao.SessionId, req.AccountId); err != nil {
-				log.Logger.Error(err.Error())
-				return
+		} else {
+			if message.Send == req.AccountId {
+				// 如果消息是查询者发送的，需要额外查询已读人数
+				var readUserTotal int64
+				if readUserTotal, err = query.GetMessageReadUserTotal(messageDao.MessageId, messageDao.SessionId, req.AccountId); err != nil {
+					log.Logger.Error(err.Error())
+					return
+				}
+				messageDao.ReadUserTotal = readUserTotal
+			} else {
+				readMessageIds = append(readMessageIds, messageDao.MessageId)
 			}
-			messageDao.ReadUserTotal = readUserTotal
 		}
 		messageDaos = append(messageDaos, messageDao)
 	}
@@ -714,7 +718,7 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	_, err = service.SessionMessageReadStatusUpdateDao(ctx, &im.ReqSessionMessageReadStatusUpdateDao{
 		AccountId:  req.AccountId,
 		SessionId:  req.SessionId,
-		MessageIds: messageIds,
+		MessageIds: readMessageIds,
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
@@ -768,8 +772,17 @@ func (service *IMService) SessionMessageReadUsersQueryDao(ctx context.Context, r
 
 // 会话消息读取状态更新
 func (service *IMService) SessionMessageReadStatusUpdateDao(ctx context.Context, req *im.ReqSessionMessageReadStatusUpdateDao) (empty *emptypb.Empty, err error) {
-	if err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("session_id = ? and receive = ?",
-		req.SessionId, req.AccountId).Update("read", true).Error; err != nil {
+	var messages []tables.Message
+	if err = db.GetDB().GetDB().Where("send != ?", req.AccountId).Find(&messages).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var ids = make([]int64, 0)
+	for _, msg := range messages {
+		ids = append(ids, msg.ID)
+	}
+	if err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("message_id in (?) and session_id = ? and receive = ?",
+		ids, req.SessionId, req.AccountId).Update("read", true).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}

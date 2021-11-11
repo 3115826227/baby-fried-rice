@@ -21,6 +21,6 @@ func GetMessageRelation(id, sessionId int64) (relations []tables.MessageUserRela
 }
 
 func GetMessageReadUserTotal(id, sessionId int64, accountId string) (count int64, err error) {
-	err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("message_id = ? and session_id = ? and receive != ?", id, sessionId, accountId).Count(&count).Error
+	err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("message_id = ? and session_id = ? and receive != ? and `read` = 1", id, sessionId, accountId).Count(&count).Error
 	return
 }
