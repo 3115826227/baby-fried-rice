@@ -142,6 +142,7 @@ func handleSession(msg models.WSMessageNotify, accountId string) {
 		for _, u := range notify.WSMessage.SessionMessage.Session.Users {
 			if u.AccountID != accountId {
 				notify.Receive = u.AccountID
+				break
 			}
 		}
 	case im.SessionNotifyType_OnlineStatus:
@@ -208,6 +209,20 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 		log.Logger.Error(err.Error())
 		return
 	}
+	// 将会话消息发给imDao服务存入数据库中
+	var req = &im.ReqSessionMessageAddDao{
+		MessageType:   msg.WSMessage.SessionMessage.Message.MessageType,
+		Send:          msg.WSMessage.Send.AccountID,
+		SessionId:     msg.WSMessage.SessionMessage.Message.SessionId,
+		Content:       msg.WSMessage.SessionMessage.Message.Content,
+		SendTimestamp: msg.Timestamp,
+	}
+	var messageAddResp *im.RspSessionMessageAddDao
+	messageAddResp, err = imClient.SessionMessageAddDao(context.Background(), req)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	// 发送给nsq
 	for _, u := range resp.Joins {
 		var notify = models.WSMessageNotify{
@@ -217,6 +232,7 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 			Timestamp:           msg.Timestamp,
 		}
 		notify.WSMessage.SessionMessage.Message = rsp.Message{
+			MessageId:   messageAddResp.MessageId,
 			SessionId:   resp.SessionId,
 			MessageType: msg.WSMessage.SessionMessage.Message.MessageType,
 			Send: rsp.User{
@@ -229,18 +245,5 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 			SendTimestamp: msg.Timestamp,
 		}
 		writeChan <- notify
-	}
-	// 将会话消息发给imDao服务存入数据库中
-	var req = &im.ReqSessionMessageAddDao{
-		MessageType:   msg.WSMessage.SessionMessage.Message.MessageType,
-		Send:          msg.WSMessage.Send.AccountID,
-		SessionId:     msg.WSMessage.SessionMessage.Message.SessionId,
-		Content:       msg.WSMessage.SessionMessage.Message.Content,
-		SendTimestamp: msg.Timestamp,
-	}
-	_, err = imClient.SessionMessageAddDao(context.Background(), req)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		return
 	}
 }

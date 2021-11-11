@@ -36,7 +36,7 @@ service DaoIm {
   // 删除会话
   rpc SessionDeleteDao (ReqSessionDeleteDao) returns (google.protobuf.Empty);
   // 会话消息添加
-  rpc SessionMessageAddDao (ReqSessionMessageAddDao) returns (google.protobuf.Empty);
+  rpc SessionMessageAddDao (ReqSessionMessageAddDao) returns (RspSessionMessageAddDao);
   // 会话消息查询
   rpc SessionMessageQueryDao (ReqSessionMessageQueryDao) returns (RspSessionMessageQueryDao);
   // 会话消息已读用户列表查询
@@ -394,6 +394,13 @@ message ReqSessionMessageAddDao {
   string content = 5;
   // 发送时间
   int64 sendTimestamp = 6;
+}
+
+message RspSessionMessageAddDao {
+  // 会话id
+  int64 sessionId = 1;
+  // 消息id
+  int64 messageId = 2;
 }
 
 // 会话消息查询
