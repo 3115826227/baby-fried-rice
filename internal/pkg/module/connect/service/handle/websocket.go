@@ -142,6 +142,7 @@ func handleSession(msg models.WSMessageNotify, accountId string) {
 		for _, u := range notify.WSMessage.SessionMessage.Session.Users {
 			if u.AccountID != accountId {
 				notify.Receive = u.AccountID
+				break
 			}
 		}
 	case im.SessionNotifyType_OnlineStatus:
