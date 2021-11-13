@@ -98,6 +98,14 @@ services:
     volumes:
       - "./data/nsq:/usr/local/nsq/bin/data"
     command: /nsqd --broadcast-address=172.16.29.129 --lookupd-tcp-address=nsqlookupd:4160
+  baby-book:
+    image: nginx
+    container_name: baby-book
+    ports:
+      - "18071:80"
+    volumes:
+      - "../docs/_book:/usr/share/nginx/html"
+    restart: always
   baby-gateway:
     image: baby-gateway
     container_name: baby-gateway

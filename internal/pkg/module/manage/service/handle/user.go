@@ -54,7 +54,6 @@ func AddUserHandle(c *gin.Context) {
 
 	detail.AccountID = accountID
 	detail.Username = req.Username
-	detail.Gender = req.Gender
 	detail.Phone = req.Phone
 	detail.CreatedAt = now
 	detail.UpdatedAt = now

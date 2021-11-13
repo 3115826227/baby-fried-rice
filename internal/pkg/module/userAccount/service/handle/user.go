@@ -108,7 +108,6 @@ func UserRegisterHandle(c *gin.Context) {
 			Ip:        c.GetHeader(handle.HeaderIP),
 		},
 		Username: req.Username,
-		Gender:   req.Gender,
 		Phone:    req.Phone,
 	}
 	_, err = userClient.UserDaoRegister(context.Background(), reqRegister)
