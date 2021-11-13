@@ -11,7 +11,6 @@ type PasswordLoginReq struct {
 type UserRegisterReq struct {
 	PasswordLoginReq
 	Username string `json:"username" binding:"required"` //昵称
-	Gender   int32  `json:"gender" binding:"required"`   //性别
 	Phone    string `json:"phone" binding:"required"`    //手机号
 }
 
