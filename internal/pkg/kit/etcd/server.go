@@ -75,13 +75,10 @@ func (server *ServerETCD) Register(rs interfaces.RegisterServerInfo) (err error)
 
 func (server *ServerETCD) leaseKeepAlive(rs interfaces.RegisterServerInfo) (err error) {
 	if server.lease == nil {
-		err = server.Register(rs)
-		if err != nil {
-			return err
-		}
+		server.lease = clientv3.NewLease(server.client)
 	}
-	_, err = server.lease.KeepAlive(server.ctx, server.leaseID)
-	return
+	server.lease.Revoke(server.ctx, server.leaseID)
+	return server.Register(rs)
 }
 
 func (server *ServerETCD) HealthCheck(rs interfaces.RegisterServerInfo, rollTime time.Duration, errChan chan error) {
