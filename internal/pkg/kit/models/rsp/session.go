@@ -1,6 +1,9 @@
 package rsp
 
-import "baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+import (
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"encoding/json"
+)
 
 type Session struct {
 	// 会话id
@@ -101,6 +104,33 @@ type ReadMessage struct {
 	MessageId int64 `json:"message_id"`
 	// 已读消息用户
 	User string `json:"user"`
+}
+
+// 视频语音通话WebRTC消息
+type WebRTC struct {
+	// 邀请者id
+	InviteAccount string   `json:"invite_account"`
+	InviteUsers   []string `json:"invite_users"`
+	Sdp           string   `json:"sdp"`
+	SwapSdp       string   `json:"swap_sdp"`
+	RemoteSdp     string   `json:"remote_sdp"`
+	RemoteSwapSdp string   `json:"remote_swap_sdp"`
+}
+
+// 视频语音通话用户状态信息
+type SessionWebRTCUserStatus struct {
+	SessionId     int64                `json:"session_id"`
+	AccountId     string               `json:"account_id"`
+	Status        im.SessionNotifyType `json:"status"`
+	Sdp           string               `json:"sdp"`
+	SwapSdp       string               `json:"swap_sdp"`
+	RemoteSdp     string               `json:"remote_sdp"`
+	RemoteSwapSdp string               `json:"remote_swap_sdp"`
+}
+
+func (status *SessionWebRTCUserStatus) ToString() string {
+	data, _ := json.Marshal(status)
+	return string(data)
 }
 
 type MessageReadUsers struct {

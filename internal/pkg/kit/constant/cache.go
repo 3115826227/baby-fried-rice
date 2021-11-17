@@ -15,5 +15,9 @@ const (
 
 	AccountUserOnlineStatusKey = "account:user:online:status"
 
+	AccountUserSessionWebRTCStatusKey = "account:user:session:webrtc:status"
+
+	AccountUserSessionWebRTCTimeKey = "account:user:session:webrtc:time"
+
 	AccountDialogSessionUserIDPrefix = "account:dialog:session:user:id"
 )

@@ -9,6 +9,7 @@ replace (
 )
 
 require (
+	github.com/Shopify/sarama v1.30.0
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/alibabacloud-go/darabonba-openapi v0.1.5
 	github.com/alibabacloud-go/dysmsapi-20170525/v2 v2.0.1
@@ -48,7 +49,7 @@ require (
 	github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
 	go.uber.org/zap v1.16.0
-	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
+	golang.org/x/net v0.0.0-20210917221730-978cfadd31cf
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	golang.org/x/tools v0.1.4 // indirect
 	google.golang.org/genproto v0.0.0-20210617175327-b9e0b3197ced

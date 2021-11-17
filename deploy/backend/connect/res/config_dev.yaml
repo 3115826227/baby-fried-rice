@@ -16,6 +16,13 @@ register:
     cluster:
       - "http://etcd:2379"
 
+cache:
+  redis:
+    maincache:
+      addr: "redis:6379"
+      password: "123456"
+      db: 9
+
 rpc:
   cert:
     client:

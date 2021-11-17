@@ -345,6 +345,25 @@ enum SessionNotifyType
   UserReadMessage = 6;
   // 用户撤回发送的消息
   UserWithDrawn = 7;
+
+  // 用户发起视频通话邀请通知
+  InviteVideoNotify = 100;
+  // 接受视频通话通知
+  ReceiveVideoMessage = 200;
+  // 用户发起视频通话邀请失败通知
+  InviteVideoFailedNotify = 300;
+  // 用户视频通话邀请超时通知
+  InviteVideoTimeoutMessage = 301;
+  // 拒绝视频通话通知
+  RejectVideoMessage = 302;
+  // 挂断视频通话通知
+  HangupVideoMessage = 303;
+  // 本地会话回执
+  LocalVideoMessage = 400;
+  // 远程会话回执
+  RemoteVideoMessage = 500;
+  // 加入视频会话通知
+  JoinVideoMessage = 600;
 }
 
 // 会话消息类型
@@ -358,6 +377,12 @@ enum  SessionMessageType
   ImgMessage = 2;
   // 已撤回消息
   WithDrawnMessage = 3;
+  // 视频通话记录消息
+  VideoLogMessage = 100;
+  // 视频通话拒绝消息
+  VideoRejectMessage = 101;
+  // 视频通话对方无响应消息
+  VideoNoReplyMessage = 102;
 }
 
 // 会话消息

@@ -7,7 +7,7 @@ server:
     name: "gateway"
     serial: 1
     addr: "0.0.0.0"
-    port: 18070
+    port: 8080
 
 cache:
   redis:

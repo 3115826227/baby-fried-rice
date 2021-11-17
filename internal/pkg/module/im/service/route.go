@@ -44,5 +44,4 @@ func Register(engine *gin.Engine) {
 	app.PATCH("/session/friend/black_list", handle.FriendBlackListUpdateHandle)
 	app.PATCH("/session/friend/remark", handle.FriendRemarkUpdateHandle)
 	app.DELETE("/session/friend", handle.FriendDeleteHandle)
-	app.POST("/session/webrtc", handle.SessionCreateWebRTC)
 }
