@@ -10,7 +10,6 @@ import (
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/im/grpc"
 	"baby-fried-rice/internal/pkg/module/im/log"
-	"baby-fried-rice/internal/pkg/module/im/service/webrtc"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -658,104 +657,4 @@ func UserManageUpdateHandle(c *gin.Context) {
 		return
 	}
 	handle.SuccessResp(c, "", nil)
-}
-
-// 创建webrtc
-func SessionCreateWebRTC(c *gin.Context) {
-	userMeta := handle.GetUserMeta(c)
-	var req requests.ReqCreateWebRTC
-	if err := c.ShouldBind(&req); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
-		return
-	}
-	imClient, err := grpc.GetImClient()
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var imReq = im.ReqSessionDetailQueryDao{
-		AccountId: userMeta.AccountId,
-		SessionId: req.SessionId,
-	}
-	var resp *im.RspSessionDetailQueryDao
-	resp, err = imClient.SessionDetailQueryDao(context.Background(), &imReq)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var sdp string
-	sdp, err = webrtc.CreateSession(req.Sdp, fmt.Sprintf("%v", req.SessionId))
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	go func() {
-		//  邀请Session中好友视频通话
-		for _, u := range resp.Joins {
-			if u.AccountId == userMeta.AccountId {
-				continue
-			}
-			var notify = models.WSMessageNotify{
-				WSMessageNotifyType: constant.SessionMessageNotify,
-				Receive:             u.AccountId,
-				WSMessage: models.WSMessage{
-					WSMessageType: im.SessionNotifyType_InviteNotify,
-					Send:          userMeta.GetUser(),
-					SessionMessage: &models.SessionMessage{
-						SessionMessageType: constant.SessionMessageMessage,
-						Message: rsp.Message{
-							SessionId: req.SessionId,
-						},
-					},
-				},
-				Timestamp: time.Now().Unix(),
-			}
-			if err = mq.Send(topic, notify.ToString()); err != nil {
-				log.Logger.Error(err.Error())
-				return
-			}
-		}
-
-	}()
-	handle.SuccessResp(c, "", map[string]interface{}{
-		"sdp": sdp,
-	})
-}
-
-// webrtc通话加入回复
-func SessionJoinWebRTC(c *gin.Context) {
-	userMeta := handle.GetUserMeta(c)
-	var req requests.ReqReturnWebRTC
-	if err := c.ShouldBind(&req); err != nil {
-		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
-		return
-	}
-	imClient, err := grpc.GetImClient()
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var imReq = im.ReqSessionDetailQueryDao{
-		AccountId: userMeta.AccountId,
-		SessionId: req.SessionId,
-	}
-	var resp *im.RspSessionDetailQueryDao
-	resp, err = imClient.SessionDetailQueryDao(context.Background(), &imReq)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	if !req.Return {
-		// 取消通话加入
-		if resp.SessionType == im.SessionType_DoubleSession {
-
-		}
-	}
 }

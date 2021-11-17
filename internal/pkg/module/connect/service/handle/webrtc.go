@@ -1,11 +1,12 @@
-package webrtc
+package handle
 
 import (
-	"baby-fried-rice/internal/pkg/module/im/log"
+	"baby-fried-rice/internal/pkg/module/connect/log"
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/pion/rtcp"
 	"github.com/pion/webrtc/v3"
 	"github.com/pkg/errors"
@@ -96,7 +97,8 @@ var (
 	}
 )
 
-func CreateSession(sdp, sessionID string) (swapSdp string, err error) {
+func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
+	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
 	offer := webrtc.SessionDescription{}
 	Decode(sdp, &offer)
 
@@ -180,7 +182,8 @@ func CreateSession(sdp, sessionID string) (swapSdp string, err error) {
 	return
 }
 
-func JoinSession(sdp string, sessionID string) (swapSdp string, err error) {
+func JoinSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
+	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
 	value, exist := localTrackMap.Load(sessionID)
 	if !exist {
 		err = errors.New("session id isn't exist")
