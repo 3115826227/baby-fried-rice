@@ -58,7 +58,7 @@ type SessionMessage struct {
 	// 新会话消息信息
 	Message rsp.Message `json:"message"`
 	// 已读消息
-	ReadMessages []rsp.ReadMessage `json:"read_messages"`
+	ReadMessage rsp.ReadMessage `json:"read_message"`
 	// webrtc消息
 	WebRtc rsp.WebRTC `json:"web_rtc"`
 }

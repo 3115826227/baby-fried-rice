@@ -27,6 +27,7 @@ func Register(engine *gin.Engine) {
 	app.GET("/session/message", handle.SessionMessageQueryHandle)
 	app.GET("/session/message/read_users", handle.SessionMessageReadUsersQueryHandle)
 	app.GET("/session/message/read_status", handle.SessionMessageReadStatusUpdateHandle)
+	app.GET("/session/message/read_status/single", handle.SessionSingleMessageReadStatusUpdateHandle)
 	app.GET("/session/message/with_drawn", handle.SessionMessageWithDrawnHandle)
 	app.DELETE("/session/message", handle.SessionMessageDeleteHandle)
 	app.DELETE("/session/message/flush", handle.SessionMessageFlushHandle)

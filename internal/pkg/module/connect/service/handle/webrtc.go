@@ -87,7 +87,8 @@ func Encode(obj interface{}) string {
 }
 
 var (
-	localTrackMap        = new(sync.Map)
+	videoLocalTrackMap   = new(sync.Map)
+	audioLocalTrackMap   = new(sync.Map)
 	peerConnectionConfig = webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -97,7 +98,7 @@ var (
 	}
 )
 
-func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
+func CreateSession(sdp string, id int64, accountId string, video bool) (swapSdp string, err error) {
 	log.Logger.Debug(fmt.Sprintf("user %v start create session %v start", accountId, id))
 	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
 	offer := webrtc.SessionDescription{}
@@ -109,15 +110,22 @@ func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err 
 		return
 	}
 
-	// Allow us to receive 1 video track
-	if _, err = peerConnection.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo); err != nil {
+	// Allow us to receive 1 video track and 1 audio track
+	if video {
+		if _, err = peerConnection.AddTransceiverFromKind(webrtc.RTPCodecTypeVideo); err != nil {
+			return
+		}
+	}
+	if _, err = peerConnection.AddTransceiverFromKind(webrtc.RTPCodecTypeAudio); err != nil {
 		return
 	}
 
-	localTrackChan := make(chan *webrtc.TrackLocalStaticRTP)
+	videoLocalTrackChan := make(chan *webrtc.TrackLocalStaticRTP)
+	audioLocalTrackChan := make(chan *webrtc.TrackLocalStaticRTP)
 	// Set a handler for when a new remote track starts, this just distributes all our packets
 	// to connected peers
 	peerConnection.OnTrack(func(remoteTrack *webrtc.TrackRemote, receiver *webrtc.RTPReceiver) {
+		var kind = remoteTrack.Kind().String()
 		// Send a PLI on an interval so that the publisher is pushing a keyframe every rtcpPLIInterval
 		// This can be less wasteful by processing incoming RTCP events, then we would emit a NACK/PLI when a viewer requests it
 		go func() {
@@ -130,11 +138,19 @@ func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err 
 		}()
 
 		// Create a local track, all our SFU clients will be fed via this track
-		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, "video", sessionID)
+		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, kind, fmt.Sprintf("%v_%v", kind, sessionID))
 		if newTrackErr != nil {
 			panic(newTrackErr)
 		}
-		localTrackChan <- localTrack
+		switch kind {
+		case webrtc.RTPCodecTypeVideo.String():
+			videoLocalTrackChan <- localTrack
+		case webrtc.RTPCodecTypeAudio.String():
+			audioLocalTrackChan <- localTrack
+		default:
+			err = webrtc.ErrUnknownType
+			panic(err)
+		}
 
 		rtpBuf := make([]byte, 1400)
 		for {
@@ -176,58 +192,85 @@ func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err 
 	// in a production application you should exchange ICE Candidates via OnICECandidate
 	<-gatherComplete
 	swapSdp = Encode(*peerConnection.LocalDescription())
+	if video {
+		go func() {
+			localTrack := <-videoLocalTrackChan
+			log.Logger.Debug(fmt.Sprintf("sessionID: %v receive video local track ", sessionID))
+			videoLocalTrackMap.Store(sessionID, localTrack)
+		}()
+	}
 	go func() {
-		localTrack := <-localTrackChan
-		//data, err1 := json.Marshal(localTrack)
-		//if err1 != nil {
-		//	log.Logger.Error(err1.Error())
-		//	return
-		//}
-		//if err1 = cache.GetCache().Add(sessionID, string(data)); err1 != nil {
-		//	log.Logger.Error(err1.Error())
-		//	return
-		//}
-		log.Logger.Debug(fmt.Sprintf("sessionID: %v receive local track ", sessionID))
-		localTrackMap.Store(sessionID, localTrack)
+		localTrack := <-audioLocalTrackChan
+		log.Logger.Debug(fmt.Sprintf("sessionID: %v receive audio local track ", sessionID))
+		audioLocalTrackMap.Store(sessionID, localTrack)
 	}()
+
 	log.Logger.Debug(fmt.Sprintf("user %v create session %v success", accountId, id))
 	return
 }
 
-func JoinSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
-	log.Logger.Debug(fmt.Sprintf("user %v start join session %v", accountId, id))
-	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
-	//val, err := cache.GetCache().Get(sessionID)
-	//if err != nil {
-	//	log.Logger.Error(err.Error())
-	//	return
-	//}
-	//var localTrack *webrtc.TrackLocalStaticRTP
-	//if err = json.Unmarshal([]byte(val), &localTrack); err != nil {
-	//	log.Logger.Error(err.Error())
-	//	return
-	//}
-	value, exist := localTrackMap.Load(sessionID)
+func getVideoLocalTrack(sessionID string) (*webrtc.TrackLocalStaticRTP, error) {
+	value, exist := videoLocalTrackMap.Load(sessionID)
 	if !exist {
-		err = errors.New(fmt.Sprintf("sessionID %v isn't exist", sessionID))
-		return
+		err := errors.New(fmt.Sprintf("video sessionID %v isn't exist", sessionID))
+		return nil, err
 	}
 	localTrack := value.(*webrtc.TrackLocalStaticRTP)
+	return localTrack, nil
+}
 
+func getAudioLocalTrack(sessionID string) (*webrtc.TrackLocalStaticRTP, error) {
+	value, exist := audioLocalTrackMap.Load(sessionID)
+	if !exist {
+		err := errors.New(fmt.Sprintf("audio sessionID %v isn't exist", sessionID))
+		return nil, err
+	}
+	localTrack := value.(*webrtc.TrackLocalStaticRTP)
+	return localTrack, nil
+}
+
+func JoinSession(sdp string, id int64, accountId string, video bool) (swapSdp string, err error) {
+	log.Logger.Debug(fmt.Sprintf("user %v start join session %v", accountId, id))
+	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
+
+	var videoLocalTrack *webrtc.TrackLocalStaticRTP
+	if video {
+		if videoLocalTrack, err = getVideoLocalTrack(sessionID); err != nil {
+			return
+		}
+	}
+	var audioLocalTrack *webrtc.TrackLocalStaticRTP
+	if audioLocalTrack, err = getAudioLocalTrack(sessionID); err != nil {
+		return
+	}
 	recvOnlyOffer := webrtc.SessionDescription{}
 	Decode(sdp, &recvOnlyOffer)
 	var peerConnection *webrtc.PeerConnection
 	if peerConnection, err = webrtc.NewPeerConnection(peerConnectionConfig); err != nil {
 		return
 	}
-	var rtpSender *webrtc.RTPSender
-	if rtpSender, err = peerConnection.AddTrack(localTrack); err != nil {
+	if video {
+		var videoRtpSender *webrtc.RTPSender
+		if videoRtpSender, err = peerConnection.AddTrack(videoLocalTrack); err != nil {
+			return
+		}
+		go func() {
+			rtcpBuf := make([]byte, 1500)
+			for {
+				if _, _, rtcpErr := videoRtpSender.Read(rtcpBuf); rtcpErr != nil {
+					return
+				}
+			}
+		}()
+	}
+	var audioRtpSender *webrtc.RTPSender
+	if audioRtpSender, err = peerConnection.AddTrack(audioLocalTrack); err != nil {
 		return
 	}
 	go func() {
 		rtcpBuf := make([]byte, 1500)
 		for {
-			if _, _, rtcpErr := rtpSender.Read(rtcpBuf); rtcpErr != nil {
+			if _, _, rtcpErr := audioRtpSender.Read(rtcpBuf); rtcpErr != nil {
 				return
 			}
 		}
