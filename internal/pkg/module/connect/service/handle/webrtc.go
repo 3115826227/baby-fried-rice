@@ -98,6 +98,7 @@ var (
 )
 
 func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
+	log.Logger.Debug(fmt.Sprintf("user %v start create session %v start", accountId, id))
 	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
 	offer := webrtc.SessionDescription{}
 	Decode(sdp, &offer)
@@ -177,16 +178,38 @@ func CreateSession(sdp string, id int64, accountId string) (swapSdp string, err 
 	swapSdp = Encode(*peerConnection.LocalDescription())
 	go func() {
 		localTrack := <-localTrackChan
+		//data, err1 := json.Marshal(localTrack)
+		//if err1 != nil {
+		//	log.Logger.Error(err1.Error())
+		//	return
+		//}
+		//if err1 = cache.GetCache().Add(sessionID, string(data)); err1 != nil {
+		//	log.Logger.Error(err1.Error())
+		//	return
+		//}
+		log.Logger.Debug(fmt.Sprintf("sessionID: %v receive local track ", sessionID))
 		localTrackMap.Store(sessionID, localTrack)
 	}()
+	log.Logger.Debug(fmt.Sprintf("user %v create session %v success", accountId, id))
 	return
 }
 
 func JoinSession(sdp string, id int64, accountId string) (swapSdp string, err error) {
+	log.Logger.Debug(fmt.Sprintf("user %v start join session %v", accountId, id))
 	var sessionID = fmt.Sprintf("%v:%v", id, accountId)
+	//val, err := cache.GetCache().Get(sessionID)
+	//if err != nil {
+	//	log.Logger.Error(err.Error())
+	//	return
+	//}
+	//var localTrack *webrtc.TrackLocalStaticRTP
+	//if err = json.Unmarshal([]byte(val), &localTrack); err != nil {
+	//	log.Logger.Error(err.Error())
+	//	return
+	//}
 	value, exist := localTrackMap.Load(sessionID)
 	if !exist {
-		err = errors.New("session id isn't exist")
+		err = errors.New(fmt.Sprintf("sessionID %v isn't exist", sessionID))
 		return
 	}
 	localTrack := value.(*webrtc.TrackLocalStaticRTP)
@@ -223,5 +246,6 @@ func JoinSession(sdp string, id int64, accountId string) (swapSdp string, err er
 	}
 	<-gatherComplete
 	swapSdp = Encode(*peerConnection.LocalDescription())
+	log.Logger.Debug(fmt.Sprintf("user %v join session %v success", accountId, id))
 	return
 }
