@@ -30,7 +30,7 @@ func GetSessionRelations(param SessionRelationParam) (relations []tables.Session
 }
 
 func GetRelationsById(sessionId int64) (relations []tables.SessionUserRelation, err error) {
-	err = db.GetDB().GetDB().Where("session_id = ?", sessionId).Find(&relations).Error
+	err = db.GetDB().GetDB().Where("session_id = ?", sessionId).Order("join_time").Find(&relations).Error
 	return
 }
 

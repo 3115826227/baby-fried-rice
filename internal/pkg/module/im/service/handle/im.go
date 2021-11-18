@@ -634,9 +634,12 @@ func SessionMessageQueryHandle(c *gin.Context) {
 	}
 	go func() {
 		for _, msg := range msgs {
-			if msg.Send.AccountID != userMeta.AccountId {
-				var rm = []rsp.ReadMessage{{MessageId: msg.MessageId, User: userMeta.AccountId}}
-				sendMessageReadNotify(rm, msg.Send.AccountID)
+			if msg.Send.AccountID != userMeta.AccountId && !msg.ReadStatus {
+				var rm = rsp.ReadMessage{
+					SessionId: int64(sessionId),
+					MessageId: msg.MessageId,
+				}
+				sendMessageReadNotify(rm, userMeta.GetUser(), msg.Send.AccountID)
 			}
 		}
 	}()
@@ -795,6 +798,49 @@ func SessionMessageReadStatusUpdateHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	handle.SuccessResp(c, "", nil)
+}
+
+// 会话消息单条消息已读更新
+func SessionSingleMessageReadStatusUpdateHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	sessionId, err := strconv.Atoi(c.Query("session_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	var messageId int
+	messageId, err = strconv.Atoi(c.Query("message_id"))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	accountId := c.Query("account_id")
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	_, err = imClient.SessionMessageReadStatusUpdateDao(context.Background(), &im.ReqSessionMessageReadStatusUpdateDao{
+		AccountId:  userMeta.AccountId,
+		SessionId:  int64(sessionId),
+		MessageIds: []int64{int64(messageId)},
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	go func() {
+		var rm = rsp.ReadMessage{
+			SessionId: int64(sessionId),
+			MessageId: int64(messageId),
+		}
+		sendMessageReadNotify(rm, userMeta.GetUser(), accountId)
+	}()
 	handle.SuccessResp(c, "", nil)
 }
 

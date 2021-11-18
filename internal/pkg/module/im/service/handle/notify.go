@@ -31,15 +31,16 @@ func sendInviteNotify(session rsp.Session, send rsp.User, accountId string) {
 }
 
 // 消息已读通知
-func sendMessageReadNotify(readMessages []rsp.ReadMessage, accountId string) {
+func sendMessageReadNotify(readMessage rsp.ReadMessage, send rsp.User, accountId string) {
 	var notify = models.WSMessageNotify{
 		WSMessageNotifyType: constant.SessionMessageNotify,
 		Receive:             accountId,
 		WSMessage: models.WSMessage{
+			Send:          send,
 			WSMessageType: im.SessionNotifyType_UserReadMessage,
 			SessionMessage: &models.SessionMessage{
 				SessionMessageType: constant.SessionMessage,
-				ReadMessages:       readMessages,
+				ReadMessage:        readMessage,
 			},
 		},
 		Timestamp: time.Now().Unix(),

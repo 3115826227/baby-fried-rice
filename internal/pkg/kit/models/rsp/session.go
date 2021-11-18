@@ -100,14 +100,16 @@ type SessionMessageResp struct {
 
 // 已读消息
 type ReadMessage struct {
+	// 已读消息所属会话id
+	SessionId int64 `json:"session_id"`
 	// 已读消息id
 	MessageId int64 `json:"message_id"`
-	// 已读消息用户
-	User string `json:"user"`
 }
 
-// 视频语音通话WebRTC消息
+// 音视频语音通话WebRTC消息
 type WebRTC struct {
+	// 是否开启视频
+	Video bool `json:"video"`
 	// 邀请者id
 	InviteAccount string   `json:"invite_account"`
 	InviteUsers   []string `json:"invite_users"`
@@ -117,7 +119,7 @@ type WebRTC struct {
 	RemoteSwapSdp string   `json:"remote_swap_sdp"`
 }
 
-// 视频语音通话用户状态信息
+// 音视频通话用户状态信息
 type SessionWebRTCUserStatus struct {
 	SessionId     int64                `json:"session_id"`
 	AccountId     string               `json:"account_id"`

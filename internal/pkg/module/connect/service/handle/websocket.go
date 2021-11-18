@@ -271,7 +271,7 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 		notify.WSMessage.SessionMessage.Session.SessionId = sessionId
 		// 邀请用户创建视频会话
 		var swapSdp string
-		swapSdp, err = CreateSession(msg.WSMessage.SessionMessage.WebRtc.Sdp, sessionId, accountId)
+		swapSdp, err = CreateSession(msg.WSMessage.SessionMessage.WebRtc.Sdp, sessionId, accountId, msg.WSMessage.SessionMessage.WebRtc.Video)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			notify.WSMessage.WSMessageType = im.SessionNotifyType_InviteVideoFailedNotify
@@ -414,7 +414,8 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 		// 接受视频通话
 		// 接受用户加入邀请用户的视频通话
 		var remotesSwapSdp string
-		remotesSwapSdp, err = JoinSession(msg.WSMessage.SessionMessage.WebRtc.RemoteSdp, sessionId, notify.WSMessage.SessionMessage.WebRtc.InviteAccount)
+		remotesSwapSdp, err = JoinSession(msg.WSMessage.SessionMessage.WebRtc.RemoteSdp, sessionId,
+			notify.WSMessage.SessionMessage.WebRtc.InviteAccount, msg.WSMessage.SessionMessage.WebRtc.Video)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			notify.WSMessage.WSMessageType = im.SessionNotifyType_InviteVideoFailedNotify
@@ -467,7 +468,8 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 		notify.WSMessage.SessionMessage.WebRtc.InviteAccount = accountId
 		// 接受用户创建视频会话
 		var ownSessionSwapSdp string
-		ownSessionSwapSdp, err = CreateSession(msg.WSMessage.SessionMessage.WebRtc.Sdp, sessionId, accountId)
+		ownSessionSwapSdp, err = CreateSession(msg.WSMessage.SessionMessage.WebRtc.Sdp, sessionId,
+			accountId, msg.WSMessage.SessionMessage.WebRtc.Video)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return
@@ -566,9 +568,9 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 			// todo 如果是多人视频会话，则另做处理
 		}
 	case im.SessionNotifyType_JoinVideoMessage:
-		fmt.Println("join video")
 		var remotesSwapSdp string
-		remotesSwapSdp, err = JoinSession(msg.WSMessage.SessionMessage.WebRtc.RemoteSdp, sessionId, notify.WSMessage.SessionMessage.WebRtc.InviteAccount)
+		remotesSwapSdp, err = JoinSession(msg.WSMessage.SessionMessage.WebRtc.RemoteSdp, sessionId,
+			notify.WSMessage.SessionMessage.WebRtc.InviteAccount, notify.WSMessage.SessionMessage.WebRtc.Video)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return
