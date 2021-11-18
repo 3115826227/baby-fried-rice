@@ -265,7 +265,6 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 		// 用户邀请视频
 		notify = models.WSMessageNotify{
 			WSMessageNotifyType: msg.WSMessageNotifyType,
-			Receive:             accountId,
 			WSMessage:           msg.WSMessage,
 			Timestamp:           msg.Timestamp,
 		}
