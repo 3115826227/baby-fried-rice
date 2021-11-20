@@ -1,0 +1,175 @@
+// proto 文件版本
+syntax = "proto3";
+// 生成文件的包名
+package game;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/game";  // 声明生成的 go 文件所属的包
+
+
+service DaoGame {
+  // 添加游戏对局
+  rpc GameRecordAddDao (ReqGameRecordAddDao) returns (RspGameRecordAddDao);
+  // 添加游戏进程数据
+  rpc GameProcessAddDao (ReqGameProcessAddDao) returns (RspGameProcessAddDao);
+  // 查询游戏状态数据
+  rpc GameStatusQueryDao (ReqGameStatusQueryDao) returns (RspGameStatusQueryDao);
+  // 查询游戏的个人对局记录
+  rpc GameRecordQueryDao (ReqGameRecordQueryDao) returns (RspGameRecordQueryDao);
+  // 查询游戏的详情记录
+  rpc GameRecordDetailQueryDao (ReqGameRecordDetailQueryDao) returns (RspGameRecordDetailQueryDao);
+}
+
+enum GameType
+{
+  // 无效游戏类型
+  InvalidGameType = 0;
+  // 中国象棋人人对战
+  ChinaChessManManGame = 10000;
+  // 中国象棋人机对战简单版
+  ChinaChessManMachineGame = 10010;
+}
+
+enum GameResult
+{
+  // 失败
+  Failed = 0;
+  // 胜利
+  Succeed = 1;
+}
+
+enum GameStatus
+{
+  // 默认
+  DefaultGameStatus = 0;
+  // 进行中
+  Progressing = 1;
+  // 已结束
+  Finished = 2;
+}
+
+enum UserRole
+{
+  // 旁观者
+  BystanderType = 0;
+  // 红方
+  RedType = 10;
+  // 黑方
+  BlackType = 11;
+}
+
+message GameRecordUserDao {
+  string accountId = 1;
+  // 用户游戏对局结果
+  GameResult gameResult = 2;
+  UserRole userRole = 3;
+}
+
+message ReqGameRecordAddDao {
+  // 游戏类型
+  GameType gameType = 1;
+  // 游戏状态数据
+  string gameStatusData = 2;
+  // 游戏状态
+  GameStatus gameStatus = 3;
+  // 结束时间
+  int64 finishTimestamp = 4;
+  // 对局的用户列表记录
+  repeated GameRecordUserDao gameRecordUserList = 5;
+}
+
+message RspGameRecordAddDao {
+  int64 gameRecordId = 1;
+}
+
+// 添加游戏进程数据
+message ReqGameProcessAddDao {
+  int64 gameRecordId = 1;
+  GameType gameType = 2;
+  string accountId = 3;
+  // 游戏进程数据
+  string gameProcessData = 4;
+}
+
+enum GameProcessDataAddResult
+{
+  // 添加成功
+  Success = 0;
+  // 出现冲突
+  Conflict = 11;
+  // 未到操作回合
+  NoOperatorRound = 21;
+  // 操作无效
+  OperatorInvalid = 101;
+}
+
+message RspGameProcessAddDao {
+  // 进程数据添加结果
+  GameProcessDataAddResult result = 1;
+  // 游戏状态数据
+  string gameStatusData = 2;
+  // 游戏状态
+  GameStatus gameStatus = 3;
+}
+
+// 查询游戏状态数据
+message ReqGameStatusQueryDao {
+  int64 gameRecordId = 1;
+  GameType gameType = 2;
+  string accountId = 3;
+}
+
+message RspGameStatusQueryDao {
+  // 游戏状态数据
+  string gameStatusData = 1;
+  // 游戏状态
+  GameStatus gameStatus = 2;
+  // 查询玩家角色
+  UserRole userRole = 4;
+  // 旁观者
+  repeated string bystanders = 5;
+}
+
+// 查询游戏的个人对局记录
+message ReqGameRecordQueryDao {
+  // 游戏类型
+  GameType gameType = 1;
+  string accountId = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+message GameRecordQueryDao {
+  int64 gameRecordId = 1;
+  GameType gameType = 2;
+  GameResult gameResult = 3;
+  GameStatus gameStatus = 4;
+  int64 finishTimestamp = 5;
+  UserRole userRole = 6;
+}
+
+message RspGameRecordQueryDao {
+  repeated  GameRecordQueryDao list = 1;
+  int64 total = 2;
+  int64 page = 3;
+  int64 pageSize = 4;
+}
+
+// 查询游戏的详情记录
+message ReqGameRecordDetailQueryDao {
+  int64 gameRecordId = 1;
+  GameType gameType = 2;
+}
+
+message RspGameRecordDetailQueryDao {
+  int64 gameRecordId = 1;
+  GameType gameType = 2;
+  // 游戏状态数据
+  string gameStatusData = 3;
+  // 游戏进程数据
+  string gameProcessDao = 4;
+  // 游戏状态
+  GameStatus gameStatus = 5;
+  // 结束时间
+  int64 finishTimestamp = 6;
+  // 对局的用户列表记录
+  repeated GameRecordUserDao gameRecordUserList = 7;
+}

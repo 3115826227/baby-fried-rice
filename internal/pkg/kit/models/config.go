@@ -38,6 +38,7 @@ type Conf struct {
 			ImDaoServer      string `json:"im_dao_server"`
 			ShopDaoServer    string `json:"shop_dao_server"`
 			SmsDaoServer     string `json:"sms_dao_server"`
+			GameDaoServer    string `json:"game_dao_server"`
 		} `json:"sub_servers"`
 	} `json:"rpc"`
 

@@ -60,6 +60,14 @@ cd $CMD/smsDao
 exec -a baby-sms-dao ./smsDao &
 cd $DIR
 
+cd $CMD/gameDao
+exec -a baby-game-dao ./gameDao &
+cd $DIR
+
+cd $CMD/game
+exec -a baby-game ./game &
+cd $DIR
+
 trap cleanup EXIT
 
 while : ; do sleep 1 ; done
