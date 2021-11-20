@@ -1,0 +1,38 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  rpcserver:
+    name: "game-dao"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 18065
+    register: "http://127.0.0.1:18065"
+
+rpc:
+  cert:
+    server:
+      servercertfile: "cert/server.pem"
+      serverkeyfile: "cert/server.key"
+
+cache:
+  redis:
+    maincache:
+      addr: "localhost:26379"
+      password: "123456"
+      db: 9
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+database:
+  maindatabase:
+    host: 127.0.0.1
+    port: 23306
+    username: root
+    password: 123456
+    dbname: baby-game

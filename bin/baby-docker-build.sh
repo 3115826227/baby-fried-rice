@@ -28,6 +28,10 @@ case $1 in
   docker build -t baby-shop-dao -f cmd/shopDao/Dockerfile .
   docker rmi baby-sms-dao
   docker build -t baby-sms-dao -f cmd/smsDao/Dockerfile .
+  docker rmi baby-game
+  docker build -t baby-game -f cmd/game/Dockerfile .
+  docker rmi baby-game-dao
+  docker build -t baby-game-dao -f cmd/gameDao/Dockerfile .
 ;;
 "gateway")
   docker rmi baby-gateway
@@ -80,5 +84,13 @@ case $1 in
 "sms-dao")
   docker rmi baby-sms-dao
   docker build -t baby-sms-dao -f cmd/smsDao/Dockerfile .
+;;
+"game")
+  docker rmi baby-game
+  docker build -t baby-game -f cmd/game/Dockerfile .
+;;
+"game-dao")
+  docker rmi baby-game-dao
+  docker build -t baby-game-dao -f cmd/gameDao/Dockerfile .
 ;;
 esac

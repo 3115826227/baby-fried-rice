@@ -10,3 +10,5 @@ create database `baby-file` default character set utf8 collate utf8_general_ci;
 create database `baby-shop` default character set utf8 collate utf8_general_ci;
 ## 创建短信数据库
 CREATE DATABASE `baby-sms` CHARACTER SET utf8 COLLATE utf8_general_ci;
+## 创建游戏数据库
+CREATE DATABASE `baby-game` CHARACTER SET utf8 COLLATE utf8_general_ci;

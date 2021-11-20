@@ -15,6 +15,8 @@ const (
 	SessionMessageNotify = 2
 	// 动态消息通知
 	SpaceMessageNotify = 3
+	// 游戏消息通知
+	GameMessageNotify = 4
 )
 
 type WSMessageType int

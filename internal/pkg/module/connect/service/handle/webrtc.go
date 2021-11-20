@@ -136,9 +136,10 @@ func CreateSession(sdp string, id int64, accountId string, video bool) (swapSdp 
 				}
 			}
 		}()
+		log.Logger.Debug("peer connection on track remote track, the kind is " + kind)
 
 		// Create a local track, all our SFU clients will be fed via this track
-		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, kind, fmt.Sprintf("%v_%v", kind, sessionID))
+		localTrack, newTrackErr := webrtc.NewTrackLocalStaticRTP(remoteTrack.Codec().RTPCodecCapability, kind, sessionID)
 		if newTrackErr != nil {
 			panic(newTrackErr)
 		}

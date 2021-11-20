@@ -2,11 +2,11 @@ package grpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/rpc"
-	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/shop"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/game"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
-	"baby-fried-rice/internal/pkg/module/shop/config"
-	"baby-fried-rice/internal/pkg/module/shop/log"
-	"baby-fried-rice/internal/pkg/module/shop/server"
+	"baby-fried-rice/internal/pkg/module/game/config"
+	"baby-fried-rice/internal/pkg/module/game/log"
+	"baby-fried-rice/internal/pkg/module/game/server"
 	"crypto/x509"
 	"fmt"
 	"github.com/pkg/errors"
@@ -69,20 +69,20 @@ func initClient(addr string) (client *Client, err error) {
 	return &Client{c: c}, nil
 }
 
-func GetShopClient() (shop.DaoShopClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.ShopDaoServer)
-	if err != nil {
-		err = errors.Wrap(err, "failed to get shop rpc client")
-		return nil, err
-	}
-	return shop.NewDaoShopClient(cli.GetRpcClient()), nil
-}
-
 func GetUserClient() (user.DaoUserClient, error) {
 	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.AccountDaoServer)
 	if err != nil {
-		err = errors.Wrap(err, "failed to get user rpc client")
+		log.Logger.Error(err.Error())
 		return nil, err
 	}
 	return user.NewDaoUserClient(cli.GetRpcClient()), nil
+}
+
+func GetGameClient() (game.DaoGameClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.GameDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return game.NewDaoGameClient(cli.GetRpcClient()), nil
 }
