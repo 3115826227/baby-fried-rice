@@ -93,6 +93,13 @@ type Conf struct {
 	AccessKeySecret string `json:"access_key_secret"`
 
 	TokenSecret string `json:"token_secret"`
+
+	Stuns []string `json:"stuns"`
+	Turn  struct {
+		URLs       []string `json:"urls"`
+		Username   string   `json:"username"`
+		Credential string   `json:"credential"`
+	} `json:"turn"`
 }
 
 type Server struct {
