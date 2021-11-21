@@ -39,3 +39,10 @@ messagequeue:
       channel: "websocket_notify_channel"
   nsq:
     cluster: "127.0.0.1:4150"
+
+stuns:
+  - "stun:stun.l.google.com:19302"
+turn:
+  urls: ""
+  username: ""
+  credential: ""

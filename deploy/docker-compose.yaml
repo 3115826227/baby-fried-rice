@@ -1,5 +1,12 @@
 version: "3"
 services:
+  coturn:
+    image: coturn
+    container_name: baby-coturn
+    ports:
+      - "3478:3478"
+      - "3478:3478/udp"
+    restart: always
   zookeeper:
     image: wurstmeister/zookeeper
     container_name: zookeeper

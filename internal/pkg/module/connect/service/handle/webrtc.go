@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/module/connect/config"
 	"baby-fried-rice/internal/pkg/module/connect/log"
 	"bytes"
 	"compress/gzip"
@@ -92,7 +93,12 @@ var (
 	peerConnectionConfig = webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
+				URLs: config.GetConfig().Stuns,
+			},
+			{
+				URLs:       config.GetConfig().Turn.URLs,
+				Username:   config.GetConfig().Turn.Username,
+				Credential: config.GetConfig().Turn.Credential,
 			},
 		},
 	}
