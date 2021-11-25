@@ -8,6 +8,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/mq/nsq"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/live"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/connect/cache"
 	"baby-fried-rice/internal/pkg/module/connect/config"
@@ -151,6 +152,8 @@ func WebSocketHandle(c *gin.Context) {
 			case constant.SessionMessageMessage:
 				handleSessionMessage(msg, userMeta.AccountId)
 			}
+		case constant.LiveMessageNotify:
+			handleLiveMessage(msg)
 		default:
 			continue
 		}
@@ -568,6 +571,7 @@ func handleSession(msg models.WSMessageNotify, userMeta *handle.UserMeta) {
 			// todo 如果是多人视频会话，则另做处理
 		}
 	case im.SessionNotifyType_JoinVideoMessage:
+		// 加入视频通话
 		var remotesSwapSdp string
 		remotesSwapSdp, err = JoinSession(msg.WSMessage.SessionMessage.WebRtc.RemoteSdp, sessionId,
 			notify.WSMessage.SessionMessage.WebRtc.InviteAccount, notify.WSMessage.SessionMessage.WebRtc.Video)
@@ -651,5 +655,24 @@ func handleSessionMessage(msg models.WSMessageNotify, accountId string) {
 			SendTimestamp: msg.Timestamp,
 		}
 		writeChan <- notify
+	}
+}
+
+func handleLiveMessage(msg models.WSMessageNotify) {
+	liveClient, err := grpc.GetLiveClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var req = live.ReqLiveRoomMessageAddDao{
+		MessageType:   msg.WSMessage.LiveMessage.MessageType,
+		Send:          msg.WSMessage.LiveMessage.Send.AccountID,
+		LiveRoomId:    msg.Receive,
+		Content:       msg.WSMessage.LiveMessage.Content,
+		SendTimestamp: time.Now().Unix(),
+	}
+	if _, err = liveClient.LiveRoomMessageAddDao(context.Background(), &req); err != nil {
+		log.Logger.Error(err.Error())
+		return
 	}
 }

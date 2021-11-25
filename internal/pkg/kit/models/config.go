@@ -31,6 +31,7 @@ type Conf struct {
 			ImServer          string `json:"im_server"`
 			FileServer        string `json:"file_server"`
 			ShopServer        string `json:"shop_server"`
+			LiveServer        string `json:"live_server"`
 
 			AccountDaoServer string `json:"account_dao_server"`
 			SpaceDaoServer   string `json:"space_dao_server"`
@@ -39,6 +40,7 @@ type Conf struct {
 			ShopDaoServer    string `json:"shop_dao_server"`
 			SmsDaoServer     string `json:"sms_dao_server"`
 			GameDaoServer    string `json:"game_dao_server"`
+			LiveDaoServer    string `json:"live_dao_server"`
 		} `json:"sub_servers"`
 	} `json:"rpc"`
 

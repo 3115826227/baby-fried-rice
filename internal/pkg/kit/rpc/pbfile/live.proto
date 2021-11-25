@@ -1,0 +1,192 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package live;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/live";  // 声明生成的 go 文件所属的包
+
+service DaoLive {
+  // 查询直播房间列表
+  rpc LiveRoomQueryDao (ReqLiveRoomQueryDao) returns (RspLiveRoomQueryDao);
+  // 查询直播房间详情
+  rpc LiveRoomDetailQueryDao (ReqLiveRoomDetailQueryDao) returns (RspLiveRoomDetailQueryDao);
+  // 查询直播房间用户列表 (仅主播可查)
+  rpc LiveRoomUserQueryDao (ReqLiveRoomUserQueryDao) returns (RspLiveRoomUserQueryDao);
+  // 更新直播房间状态 (主播上线、下线、禁言、关闭直播房间等)
+  rpc LiveRoomStatusUpdateDao (ReqLiveRoomStatusUpdateDao) returns (RspLiveRoomDetailQueryDao);
+  // 直播房间用户操作添加 (用户进入、退出直播房间等)
+  rpc LiveRoomUserOptAddDao (ReqLiveRoomUserOptAddDao) returns (RspLiveRoomUserOptAddDao);
+  // 直播房间用户消息发送
+  rpc LiveRoomMessageAddDao (ReqLiveRoomMessageAddDao) returns (google.protobuf.Empty);
+  // 直播房间用户消息查询
+  rpc LiveRoomMessageQueryDao (ReqLiveRoomMessageQueryDao) returns (RspLiveRoomMessageQueryDao);
+}
+
+// 直播房间列表查询
+message ReqLiveRoomQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  LiveRoomStatus status = 3;
+}
+
+message RspLiveRoomQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  repeated LiveRoom list = 3;
+}
+
+message LiveRoom
+{
+  // 直播房间ID
+  string liveRoomId = 1;
+  // 直播房间主播账号
+  string origin = 2;
+  // 直播房间状态
+  LiveRoomStatus status = 3;
+  // 直播房间人数
+  int64 userTotal = 4;
+}
+
+// 直播房间详情查询
+message ReqLiveRoomDetailQueryDao
+{
+  string liveRoomId = 1;
+  string accountId = 2;
+}
+
+message RspLiveRoomDetailQueryDao
+{
+  string liveRoomId = 1;
+  string origin = 2;
+  LiveRoomStatus status = 3;
+  int64 userTotal = 4;
+  // 在线时长
+  int64 onlineTime = 5;
+}
+
+// 直播房间主播查询用户列表
+message ReqLiveRoomUserQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  string liveRoomId = 3;
+  string origin = 4;
+}
+
+message RspLiveRoomUserQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  repeated string users = 3;
+}
+
+enum LiveRoomStatus
+{
+  // 默认关闭
+  DefaultClose = 0;
+  // 主播正常上线直播中
+  Online = 1;
+  // 主播活动直播中
+  ActivityOnline = 2;
+  // 主播已下线
+  Offline = 101;
+}
+
+// 主播更新直播房间状态
+message ReqLiveRoomStatusUpdateDao
+{
+  string origin = 1;
+  LiveRoomStatus status = 2;
+}
+
+// 直播房间用户操作类型
+enum LiveRoomUserOptType
+{
+  // 默认无效操作
+  DefaultInvalidOptType = 0;
+  // 用户进入直播房间
+  EnterOptType = 10;
+  // 用户退出直播房间
+  QuitOptType = 11;
+  // 主播将用户移出直播房间
+  RemoveOptType = 12;
+}
+
+// 直播房间用户操作添加
+message ReqLiveRoomUserOptAddDao
+{
+  string liveRoomId = 1;
+  string accountId = 2;
+  LiveRoomUserOptType opt = 3;
+}
+
+message RspLiveRoomUserOptAddDao
+{
+  string liveRoomId = 1;
+  string origin = 2;
+}
+
+// 直播房间消息类型
+enum LiveRoomMessageType
+{
+  // 文字消息
+  TextMessage = 0;
+  // 用户进入直播房间操作消息
+  UserEnterOptMessage = 100;
+  // 用户退出直播房间操作消息
+  UserQuitOptMessage = 101;
+  // 直播房间已禁言
+  MuteOptMessage = 201;
+  // 直播房间已解除禁言
+  UnmuteOptMessage = 200;
+}
+
+// 直播房间用户消息发送
+message ReqLiveRoomMessageAddDao
+{
+  // 消息类型
+  LiveRoomMessageType messageType = 2;
+  // 消息发送者
+  string send = 3;
+  // 直播房间ID
+  string liveRoomId = 4;
+  // 消息内容
+  string content = 5;
+  // 发送时间
+  int64 sendTimestamp = 6;
+}
+
+// 直播房间消息查询
+message ReqLiveRoomMessageQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  // 直播房间ID
+  string liveRoomId = 3;
+  // 查询者
+  string accountId = 4;
+}
+
+message RspLiveRoomMessageQueryDao
+{
+  int64 page = 1;
+  int64 pageSize = 2;
+  repeated  LiveRoomMessage list = 3;
+}
+
+message LiveRoomMessage
+{
+  int64 messageId = 1;
+  // 消息类型
+  LiveRoomMessageType messageType = 2;
+  // 消息发送者
+  string send = 3;
+  // 直播房间ID
+  string liveRoomId = 4;
+  // 消息内容
+  string content = 5;
+  // 发送时间
+  int64 sendTimestamp = 6;
+}

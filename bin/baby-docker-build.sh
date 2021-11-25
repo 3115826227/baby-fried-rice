@@ -32,6 +32,10 @@ case $1 in
   docker build -t baby-game -f cmd/game/Dockerfile .
   docker rmi baby-game-dao
   docker build -t baby-game-dao -f cmd/gameDao/Dockerfile .
+  docker rmi baby-live
+  docker build -t baby-live -f cmd/live/Dockerfile .
+  docker rmi baby-live-dao
+  docker build -t baby-live-dao -f cmd/liveDao/Dockerfile .
   docker rmi baby-coturn
   docker build -t baby-coturn -f cmd/coturn/Dockerfile
 ;;
@@ -94,6 +98,14 @@ case $1 in
 "game-dao")
   docker rmi baby-game-dao
   docker build -t baby-game-dao -f cmd/gameDao/Dockerfile .
+;;
+"live")
+  docker rmi baby-live
+  docker build -t baby-live -f cmd/live/Dockerfile .
+;;
+"live-dao")
+  docker rmi baby-live-dao
+  docker build -t baby-live-dao -f cmd/liveDao/Dockerfile .
 ;;
 "coturn")
   docker rmi baby-coturn

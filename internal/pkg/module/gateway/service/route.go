@@ -31,6 +31,7 @@ func Register(engine *gin.Engine) {
 	user.Any("/connect/*any", HandleConnectProxy)
 	user.Any("/file/*any", HandleFileProxy)
 	user.Any("/shop/*any", HandleShopProxy)
+	user.Any("/live/*any", HandleLiveProxy)
 }
 
 func HandleAccountUserProxy(c *gin.Context) {
@@ -59,6 +60,10 @@ func HandleFileProxy(c *gin.Context) {
 
 func HandleShopProxy(c *gin.Context) {
 	handleProxy(c, config.GetConfig().Rpc.SubServers.ShopServer)
+}
+
+func HandleLiveProxy(c *gin.Context) {
+	handleProxy(c, config.GetConfig().Rpc.SubServers.LiveServer)
 }
 
 func handleProxy(c *gin.Context, serverName string) {

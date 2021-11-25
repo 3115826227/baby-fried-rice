@@ -31,3 +31,4 @@ rpc:
     imserver: "im-service"
     fileserver: "file"
     shopserver: "shop-service"
+    liveserver: "live-service"

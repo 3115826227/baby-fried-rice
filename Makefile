@@ -16,7 +16,9 @@ MICROSERVICES= \
 	cmd/shop/shop \
 	cmd/smsDao/smsDao \
 	cmd/gameDao/gameDao \
-    cmd/game/game
+    cmd/game/game \
+    cmd/liveDao/liveDao \
+    cmd/live/live
 
 build: $(MICROSERVICES)
 
@@ -64,6 +66,12 @@ cmd/gameDao/gameDao:
 
 cmd/game/game:
 	$(GO) build $(GOFLAGS) -o $@ ./cmd/game
+
+cmd/liveDao/liveDao:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/liveDao
+
+cmd/live/live:
+	$(GO) build $(GOFLAGS) -o $@ ./cmd/live
 
 
 clean:

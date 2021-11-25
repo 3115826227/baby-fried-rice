@@ -41,6 +41,8 @@ type WSMessage struct {
 	SessionMessage *SessionMessage `json:"session_message,omitempty"`
 	// 私信消息 主要是推送
 	PrivateMessage rsp.UserPrivateMessageDetailResp `json:"private_message,omitempty"`
+	// 直播消息
+	LiveMessage *rsp.LiveRoomMessage `json:"live_message"`
 }
 
 func (message *WSMessage) ToString() string {

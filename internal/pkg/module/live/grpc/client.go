@@ -2,12 +2,11 @@ package grpc
 
 import (
 	"baby-fried-rice/internal/pkg/kit/rpc"
-	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/live"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
-	"baby-fried-rice/internal/pkg/module/connect/config"
-	"baby-fried-rice/internal/pkg/module/connect/log"
-	"baby-fried-rice/internal/pkg/module/connect/server"
+	"baby-fried-rice/internal/pkg/module/live/config"
+	"baby-fried-rice/internal/pkg/module/live/log"
+	"baby-fried-rice/internal/pkg/module/live/server"
 	"crypto/x509"
 	"fmt"
 	"github.com/pkg/errors"
@@ -77,15 +76,6 @@ func GetUserClient() (user.DaoUserClient, error) {
 		return nil, err
 	}
 	return user.NewDaoUserClient(cli.GetRpcClient()), nil
-}
-
-func GetImClient() (im.DaoImClient, error) {
-	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.ImDaoServer)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		return nil, err
-	}
-	return im.NewDaoImClient(cli.GetRpcClient()), nil
 }
 
 func GetLiveClient() (live.DaoLiveClient, error) {

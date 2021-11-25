@@ -17,6 +17,8 @@ const (
 	SpaceMessageNotify = 3
 	// 游戏消息通知
 	GameMessageNotify = 4
+	// 直播消息通知
+	LiveMessageNotify = 5
 )
 
 type WSMessageType int

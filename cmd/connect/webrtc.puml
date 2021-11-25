@@ -1,0 +1,45 @@
+@startuml
+
+group 一对一音视频通话
+
+客户端A -> 客户端A: 收集摄像头和麦克风信息，创建RTPPeerConnection对象，\n收集本地Track并在本地渲染
+客户端A -> 客户端A: 通过RTPPeerConnection对象生成本地端Offer SDP信息
+客户端A -> connect: 通过websocket发送与客户端B进行音视频通话的请求，\n请求中含有客户端A的本地端Offer SDP信息
+connect -> connect: 保存客户端A的邀请状态以及本地端Offer SDP信息
+客户端B <-- connect: 转发客户端A的音视频通话请求，并等待响应
+客户端B -> 客户端B: 收集摄像头和麦克风信息，创建RTPPeerConnection对象，\n收集本地Track并在本地渲染
+客户端B -> 客户端B: 通过RTPPeerConnection对象生成本地端Offer SDP信息
+客户端B -> 客户端B: 通过RTPPeerConnection对象生成远程端Offer SDP信息
+客户端B -> connect: 通过websocket发送同意与客户端A进行音视频通话的响应，\n响应中含有客户端B的本地端Offer SDP信息以及远程端Offer SDP信息
+connect -> connect: （客户端A的本地端SDP交换）通过客户端A的本地端Offer SDP信息创建客户端A会话缓存，\nkey为SessionID+客户端A的用户ID，\n并保存生成的客户端A的本地端Answer SDP信息
+客户端A <-- connect: 通过websocket推送客户端A的本地端Answer SDP信息
+connect -> connect: （客户端B的远程端SDP交换）通过客户端B的远程端Offer SDP信息加入到客户端A会话缓存，\n并保存生成的客户端B的远程端Answer SDP信息
+客户端B <-- connect: 通过websocket推送客户端B的远程端Answer SDP信息
+connect -> connect: （客户端B的本地端SDP交换）通过客户端B的本地端Offer SDP信息创建客户端B会话缓存，\nkey为SessionID+客户端B的用户ID，\n并保存生成的客户端B的本地端Answer SDP信息
+客户端B <-- connect: 通过websocket推送客户端B的本地端Answer SDP信息
+客户端A <-- connect: 通过websocket推送客户端B接受音视频通话的响应
+客户端A -> 客户端A: 通过RTPPeerConnection对象生成远程端Offer SDP信息
+客户端A -> connect: 通过websocket发送请求，请求中含有客户端A的远程端Offer SDP信息
+connect -> connect: （客户端A的远程端SDP交换）通过客户端A的远程端Offer SDP信息加入到客户端B会话缓存，\n并保存生成的客户端A的远程端Answer SDP信息
+客户端A <-- connect: 通过websocket推送客户端A的远程端Answer SDP信息
+end
+
+group 直播
+客户端A -> 客户端A: 收集摄像头和麦克风信息，创建RTPPeerConnection对象，\n收集本地Track并在本地渲染
+客户端A -> 客户端A: 通过RTPPeerConnection对象生成本地端Offer SDP信息
+客户端A -> connect: 通过websocket发送与客户端B进行音视频通话的请求，\n请求中含有客户端A的本地端Offer SDP信息
+connect -> connect: （客户端A的本地端SDP交换）通过客户端A的本地端Offer SDP信息创建客户端A直播会话缓存，\nkey为直播业务Key+客户端A的用户ID，\n并保存生成的客户端A的本地端Answer SDP信息
+客户端A <-- connect: 通过websocket推送客户端A的本地端Answer SDP信息
+
+客户端B -> 客户端B: 创建RTPPeerConnection对象，生成远程端Offer SDP信息
+客户端B -> connect: 通过websocket发送客户端B加入客户端A直播间的请求，\n请求中含有客户端B的远程端Offer SDP信息
+connect -> connect: （客户端B的远程端SDP交换）通过客户端B的远程端Offer SDP信息加入到客户端A直播会话缓存，\n并保存生成的客户端B的远程端Answer SDP信息
+客户端B <-- connect: 通过websocket推送客户端B的远程端Answer SDP信息
+
+客户端C -> 客户端C: 创建RTPPeerConnection对象，生成远程端Offer SDP信息
+客户端C -> connect: 通过websocket发送客户端C加入客户端A直播间的请求，\n请求中含有客户端C的远程端Offer SDP信息
+connect -> connect: （客户端C的远程端SDP交换）通过客户端C的远程端Offer SDP信息加入到客户端A直播会话缓存，\n并保存生成的客户端C的远程端Answer SDP信息
+客户端C <-- connect: 通过websocket推送客户端C的远程端Answer SDP信息
+
+end
+@enduml
