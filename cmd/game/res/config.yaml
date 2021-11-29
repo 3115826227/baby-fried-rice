@@ -7,8 +7,8 @@ server:
     name: "game-service"
     addr: "0.0.0.0"
     serial: 1
-    port: 18074
-    register: "http://127.0.0.1:18074"
+    port: 18078
+    register: "http://127.0.0.1:18078"
 
 register:
   healthyrolltime: 3000

@@ -31,6 +31,7 @@ rpc:
     accountdaoserver: "account-dao"
     imdaoserver: "im-dao"
     spacedaoserver: "space-dao"
+    livedaoserver: "live-dao"
 
 messagequeue:
   consumetopics:
@@ -43,6 +44,7 @@ messagequeue:
 stuns:
   - "stun:stun.l.google.com:19302"
 turn:
-  urls: ""
+  urls:
+    - ""
   username: ""
   credential: ""

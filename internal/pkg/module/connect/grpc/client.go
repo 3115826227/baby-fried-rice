@@ -3,6 +3,7 @@ package grpc
 import (
 	"baby-fried-rice/internal/pkg/kit/rpc"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/live"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/connect/config"
 	"baby-fried-rice/internal/pkg/module/connect/log"
@@ -85,4 +86,13 @@ func GetImClient() (im.DaoImClient, error) {
 		return nil, err
 	}
 	return im.NewDaoImClient(cli.GetRpcClient()), nil
+}
+
+func GetLiveClient() (live.DaoLiveClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.LiveDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return live.NewDaoLiveClient(cli.GetRpcClient()), nil
 }

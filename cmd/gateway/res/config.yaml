@@ -8,6 +8,8 @@ server:
     serial: 1
     addr: "0.0.0.0"
     port: 18070
+    certfile: "./cert/server.pem"
+    keyfile: "./cert/server.key"
 
 cache:
   redis:
@@ -31,3 +33,5 @@ rpc:
     imserver: "im-service"
     fileserver: "file"
     shopserver: "shop-service"
+    liveserver: "live-service"
+    blogserver: "blog-service"

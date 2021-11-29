@@ -1,0 +1,32 @@
+log:
+  loglevel: "debug"
+  logpath:
+
+server:
+  httpserver:
+    name: "blog-service"
+    addr: "0.0.0.0"
+    serial: 1
+    port: 18171
+    register: "http://127.0.0.1:18171"
+
+register:
+  healthyrolltime: 3000
+  etcd:
+    cluster:
+      - "http://127.0.0.1:23791"
+
+rpc:
+  cert:
+    client:
+      clientcertfile: "cert/server.pem"
+  subservers:
+    accountdaoserver: "account-dao"
+    blogdaoserver: "blog-dao"
+    fileserver: "file"
+
+messagequeue:
+  publishtopics:
+    websocketnotify:  "websocket_notify"
+  nsq:
+    cluster: "127.0.0.1:4150"

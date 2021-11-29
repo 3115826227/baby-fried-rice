@@ -68,6 +68,22 @@ cd $CMD/game
 exec -a baby-game ./game &
 cd $DIR
 
+cd $CMD/liveDao
+exec -a baby-live-dao ./liveDao &
+cd $DIR
+
+cd $CMD/live
+exec -a baby-live ./live &
+cd $DIR
+
+cd $CMD/blogDao
+exec -a baby-blog-dao ./blogDao &
+cd $DIR
+
+cd $CMD/blog
+exec -a baby-blog ./blog &
+cd $DIR
+
 trap cleanup EXIT
 
 while : ; do sleep 1 ; done
