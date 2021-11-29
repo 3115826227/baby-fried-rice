@@ -10,7 +10,6 @@ import (
 	"baby-fried-rice/internal/pkg/module/gateway/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/unrolled/secure"
 )
 
 var (
@@ -33,29 +32,11 @@ func init() {
 	}
 }
 
-func LoadTls() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		err := secure.New(secure.Options{
-			SSLRedirect: true,
-			SSLHost:     fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port),
-		}).Process(c.Writer, c.Request)
-		if err != nil {
-			//如果出现错误，请不要继续。
-			panic(err)
-			return
-		}
-		// 继续往下处理
-		c.Next()
-	}
-}
-
 func Main() {
 	engine := gin.Default()
 
 	engine.Use(middleware.Cors())
 	service.Register(engine)
 
-	engine.RunTLS(
-		fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port),
-		conf.Server.HTTPServer.CertFile, conf.Server.HTTPServer.KeyFile)
+	engine.Run(fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port))
 }
