@@ -112,8 +112,6 @@ type Server struct {
 	Addr     string `json:"addr"`
 	Port     int    `json:"port"`
 	Register string `json:"register"`
-	CertFile string `json:"cert_file"`
-	KeyFile  string `json:"key_file"`
 }
 
 type Redis struct {
