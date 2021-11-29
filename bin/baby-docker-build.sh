@@ -36,6 +36,10 @@ case $1 in
   docker build -t baby-live -f cmd/live/Dockerfile .
   docker rmi baby-live-dao
   docker build -t baby-live-dao -f cmd/liveDao/Dockerfile .
+  docker rmi baby-blog
+  docker build -t baby-blog -f cmd/blog/Dockerfile .
+  docker rmi baby-blog-dao
+  docker build -t baby-blog-dao -f cmd/blogDao/Dockerfile .
   docker rmi baby-coturn
   docker build -t baby-coturn -f cmd/coturn/Dockerfile
 ;;
@@ -106,6 +110,14 @@ case $1 in
 "live-dao")
   docker rmi baby-live-dao
   docker build -t baby-live-dao -f cmd/liveDao/Dockerfile .
+;;
+"blog")
+  docker rmi baby-blog
+  docker build -t baby-blog -f cmd/blog/Dockerfile .
+;;
+"blog-dao")
+  docker rmi baby-blog-dao
+  docker build -t baby-blog-dao -f cmd/blogDao/Dockerfile .
 ;;
 "coturn")
   docker rmi baby-coturn

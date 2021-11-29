@@ -14,3 +14,5 @@ CREATE DATABASE `baby-sms` CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE DATABASE `baby-game` CHARACTER SET utf8 COLLATE utf8_general_ci;
 ## 创建直播数据库
 CREATE DATABASE `baby-live` CHARACTER SET utf8 COLLATE utf8_general_ci;
+## 创建博客数据库
+CREATE DATABASE `baby-blog` CHARACTER SET utf8 COLLATE utf8_general_ci;

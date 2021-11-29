@@ -31,6 +31,7 @@ rpc:
     accountdaoserver: "account-dao"
     imdaoserver: "im-dao"
     spacedaoserver: "space-dao"
+    livedaoserver: "live-dao"
 
 messagequeue:
   consumetopics:

@@ -1,0 +1,221 @@
+// proto 文件版本
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+// 生成文件的包名
+package blog;
+option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/blog";  // 声明生成的 go 文件所属的包
+
+service DaoBlog {
+  // 添加标签
+  rpc TagAddDao (ReqTagAddDao) returns (google.protobuf.Empty);
+  // 查询标签
+  rpc TagQueryDao (ReqTagQueryDao) returns (RspTagQueryDao);
+  // 删除标签
+  rpc TagDeleteDao (ReqTagDeleteDao) returns (google.protobuf.Empty);
+  // 添加分类
+  rpc CategoryAddDao (ReqCategoryAddDao) returns (google.protobuf.Empty);
+  // 查询分类
+  rpc CategoryQueryDao (ReqCategoryQueryDao) returns (RspCategoryQueryDao);
+  // 删除分类
+  rpc CategoryDeleteDao (ReqCategoryDeleteDao) returns (google.protobuf.Empty);
+  // 关注/取关博主
+  rpc FocusAddDao (ReqFocusAddDao) returns (google.protobuf.Empty);
+  // 喜欢/取消喜欢博文
+  rpc BlogLikeAddDao (ReqBlogLikeAddDao) returns (google.protobuf.Empty);
+  // 查询粉丝
+  rpc FansQueryDao (ReqFansQueryDao) returns (RspFansQueryDao);
+  // 添加博文
+  rpc BlogAddDao (ReqBlogAddDao) returns (google.protobuf.Empty);
+  // 更新博文
+  rpc BlogUpdateDao (ReqBlogUpdateDao) returns (google.protobuf.Empty);
+  // 查询博主信息
+  rpc BloggerQueryDao (ReqBloggerQueryDao) returns (RspBloggerQueryDao);
+  // 查询博文列表
+  rpc BlogQueryDao (ReqBlogQueryDao) returns (RspBlogQueryDao);
+  // 查询博文详情
+  rpc BlogDetailQueryDao (ReqBlogDetailQueryDao) returns (RspBlogDetailQueryDao);
+  // 删除博文
+  rpc BlogDeleteDao (ReqBlogDeleteDao) returns (google.protobuf.Empty);
+}
+
+// 添加标签
+message ReqTagAddDao {
+  string origin = 1;
+  repeated string tags = 2;
+}
+
+// 查询标签
+message ReqTagQueryDao {
+  string origin = 1;
+}
+
+message RspTagQueryDao {
+  string origin = 1;
+  repeated string tags = 2;
+}
+
+// 删除标签
+message ReqTagDeleteDao {
+  string origin = 1;
+  repeated string tags = 2;
+}
+
+// 添加分类
+message ReqCategoryAddDao {
+  string origin = 1;
+  string category = 2;
+}
+
+// 查询分类
+message ReqCategoryQueryDao {
+  string origin = 1;
+}
+
+message RspCategoryQueryDao {
+  string origin = 1;
+  repeated string category = 2;
+}
+
+// 删除分类
+message ReqCategoryDeleteDao {
+  string origin = 1;
+  string category = 2;
+}
+
+// 关注博主
+message ReqFocusAddDao {
+  // 操作用户
+  string account = 1;
+  // 博主
+  string origin = 2;
+  // true-关注 false-取关
+  bool focus = 3;
+}
+
+// 喜欢博文
+message ReqBlogLikeAddDao {
+  // 操作用户
+  string account = 1;
+  // 博文
+  string blogId = 2;
+  // true-喜欢 false-取消喜欢
+  bool like = 3;
+}
+
+// 查询粉丝
+message ReqFansQueryDao {
+  string blogger = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+message RspFansQueryDao {
+  repeated string users = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+// 添加博文
+message ReqBlogAddDao {
+  string origin = 1;
+  string title = 2;
+  repeated string tags = 3;
+  string category = 4;
+  string previewContent = 5;
+}
+
+enum BlogStatus
+{
+  // 未发布
+  Unpublished = 0;
+  // 待审核
+  PendingReview = 1;
+  // 已发布
+  Published = 2;
+}
+
+// 更新博文
+message ReqBlogUpdateDao {
+  string origin = 1;
+  string blogId = 2;
+  string title = 3;
+  repeated string tags = 4;
+  string category = 5;
+  BlogStatus status = 6;
+  // 预览内容
+  string previewContent = 7;
+}
+
+// 删除博文
+message ReqBlogDeleteDao {
+  string origin = 1;
+  repeated string blogIds = 2;
+}
+
+// 查询博主信息
+message ReqBloggerQueryDao {
+  string blogger = 1;
+}
+
+message RspBloggerQueryDao {
+  string blogger = 1;
+  // 标签列表
+  repeated string tags = 2;
+  // 博文数
+  int64 blogTotal = 3;
+  // 总点赞数
+  int64 likeTotal = 4;
+  // 总阅读数
+  int64 readTotal = 5;
+  // 粉丝数
+  int64 fansTotal = 6;
+}
+
+enum QueryType
+{
+  NewType = 0;
+  ReadMostType = 1;
+  LikeMostType = 2;
+}
+
+// 查询博文列表
+message ReqBlogQueryDao {
+  // 关键词模糊搜索
+  string search = 1;
+  // 博主名称模糊搜索
+  string bloggerLike = 2;
+  // 查询方式
+  QueryType queryType = 3;
+  int64 page = 4;
+  int64 pageSize = 5;
+}
+
+message BlogQueryDao {
+  string blogger = 1;
+  string blogId = 2;
+  string title = 3;
+  repeated string tags = 4;
+  string category = 5;
+  string previewContent = 6;
+  int64 likeTotal = 7;
+  int64 readTotal = 8;
+  int64 commentTotal = 9;
+  int64 timestamp = 10;
+}
+
+message RspBlogQueryDao {
+  repeated BlogQueryDao list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+message ReqBlogDetailQueryDao {
+  string blogId = 1;
+  string accountId = 2;
+}
+
+message RspBlogDetailQueryDao {
+  BlogQueryDao blog = 1;
+}

@@ -32,6 +32,7 @@ type Conf struct {
 			FileServer        string `json:"file_server"`
 			ShopServer        string `json:"shop_server"`
 			LiveServer        string `json:"live_server"`
+			BlogServer        string `json:"blog_server"`
 
 			AccountDaoServer string `json:"account_dao_server"`
 			SpaceDaoServer   string `json:"space_dao_server"`
@@ -41,6 +42,7 @@ type Conf struct {
 			SmsDaoServer     string `json:"sms_dao_server"`
 			GameDaoServer    string `json:"game_dao_server"`
 			LiveDaoServer    string `json:"live_dao_server"`
+			BlogDaoServer    string `json:"blog_dao_server"`
 		} `json:"sub_servers"`
 	} `json:"rpc"`
 
@@ -110,6 +112,8 @@ type Server struct {
 	Addr     string `json:"addr"`
 	Port     int    `json:"port"`
 	Register string `json:"register"`
+	CertFile string `json:"cert_file"`
+	KeyFile  string `json:"key_file"`
 }
 
 type Redis struct {

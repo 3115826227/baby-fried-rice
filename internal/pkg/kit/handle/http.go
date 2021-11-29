@@ -1,11 +1,58 @@
 package handle
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/pkg/errors"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 )
+
+func FileUpload(url, filePath string, userMeta UserMeta) (data []byte, err error) {
+	var payload = &bytes.Buffer{}
+	var writer = multipart.NewWriter(payload)
+	var file *os.File
+	if file, err = os.Open(filePath); err != nil {
+		return
+	}
+	defer file.Close()
+	var part io.Writer
+	if part, err = writer.CreateFormFile("file", filepath.Base(filePath)); err != nil {
+		return
+	}
+	if _, err = io.Copy(part, file); err != nil {
+		return
+	}
+	if err = writer.Close(); err != nil {
+		return
+	}
+	var client = &http.Client{}
+	var req *http.Request
+	if req, err = http.NewRequest("POST", url, payload); err != nil {
+		return
+	}
+	req.Header.Set(HeaderAccountId, userMeta.AccountId)
+	req.Header.Set(HeaderUsername, userMeta.Username)
+	req.Header.Set(HeaderSchoolId, userMeta.SchoolId)
+	req.Header.Set(HeaderReqId, userMeta.ReqId)
+	req.Header.Set(HeaderIsOfficial, fmt.Sprintf("%v", userMeta.IsOfficial))
+	req.Header.Set(HeaderPlatform, userMeta.Platform)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	var res *http.Response
+	if res, err = client.Do(req); err != nil {
+		return
+	}
+	defer res.Body.Close()
+	if data, err = ioutil.ReadAll(res.Body); err != nil {
+		return
+	}
+	return
+}
 
 func Post(url string, payload []byte, header http.Header) (data []byte, err error) {
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(payload)))
