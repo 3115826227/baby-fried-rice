@@ -199,7 +199,7 @@ func (service *IMService) SessionDialogQueryDao(ctx context.Context, req *im.Req
 		err = template.Order("send_timestamp desc").First(&latestRel).Error
 		if err == nil {
 			var message tables.Message
-			if message, err = query.GetMessage(latestRel.MessageID, latestRel.SessionID); err != nil {
+			if message, err = query.GetMessage(latestRel.ID, latestRel.SessionID); err != nil {
 				log.Logger.Error(err.Error())
 				return
 			}
@@ -613,7 +613,7 @@ func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqS
 	var beans = make([]interface{}, 0)
 	for _, rel := range relations {
 		var msgRel = tables.MessageUserRelation{
-			MessageID:     message.ID,
+			ID:            message.ID,
 			SessionID:     message.SessionID,
 			Receive:       rel.UserID,
 			SendTimestamp: message.SendTimestamp,
@@ -652,8 +652,8 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	var messageIds []int64
 	var readMap = make(map[int64]bool)
 	for _, rel := range relations {
-		messageIds = append(messageIds, rel.MessageID)
-		readMap[rel.MessageID] = rel.Read
+		messageIds = append(messageIds, rel.ID)
+		readMap[rel.ID] = rel.Read
 	}
 	var messages []tables.Message
 	if messages, err = query.GetMessages(messageIds, req.SessionId); err != nil {
@@ -668,7 +668,7 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	var sendMap = make(map[string]tables.SessionUserRelation)
 	var readMessageIds = make([]int64, 0)
 	for _, rel := range relations {
-		var message = messageMap[rel.MessageID]
+		var message = messageMap[rel.ID]
 		sendMap[message.Send] = tables.SessionUserRelation{
 			SessionID: message.SessionID,
 			UserID:    message.Send,
@@ -1107,7 +1107,7 @@ func (service *IMService) FriendQueryDao(ctx context.Context, req *im.ReqFriendQ
 	if req.RemarkLike != "" {
 		template = template.Where("remark like ?%", req.RemarkLike)
 	}
-	if err = template.Where("origin = ? and black_list = ?", req.Origin, req.BlackList).Find(&friends).Error; err != nil {
+	if err = template.Where("origin = ? and black_list = ?", req.Origin, req.BlackList).Find(&friends).Order("remark").Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}

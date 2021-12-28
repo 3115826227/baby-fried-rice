@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"baby-fried-rice/internal/pkg/kit/constant"
+	"fmt"
+)
 
 type Conf struct {
 	Log struct {
@@ -92,6 +95,8 @@ type Conf struct {
 		} `json:"sub_database"`
 	}
 
+	ElasticSearch ElasticSearch `json:"elastic_search"`
+
 	Endpoint        string `json:"endpoint"`
 	AccessKeyId     string `json:"access_key_id"`
 	AccessKeySecret string `json:"access_key_secret"`
@@ -104,6 +109,8 @@ type Conf struct {
 		Username   string   `json:"username"`
 		Credential string   `json:"credential"`
 	} `json:"turn"`
+
+	FileMode constant.FileMode `json:"file_mode"`
 }
 
 type Server struct {
@@ -126,6 +133,12 @@ type Mysql struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	DBName   string `json:"db_name"`
+}
+
+type ElasticSearch struct {
+	Urls     []string `json:"urls"`
+	Username string   `json:"username"`
+	Password string   `json:"password"`
 }
 
 func (ms Mysql) GetMysqlUrl() string {

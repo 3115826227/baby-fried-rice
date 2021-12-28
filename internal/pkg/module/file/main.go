@@ -28,7 +28,7 @@ func init() {
 	}
 	log.Logger.Info("log init successful")
 	// 初始化oss管理
-	if err := application.InitOssManager(); err != nil {
+	if err := application.InitFileManager(conf.FileMode); err != nil {
 		panic(err)
 	}
 	// 初始化数据库

@@ -10,7 +10,7 @@ import (
 
 var (
 	config     models.Conf
-	OssMetaNum = 2
+	OssMetaNum = 1
 )
 
 func GetConfig() models.Conf {

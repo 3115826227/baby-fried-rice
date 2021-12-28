@@ -16,6 +16,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // SessionAddHandle 会话创建接口
@@ -35,26 +36,26 @@ func SessionAddHandle(c *gin.Context) {
 	var req requests.ReqAddSession
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	var resp *user.RspUserDaoById
 	resp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: req.Joins})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	var joins = make([]*im.JoinRemarkDao, 0)
@@ -258,13 +259,13 @@ func SessionDetailHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
 		return
 	}
-	imClient, err := grpc.GetImClient()
-	if err != nil {
+	var imClient im.DaoImClient
+	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -275,36 +276,13 @@ func SessionDetailHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
-	}
-	var ids = make([]string, 0)
-	for _, u := range resp.Joins {
-		ids = append(ids, u.AccountId)
-	}
-	userClient, err := grpc.GetUserClient()
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var userResp *user.RspUserDaoById
-	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
-	if err != nil {
-		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
-		return
-	}
-	var userMap = make(map[string]*user.UserDao)
-	for _, u := range userResp.Users {
-		userMap[u.Id] = u
 	}
 	var joins = make([]rsp.User, 0)
 	for _, u := range resp.Joins {
 		var join = rsp.User{
 			AccountID:  u.AccountId,
-			Username:   userMap[u.AccountId].Username,
-			HeadImgUrl: userMap[u.AccountId].HeadImgUrl,
 			Remark:     u.Remark,
 			OnlineType: u.OnlineType,
 		}
@@ -359,13 +337,13 @@ func SessionJoinHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -376,7 +354,7 @@ func SessionJoinHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.FailedResp(c, handle.CodeInternalError)
 		return
 	}
 	switch resp.JoinPermissionType {
@@ -387,7 +365,7 @@ func SessionJoinHandle(c *gin.Context) {
 		}
 		if _, err = imClient.SessionJoinDao(context.Background(), reqJoinSession); err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			handle.FailedResp(c, handle.CodeInternalError)
 			return
 		}
 	case im.SessionJoinPermissionType_InviteJoin:
@@ -403,10 +381,15 @@ func SessionJoinHandle(c *gin.Context) {
 			Content:     constant.JoinSessionOptReqContent,
 			NeedConfirm: true,
 		}
-		if _, err = imClient.OperatorAddDao(context.Background(), reqOperator); err != nil {
+		var optResp *im.RspOperatorAddDao
+		if optResp, err = imClient.OperatorAddDao(context.Background(), reqOperator); err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			handle.FailedResp(c, handle.CodeInternalError)
 			return
+		}
+		// 给需要确认的用户发送通知
+		if reqOperator.NeedConfirm {
+			go sendOperatorNotify(imClient, optResp.OperatorId, userMeta.AccountId, false)
 		}
 		log.Logger.Info(constant.CodeNeedOriginAuditSessionMsg)
 		handle.ErrorResp(c, http.StatusOK, handle.CodeNeedOriginAuditSession, handle.CodeNeedOriginAuditSessionMsg)
@@ -461,13 +444,41 @@ func SessionInviteHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// 修改会话中的备注
+func SessionRemarkUpdateHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	var req requests.ReqUpdateSessionRemark
+	if err := c.ShouldBind(&req); err != nil {
+		log.Logger.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		return
+	}
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	_, err = imClient.SessionRemarkUpdateDao(context.Background(), &im.ReqSessionRemarkUpdateDao{
+		SessionId: req.SessionId,
+		AccountId: userMeta.AccountId,
+		Remark:    req.Remark,
+	})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
+}
+
 // 从会话中移除
 func SessionRemoveHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	var req requests.ReqRemoveFromSession
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
@@ -544,6 +555,56 @@ func SessionDeleteHandle(c *gin.Context) {
 		return
 	}
 	handle.SuccessResp(c, "", nil)
+}
+
+// 发送会话消息
+func SessionMessageSendHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	var req requests.ReqSendMessage
+	if err := c.ShouldBind(&req); err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		return
+	}
+	// 将会话消息发给imDao服务存入数据库中
+	var imReq = &im.ReqSessionMessageAddDao{
+		MessageType:   req.MessageType,
+		Send:          userMeta.AccountId,
+		SessionId:     req.SessionId,
+		Content:       req.Content,
+		SendTimestamp: time.Now().Unix(),
+	}
+	imClient, err := grpc.GetImClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodeInternalError)
+		return
+	}
+	var messageAddResp *im.RspSessionMessageAddDao
+	messageAddResp, err = imClient.SessionMessageAddDao(context.Background(), imReq)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var sessionDetailResp *im.RspSessionDetailQueryDao
+	sessionDetailResp, err = imClient.SessionDetailQueryDao(context.Background(),
+		&im.ReqSessionDetailQueryDao{SessionId: req.SessionId})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var rspMsg = rsp.Message{
+		SessionId:     messageAddResp.SessionId,
+		MessageId:     messageAddResp.MessageId,
+		MessageType:   req.MessageType,
+		Send:          userMeta.GetUser(),
+		Content:       req.Content,
+		SendTimestamp: imReq.SendTimestamp,
+	}
+	for _, u := range sessionDetailResp.Joins {
+		rspMsg.Receive = u.AccountId
+		sendMessageNotify(rspMsg, userMeta.GetUser(), u.AccountId)
+	}
 }
 
 // 会话消息查询

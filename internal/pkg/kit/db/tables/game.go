@@ -23,6 +23,7 @@ func (table *GameRecord) TableName() string {
 
 // 用户对局记录关系表
 type GameRecordUserRelation struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT"`
 	// 游戏对局记录id
 	GameRecordId int64 `gorm:"column:game_record_id;unique_index:record_type_account"`
 	// 游戏类型

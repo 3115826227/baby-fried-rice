@@ -7,3 +7,6 @@ path.logs: /usr/share/elasticsearch/logs
 http.cors.enabled: true
 http.cors.allow-origin: "*"
 xpack.security.audit.enabled: true
+xpack.security.enabled: true
+xpack.license.self_generated.type: basic
+xpack.security.transport.ssl.enabled: true

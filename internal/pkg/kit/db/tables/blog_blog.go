@@ -5,8 +5,9 @@ import (
 )
 
 type Blogger struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT"`
 	// 博主id
-	Blogger string `gorm:"column:blogger;pk"`
+	Blogger string `gorm:"column:blogger;unique"`
 	// 喜欢总数
 	LikeTotal int64 `gorm:"column:like_total"`
 	// 阅读总数
@@ -50,6 +51,7 @@ func (table *Blog) TableName() string {
 
 // 用户浏览记录表
 type BlogVisitedRelation struct {
+	ID     int64  `gorm:"column:id;AUTO_INCREMENT"`
 	BlogId string `gorm:"column:blog_id;unique_index:blog_account_visit"`
 	// 浏览用户
 	AccountId string `gorm:"column:account_id;unique_index:blog_account_visit"`
@@ -62,6 +64,7 @@ func (table *BlogVisitedRelation) TableName() string {
 }
 
 type BlogUserLikeRelation struct {
+	ID        int64  `gorm:"column:id;AUTO_INCREMENT"`
 	BlogId    string `gorm:"column:blog_id;unique_index:blog_like_account"`
 	AccountId string `gorm:"column:account_id;unique_index:blog_like_account"`
 }
@@ -71,6 +74,7 @@ func (table *BlogUserLikeRelation) TableName() string {
 }
 
 type BlogCategory struct {
+	ID       int64  `gorm:"column:id;AUTO_INCREMENT"`
 	Blogger  string `gorm:"column:blogger;unique_index:blogger_category"`
 	Category string `gorm:"column:category;unique_index:blogger_category"`
 }
@@ -80,6 +84,7 @@ func (table *BlogCategory) TableName() string {
 }
 
 type BlogTag struct {
+	ID      int64  `gorm:"column:id;AUTO_INCREMENT"`
 	Blogger string `gorm:"column:blogger;unique_index:blogger_tag"`
 	Tag     string `gorm:"column:tag;unique_index:blogger_tag"`
 }
@@ -89,6 +94,7 @@ func (table *BlogTag) TableName() string {
 }
 
 type BloggerFansRelation struct {
+	ID        int64  `gorm:"column:id;AUTO_INCREMENT"`
 	Blogger   string `gorm:"column:blogger;unique_index:blogger_fans"`
 	Fans      string `gorm:"column:fans;unique_index:blogger_fans'"`
 	Timestamp int64  `gorm:"column:timestamp"`

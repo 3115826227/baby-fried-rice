@@ -17,17 +17,24 @@ import (
 )
 
 const (
-	ErrCodeLoginFailed     = 99
-	ErrCodeInvalidParam    = 400
-	ErrCodePermissionError = 401
-	ErrCodeSystemError     = 1000
+	ErrCodeLoginFailed = 99
 )
 
 var ErrCodeM = map[int]string{
-	ErrCodeLoginFailed:     "用户名或密码错误",
-	ErrCodeInvalidParam:    "参数错误",
-	ErrCodeSystemError:     "请求出错",
-	ErrCodePermissionError: "权限错误",
+	ErrCodeLoginFailed:         "用户名或者密码错误",
+	CodeInvalidParams:          CodeInvalidParamsMsg,
+	CodeInternalError:          CodeInternalErrorMsg,
+	CodeRequiredForbidden:      CodeRequiredForbiddenMsg,
+	CodePhoneInvalid:           CodePhoneInvalidMsg,
+	CodePhoneEmpty:             CodePhoneEmptyMsg,
+	CodePhoneVerifyCodeTooBusy: CodePhoneVerifyCodeTooBusyMsg,
+	CodePhoneVerifyCodeError:   CodePhoneVerifyCodeErrorMsg,
+	CodePhoneVerifyCodeInvalid: CodePhoneVerifyCodeInvalidMsg,
+	CodePhoneVerifyCodeExpire:  CodePhoneVerifyCodeExpireMsg,
+	CodePhoneVerifyCodeEmpty:   CodePhoneVerifyCodeEmptyMsg,
+	CodeSelfVideoConflictError: CodeSelfVideoConflictErrorMsg,
+	CodeUserVideoConflictError: CodeUserVideoConflictErrorMsg,
+	CodeUserOfflineError:       CodeUserOfflineErrorMsg,
 }
 
 var LoginErrResponse = gin.H{
@@ -36,18 +43,13 @@ var LoginErrResponse = gin.H{
 }
 
 var ParamErrResponse = gin.H{
-	"code":    ErrCodeInvalidParam,
-	"message": ErrCodeM[ErrCodeInvalidParam],
+	"code":    CodeInvalidParams,
+	"message": ErrCodeM[CodeInvalidParams],
 }
 
 var SysErrResponse = gin.H{
-	"code":    ErrCodeSystemError,
-	"message": ErrCodeM[ErrCodeSystemError],
-}
-
-var PermissionErrResponse = gin.H{
-	"code":    ErrCodePermissionError,
-	"message": ErrCodeM[ErrCodePermissionError],
+	"code":    CodeInternalError,
+	"message": ErrCodeM[CodeInternalError],
 }
 
 var (
@@ -73,6 +75,19 @@ func SuccessListResp(c *gin.Context, message string, list []interface{}, total, 
 	}})
 }
 
+func SystemErrorResponse(c *gin.Context) {
+	c.JSON(http.StatusInternalServerError, SysErrResponse)
+}
+
+func FailedResp(c *gin.Context, code int) {
+	msg, ok := ErrCodeM[code]
+	if !ok {
+		c.JSON(http.StatusOK, SysErrResponse)
+		return
+	}
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: code, Message: msg, Data: make(map[string]interface{})})
+}
+
 func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
 	msg, ok := ErrCodeM[errCode]
 	if ok && message == "" {
@@ -88,6 +103,10 @@ func EncodePassword(id, pwd string) string {
 
 func GenerateID() string {
 	return uuid.NewV4().String()
+}
+
+func GeneratePhoneCode() string {
+	return fmt.Sprintf("%04v", rand.New(randSource).Int31n(10000))
 }
 
 //生成八位数字

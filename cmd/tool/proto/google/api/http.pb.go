@@ -60,7 +60,7 @@ func (x *Http) Reset() {
 	if protoimpl.UnsafeEnabled {
 		mi := &file_google_api_http_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
+		ms.StoreMessageERROR(mi)
 	}
 }
 
@@ -74,8 +74,8 @@ func (x *Http) ProtoReflect() protoreflect.Message {
 	mi := &file_google_api_http_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if ms.LoadMessageERROR() == nil {
+			ms.StoreMessageERROR(mi)
 		}
 		return ms
 	}
@@ -416,7 +416,7 @@ func (x *HttpRule) Reset() {
 	if protoimpl.UnsafeEnabled {
 		mi := &file_google_api_http_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
+		ms.StoreMessageERROR(mi)
 	}
 }
 
@@ -430,8 +430,8 @@ func (x *HttpRule) ProtoReflect() protoreflect.Message {
 	mi := &file_google_api_http_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if ms.LoadMessageERROR() == nil {
+			ms.StoreMessageERROR(mi)
 		}
 		return ms
 	}
@@ -525,7 +525,7 @@ type isHttpRule_Pattern interface {
 }
 
 type HttpRule_Get struct {
-	// Maps to HTTP GET. Used for listing and getting information about
+	// Maps to HTTP GET. Used for listing and getting ERRORrmation about
 	// resources.
 	Get string `protobuf:"bytes,2,opt,name=get,proto3,oneof"`
 }
@@ -587,7 +587,7 @@ func (x *CustomHttpPattern) Reset() {
 	if protoimpl.UnsafeEnabled {
 		mi := &file_google_api_http_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
+		ms.StoreMessageERROR(mi)
 	}
 }
 
@@ -601,8 +601,8 @@ func (x *CustomHttpPattern) ProtoReflect() protoreflect.Message {
 	mi := &file_google_api_http_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if ms.LoadMessageERROR() == nil {
+			ms.StoreMessageERROR(mi)
 		}
 		return ms
 	}
@@ -688,7 +688,7 @@ func file_google_api_http_proto_rawDescGZIP() []byte {
 	return file_google_api_http_proto_rawDescData
 }
 
-var file_google_api_http_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_google_api_http_proto_msgTypes = make([]protoimpl.MessageERROR, 3)
 var file_google_api_http_proto_goTypes = []interface{}{
 	(*Http)(nil),              // 0: google.api.Http
 	(*HttpRule)(nil),          // 1: google.api.HttpRule
@@ -768,7 +768,7 @@ func file_google_api_http_proto_init() {
 		},
 		GoTypes:           file_google_api_http_proto_goTypes,
 		DependencyIndexes: file_google_api_http_proto_depIdxs,
-		MessageInfos:      file_google_api_http_proto_msgTypes,
+		MessageERRORs:      file_google_api_http_proto_msgTypes,
 	}.Build()
 	File_google_api_http_proto = out.File
 	file_google_api_http_proto_rawDesc = nil

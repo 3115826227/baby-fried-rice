@@ -18,6 +18,7 @@ func (table *LiveRoom) TableName() string {
 
 // 直播房间用户关联表
 type LiveRoomUserRelation struct {
+	ID            int64  `gorm:"column:id;pk;autoIncrement"`
 	LiveRoomID    string `gorm:"column:live_room_id;unique_index:live_room_account"`
 	AccountID     string `gorm:"column:account_id;unique_index:live_room_account"`
 	JoinTimestamp int64  `gorm:"column:join_timestamp"`

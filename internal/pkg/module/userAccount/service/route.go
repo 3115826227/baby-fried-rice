@@ -18,6 +18,8 @@ func Register(engine *gin.Engine) {
 	user.GET("/query", handle.UserQueryHandle)
 	user.PATCH("/detail", handle.UserDetailUpdateHandle)
 	user.PATCH("/pwd", handle.UserPwdUpdateHandle)
+	user.GET("/code/gen", handle.UserPhoneCodeGenHandle)
+	user.POST("/phone/verify", handle.UserPhoneVerifyHandle)
 
 	// 私信模块
 	user.POST("/private_message", handle.SendPrivateMessageHandle)

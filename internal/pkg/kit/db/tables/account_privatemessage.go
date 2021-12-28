@@ -6,7 +6,7 @@ import (
 
 type UserPrivateMessage struct {
 	// 消息id
-	MessageId string `gorm:"unique_index:message_send_receive_id"`
+	Id string `gorm:";unique_index:message_send_receive_id"`
 	// 消息发送者
 	SendId string `gorm:"unique_index:message_send_receive_id"`
 	// 消息接收者

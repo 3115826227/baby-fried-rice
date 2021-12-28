@@ -1,5 +1,5 @@
 log:
-  loglevel: "debug"
+  loglevel: "ERROR"
   logpath:
 
 server:
@@ -31,3 +31,5 @@ database:
     username: root
     password: 123456
     dbname: baby-file
+
+filemode: local

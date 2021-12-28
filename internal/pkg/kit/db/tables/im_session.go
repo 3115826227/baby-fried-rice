@@ -7,6 +7,7 @@ import (
 
 // 会话用户关系表
 type SessionUserRelation struct {
+	ID int64 `gorm:"column:id;pk;autoIncrement"`
 	// 会话id
 	SessionID int64 `gorm:"column:session_id;unique_index:session_user_relation" json:"session_id"`
 	// 用户id
@@ -24,7 +25,7 @@ func (table *SessionUserRelation) TableName() string {
 // 会话详情表
 type Session struct {
 	// 会话id
-	ID int64 `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
+	ID int64 `gorm:"column:id;pk;autoIncrement" json:"id"`
 	// 会话名称
 	Name string `gorm:"column:name;not null" json:"name"`
 	// 会话类型
@@ -49,16 +50,15 @@ func (table *Session) TableName() string {
 
 // 消息用户关系表
 type MessageUserRelation struct {
-	// 消息id
-	MessageID int64 `gorm:"column:message_id;primaryKey" json:"message_id"`
+	ID int64 `gorm:"column:id;pk;autoIncrement"`
 	// 会话id
-	SessionID int64 `gorm:"column:session_id;" json:"session_id"`
+	SessionID int64 `gorm:"column:session_id;"`
 	// 接收者id
-	Receive string `gorm:"column:receive;primaryKey" json:"receive"`
+	Receive string `gorm:"column:receive;"`
 	// 接收者消息读取状态
-	Read bool `gorm:"column:read;not null" json:"read"`
+	Read bool `gorm:"column:read;not null"`
 	// 消息发送时间
-	SendTimestamp int64 `gorm:"column:send_timestamp;not null" json:"send_time"`
+	SendTimestamp int64 `gorm:"column:send_timestamp;not null"`
 }
 
 func (table *MessageUserRelation) TableName() string {

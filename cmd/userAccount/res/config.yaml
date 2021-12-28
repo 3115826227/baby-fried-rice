@@ -1,5 +1,5 @@
 log:
-  loglevel: "debug"
+  loglevel: "ERROR"
   logpath:
 
 server:
@@ -31,6 +31,7 @@ rpc:
     accountdaoserver: "account-dao"
     shopdaoserver: "shop-dao"
     imdaoserver: "im-dao"
+    smsdaoserver: "sms-dao"
 
 messagequeue:
   consumetopics:

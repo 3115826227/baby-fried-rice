@@ -51,14 +51,13 @@ func FileUploadHandle(c *gin.Context) {
 	now := time.Now()
 	var localPath = header.Filename
 	var ossMeta tables.OssMeta
-	ossMeta, err = application.GetOssManager().UploadFile(header.Filename, localPath)
+	var downUrl string
+	ossMeta, downUrl, err = application.GetFileManager().UploadFile(header.Filename, localPath)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-
-	downUrl := fmt.Sprintf("http://%v/%v", ossMeta.Domain, header.Filename)
 
 	var f = tables.File{
 		Origin:         userMeta.AccountId,
@@ -133,7 +132,7 @@ func FileDeleteHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	if err := application.GetOssManager().DeleteFile(file.Bucket, file.FileName); err != nil {
+	if err := application.GetFileManager().DeleteFile(file.Bucket, file.FileName); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)

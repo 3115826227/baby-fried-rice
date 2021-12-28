@@ -5,6 +5,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/privatemessage"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/shop"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/sms"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
 	"baby-fried-rice/internal/pkg/module/userAccount/log"
@@ -105,4 +106,13 @@ func GetImClient() (im.DaoImClient, error) {
 		return nil, err
 	}
 	return im.NewDaoImClient(cli.GetRpcClient()), nil
+}
+
+func GetSmsClient() (sms.DaoSmsClient, error) {
+	cli, err := GetClientGRPC(config.GetConfig().Rpc.SubServers.SmsDaoServer)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	return sms.NewDaoSmsClient(cli.GetRpcClient()), nil
 }

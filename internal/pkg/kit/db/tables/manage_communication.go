@@ -21,12 +21,12 @@ func (table *Communication) TableName() string {
 }
 
 type CommunicationDetail struct {
-	CommunicationId int64  `gorm:"column:communication_id;pk"`
-	Content         string `gorm:"column:content;not null"`
-	Images          string
-	ReplyAccountId  string
-	ReplyContent    string `gorm:"column:reply_content"`
-	ReplyTimestamp  int64  `gorm:"column:reply_timestamp"`
+	Id             int64  `gorm:"column:id;pk"`
+	Content        string `gorm:"column:content;not null"`
+	Images         string
+	ReplyAccountId string
+	ReplyContent   string `gorm:"column:reply_content"`
+	ReplyTimestamp int64  `gorm:"column:reply_timestamp"`
 }
 
 func (table *CommunicationDetail) TableName() string {

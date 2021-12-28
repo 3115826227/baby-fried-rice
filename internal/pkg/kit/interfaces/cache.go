@@ -3,6 +3,7 @@ package interfaces
 import "github.com/go-redis/redis"
 
 type Cache interface {
+	GetRedis() *redis.Client
 	// kv操作
 	Add(key string, value string) error
 	Get(key string) (string, error)

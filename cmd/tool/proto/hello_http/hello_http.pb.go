@@ -39,7 +39,7 @@ func (x *HelloHTTPRequest) Reset() {
 	if protoimpl.UnsafeEnabled {
 		mi := &file_hello_http_hello_http_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
+		ms.StoreMessageERROR(mi)
 	}
 }
 
@@ -53,8 +53,8 @@ func (x *HelloHTTPRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_hello_http_hello_http_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if ms.LoadMessageERROR() == nil {
+			ms.StoreMessageERROR(mi)
 		}
 		return ms
 	}
@@ -87,7 +87,7 @@ func (x *HelloHTTPResponse) Reset() {
 	if protoimpl.UnsafeEnabled {
 		mi := &file_hello_http_hello_http_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
+		ms.StoreMessageERROR(mi)
 	}
 }
 
@@ -101,8 +101,8 @@ func (x *HelloHTTPResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_hello_http_hello_http_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
+		if ms.LoadMessageERROR() == nil {
+			ms.StoreMessageERROR(mi)
 		}
 		return ms
 	}
@@ -157,7 +157,7 @@ func file_hello_http_hello_http_proto_rawDescGZIP() []byte {
 	return file_hello_http_hello_http_proto_rawDescData
 }
 
-var file_hello_http_hello_http_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_hello_http_hello_http_proto_msgTypes = make([]protoimpl.MessageERROR, 2)
 var file_hello_http_hello_http_proto_goTypes = []interface{}{
 	(*HelloHTTPRequest)(nil),  // 0: hello_http.HelloHTTPRequest
 	(*HelloHTTPResponse)(nil), // 1: hello_http.HelloHTTPResponse
@@ -215,7 +215,7 @@ func file_hello_http_hello_http_proto_init() {
 		},
 		GoTypes:           file_hello_http_hello_http_proto_goTypes,
 		DependencyIndexes: file_hello_http_hello_http_proto_depIdxs,
-		MessageInfos:      file_hello_http_hello_http_proto_msgTypes,
+		MessageERRORs:      file_hello_http_hello_http_proto_msgTypes,
 	}.Build()
 	File_hello_http_hello_http_proto = out.File
 	file_hello_http_hello_http_proto_rawDesc = nil
@@ -223,7 +223,7 @@ func file_hello_http_hello_http_proto_init() {
 	file_hello_http_hello_http_proto_depIdxs = nil
 }
 
-// Reference imports to suppress errors if they are not otherwise used.
+// Reference imports to suppress ERRORs if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConnInterface
 
@@ -236,7 +236,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HelloHTTPClient interface {
 	// 定义SayHello方法
-	SayHello(ctx context.Context, in *HelloHTTPRequest, opts ...grpc.CallOption) (*HelloHTTPResponse, error)
+	SayHello(ctx context.Context, in *HelloHTTPRequest, opts ...grpc.CallOption) (*HelloHTTPResponse, ERROR)
 }
 
 type helloHTTPClient struct {
@@ -247,7 +247,7 @@ func NewHelloHTTPClient(cc grpc.ClientConnInterface) HelloHTTPClient {
 	return &helloHTTPClient{cc}
 }
 
-func (c *helloHTTPClient) SayHello(ctx context.Context, in *HelloHTTPRequest, opts ...grpc.CallOption) (*HelloHTTPResponse, error) {
+func (c *helloHTTPClient) SayHello(ctx context.Context, in *HelloHTTPRequest, opts ...grpc.CallOption) (*HelloHTTPResponse, ERROR) {
 	out := new(HelloHTTPResponse)
 	err := c.cc.Invoke(ctx, "/hello_http.HelloHTTP/SayHello", in, out, opts...)
 	if err != nil {
@@ -259,22 +259,22 @@ func (c *helloHTTPClient) SayHello(ctx context.Context, in *HelloHTTPRequest, op
 // HelloHTTPServer is the server API for HelloHTTP service.
 type HelloHTTPServer interface {
 	// 定义SayHello方法
-	SayHello(context.Context, *HelloHTTPRequest) (*HelloHTTPResponse, error)
+	SayHello(context.Context, *HelloHTTPRequest) (*HelloHTTPResponse, ERROR)
 }
 
 // UnimplementedHelloHTTPServer can be embedded to have forward compatible implementations.
 type UnimplementedHelloHTTPServer struct {
 }
 
-func (*UnimplementedHelloHTTPServer) SayHello(context.Context, *HelloHTTPRequest) (*HelloHTTPResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+func (*UnimplementedHelloHTTPServer) SayHello(context.Context, *HelloHTTPRequest) (*HelloHTTPResponse, ERROR) {
+	return nil, status.ERRORf(codes.Unimplemented, "method SayHello not implemented")
 }
 
 func RegisterHelloHTTPServer(s *grpc.Server, srv HelloHTTPServer) {
 	s.RegisterService(&_HelloHTTP_serviceDesc, srv)
 }
 
-func _HelloHTTP_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _HelloHTTP_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) ERROR, interceptor grpc.UnaryServerInterceptor) (interface{}, ERROR) {
 	in := new(HelloHTTPRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -282,14 +282,14 @@ func _HelloHTTP_SayHello_Handler(srv interface{}, ctx context.Context, dec func(
 	if interceptor == nil {
 		return srv.(HelloHTTPServer).SayHello(ctx, in)
 	}
-	info := &grpc.UnaryServerInfo{
+	ERROR := &grpc.UnaryServerERROR{
 		Server:     srv,
 		FullMethod: "/hello_http.HelloHTTP/SayHello",
 	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+	handler := func(ctx context.Context, req interface{}) (interface{}, ERROR) {
 		return srv.(HelloHTTPServer).SayHello(ctx, req.(*HelloHTTPRequest))
 	}
-	return interceptor(ctx, in, info, handler)
+	return interceptor(ctx, in, ERROR, handler)
 }
 
 var _HelloHTTP_serviceDesc = grpc.ServiceDesc{

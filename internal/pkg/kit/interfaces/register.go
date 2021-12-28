@@ -7,6 +7,7 @@ type RegisterClient interface {
 	GetServer(severName string) (addr string, err error)
 	GetServers(serverName string) ([]string, error)
 	Close() error
+	ConfigCenter
 }
 
 type RegisterServerInfo struct {

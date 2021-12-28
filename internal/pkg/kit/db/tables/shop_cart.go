@@ -2,6 +2,7 @@ package tables
 
 // 用户购物车表
 type CommodityCartRel struct {
+	ID int64 `gorm:"column:id;pk;autoIncrement"`
 	// 用户id
 	AccountId string `gorm:"column:account_id;unique_index:cart_account_commodity"`
 	// 商品id

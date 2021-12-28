@@ -32,11 +32,16 @@ func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDa
 	}
 	var users = make([]*user.UserDao, 0)
 	for _, detail := range details {
+		var phoneVerify = false
+		if detail.Phone != "" {
+			phoneVerify = true
+		}
 		users = append(users, &user.UserDao{
-			Id:         detail.AccountID,
-			Username:   detail.Username,
-			HeadImgUrl: detail.HeadImgUrl,
-			IsOfficial: detail.IsOfficial,
+			Id:          detail.AccountID,
+			Username:    detail.Username,
+			HeadImgUrl:  detail.HeadImgUrl,
+			IsOfficial:  detail.IsOfficial,
+			PhoneVerify: phoneVerify,
 		})
 	}
 	resp = &user.RspUserDaoById{Users: users}
@@ -70,8 +75,6 @@ func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUs
 
 	detail.AccountID = accountID
 	detail.Username = req.Username
-	detail.Gender = req.Gender
-	detail.Phone = req.Phone
 	detail.CreatedAt = now
 	detail.UpdatedAt = now
 
@@ -121,27 +124,42 @@ func (service *UserService) UserDaoLogin(ctx context.Context, req *user.ReqPassw
 		log.Logger.Error(err.Error())
 		return
 	}
+	if loginUser.Cancel {
+		err = errors.New("user is cancel")
+		log.Logger.Error(err.Error())
+		return
+	}
+	if loginUser.Freeze {
+		err = errors.New("user is freeze")
+		log.Logger.Error(err.Error())
+		return
+	}
 	if loginUser.Password != handle.EncodePassword(loginUser.AccountId, req.Password) {
 		err = errors.New("password is invalid")
 		log.Logger.Error(err.Error())
 		return
 	}
-	var detail = new(tables.AccountUserDetail)
-	detail.ID = loginUser.ID
-	if err = db.GetDB().GetObject(nil, detail); err != nil {
+	var detail tables.AccountUserDetail
+	if err = db.GetDB().GetObject(map[string]interface{}{"account_id": loginUser.AccountId}, &detail); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = cache.SetUserDetail(detail); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	// 写入日志
-	var loginLog = tables.AccountUserLoginLog{
-		AccountId: detail.AccountID,
-		IP:        req.Ip,
-		LoginTime: time.Now(),
-	}
-	if err = db.GetDB().CreateObject(&loginLog); err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
+	go func() {
+		var loginLog = tables.AccountUserLoginLog{
+			AccountId: detail.AccountID,
+			IP:        req.Ip,
+			LoginTime: time.Now(),
+		}
+		if err = db.GetDB().CreateObject(&loginLog); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	}()
 	resp = &user.RspDaoUserLogin{
 		User: &user.RspDaoUser{
 			AccountId: detail.AccountID,
@@ -563,7 +581,7 @@ func (service *UserService) UserCommunicationAddDao(ctx context.Context, req *us
 		return
 	}
 	var detail = tables.CommunicationDetail{
-		CommunicationId: communication.ID,
+		Id: communication.ID,
 		Content:         req.Content,
 		Images:          req.Images,
 	}
@@ -571,7 +589,7 @@ func (service *UserService) UserCommunicationAddDao(ctx context.Context, req *us
 		log.Logger.Error(err.Error())
 		return
 	}
-	resp = &user.RspUserCommunicationAddDao{Id: detail.CommunicationId}
+	resp = &user.RspUserCommunicationAddDao{Id: detail.Id}
 	return
 }
 
@@ -659,5 +677,22 @@ func (service *UserService) IteratorVersionQueryDao(ctx context.Context, empty *
 		})
 	}
 	resp = &user.RspIteratorVersionQueryDao{List: list}
+	return
+}
+
+// 用户举报
+func (service *UserService) UserTipAddDao(ctx context.Context, req *user.ReqUserTipAddDao) (empty *emptypb.Empty, err error) {
+	var now = time.Now()
+	var tip = tables.AccountUserTipLog{
+		ReportAccountId:   req.ReportAccountId,
+		ReportedAccountId: req.ReportedAccountId,
+		Describe:          req.Describe,
+	}
+	tip.CreatedAt, tip.UpdatedAt = now, now
+	if err = db.GetDB().CreateObject(&tip); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
 	return
 }

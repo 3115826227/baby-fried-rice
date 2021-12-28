@@ -125,5 +125,6 @@ func (service *SmsService) SendMessageDao(ctx context.Context, req *sms.ReqSendM
 		log.Logger.Error(err.Error())
 		return
 	}
+	empty = new(emptypb.Empty)
 	return
 }

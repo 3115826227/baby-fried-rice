@@ -26,10 +26,10 @@ func GetUserPrivateMessages(pms requests.UserPrivateMessagesReq) (messages []tab
 }
 
 func GetUserPrivateMessageDetail(accountId, messageId string) (msg tables.UserPrivateMessage, detail tables.UserPrivateMessageContent, err error) {
-	if err = db.GetDB().GetDB().Where("message_id = ? and receive_id = ?", messageId, accountId).First(&msg).Error; err != nil {
+	if err = db.GetDB().GetDB().Where("id = ? and receive_id = ?", messageId, accountId).First(&msg).Error; err != nil {
 		return
 	}
-	if err = db.GetDB().GetDB().Model(&tables.UserPrivateMessage{}).Where("message_id = ? and receive_id = ?", messageId, accountId).Update("message_status", 1).Error; err != nil {
+	if err = db.GetDB().GetDB().Model(&tables.UserPrivateMessage{}).Where("id = ? and receive_id = ?", messageId, accountId).Update("message_status", 1).Error; err != nil {
 		return
 	}
 	if err = db.GetDB().GetDB().Where("id = ?", messageId).First(&detail).Error; err != nil {

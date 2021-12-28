@@ -26,7 +26,6 @@ func AddUserHandle(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Phone = strings.TrimSpace(req.Phone)
 
 	if query.IsDuplicateLoginNameByUser(req.LoginName) {
 		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.LoginName))
@@ -54,7 +53,6 @@ func AddUserHandle(c *gin.Context) {
 
 	detail.AccountID = accountID
 	detail.Username = req.Username
-	detail.Phone = req.Phone
 	detail.CreatedAt = now
 	detail.UpdatedAt = now
 	detail.IsOfficial = req.IsOfficial

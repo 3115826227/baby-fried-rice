@@ -23,7 +23,7 @@ type helloService struct{}
 var HelloService = helloService{}
 
 // SayHello 实现Hello服务接口
-func (h helloService) SayHello(ctx context.Context, req *hello_http.HelloHTTPRequest) (*hello_http.HelloHTTPResponse, error) {
+func (h helloService) SayHello(ctx context.Context, req *hello_http.HelloHTTPRequest) (*hello_http.HelloHTTPResponse, ERROR) {
 	resp := new(hello_http.HelloHTTPResponse)
 	resp.Message = fmt.Sprintf("Hello %s.", req.Name)
 
