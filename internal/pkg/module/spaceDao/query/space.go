@@ -43,7 +43,7 @@ func GetSpace(id string) (space tables.Space, err error) {
 }
 
 func SpaceDetailQuery(ids []string) (details []tables.SpaceDetail, err error) {
-	err = db.GetDB().GetDB().Where("space_id in (?)", ids).Find(&details).Error
+	err = db.GetDB().GetDB().Where("id in (?)", ids).Find(&details).Error
 	return
 }
 
@@ -65,14 +65,14 @@ func SpaceLikedQuery(origin string, ids []string) (likeMap map[string]struct{}, 
 }
 
 func SpaceOptQuery(spaceId string) (relations []tables.OperatorRelation, err error) {
-	if err = db.GetDB().GetDB().Where("space_id = ?", spaceId).Find(&relations).Error; err != nil {
+	if err = db.GetDB().GetDB().Where("id = ?", spaceId).Find(&relations).Error; err != nil {
 		return
 	}
 	return
 }
 
 func SpaceCommentQuery(spaceId string) (relations []tables.CommentRelation, err error) {
-	if err = db.GetDB().GetDB().Where("space_id = ?", spaceId).Find(&relations).Error; err != nil {
+	if err = db.GetDB().GetDB().Where("id = ?", spaceId).Find(&relations).Error; err != nil {
 		return
 	}
 	return

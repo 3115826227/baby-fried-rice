@@ -53,7 +53,7 @@ func ReplyQuery(params CommentQueryParams) (replies []tables.CommentRelation, to
 
 func CommentDetailQuery(ids []string) (detailMap map[string]tables.CommentDetail, err error) {
 	var details []tables.CommentDetail
-	if err = db.GetDB().GetDB().Where("comment_id in (?)", ids).Find(&details).Error; err != nil {
+	if err = db.GetDB().GetDB().Where("id in (?)", ids).Find(&details).Error; err != nil {
 		return
 	}
 	detailMap = make(map[string]tables.CommentDetail)
