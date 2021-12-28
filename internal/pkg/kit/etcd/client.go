@@ -84,7 +84,7 @@ type serverInfo struct {
 }
 
 func (client *ClientETCD) flush() {
-	ticker := time.NewTicker(3 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case <-client.ctx.Done():

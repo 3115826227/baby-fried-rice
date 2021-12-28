@@ -29,6 +29,7 @@ func Register(engine *gin.Engine) {
 	user.Any("/account/user/*any", HandleAccountUserProxy)
 	user.Any("/im/*any", HandleImProxy)
 	user.Any("/space/*any", HandleSpaceProxy)
+	user.Any("/comment/*any", HandleSpaceProxy)
 	user.Any("/connect/*any", HandleConnectProxy)
 	user.Any("/file/*any", HandleFileProxy)
 	user.Any("/shop/*any", HandleShopProxy)

@@ -19,6 +19,7 @@ func NewClientDB(mysqlUrl string, lc log.Logging) (client interfaces.DB, err err
 	if err != nil {
 		return
 	}
+	db = db.Debug()
 	client = &ClientDB{db: db, lc: lc}
 	return
 }

@@ -116,7 +116,11 @@ func GenerateSerialNumber() string {
 
 //生成十二位数字
 func GenerateSerialNumberByLen(len int) string {
-	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(randSource).Int31n(int32(10*len)))
+	var res = 1
+	for i := 0; i < len; i++ {
+		res *= 10
+	}
+	return fmt.Sprintf("1%0"+strconv.Itoa(len)+"v", rand.New(randSource).Int31n(int32(res)))
 }
 
 /*
