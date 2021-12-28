@@ -29,8 +29,8 @@ func NewMinIOManager(lc log.Logging, metaId int) (FileManager, error) {
 		ctx: ctx,
 		lc:  lc,
 	}
-	manager.client, err = minio.New("127.0.0.1:9000", &minio.Options{
-		Creds:  credentials.NewStaticV4("admin", "admin123", ""),
+	manager.client, err = minio.New(ossMeta.Domain, &minio.Options{
+		Creds:  credentials.NewStaticV4(ossMeta.AccessKey, ossMeta.SecretKey, ""),
 		Secure: false,
 	})
 	if err != nil {
