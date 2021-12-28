@@ -11,6 +11,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/connect/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"syscall"
 	"time"
 )
 
@@ -30,7 +31,8 @@ func init() {
 	if err := cache.InitCache(conf.Cache.Redis.MainCache, log.Logger); err != nil {
 		panic(err)
 	}
-	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster); err != nil {
+	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster, log.Logger)
+		err != nil {
 		panic(err)
 	}
 	srv := etcd.NewServerETCD(conf.Register.ETCD.Cluster, log.Logger)
@@ -49,7 +51,22 @@ func init() {
 	go srv.HealthCheck(serverInfo, time.Duration(conf.Register.HealthyRollTime), errChan)
 }
 
+func setULimit() {
+	var rLimit syscall.Rlimit
+	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	if err != nil {
+		panic(err)
+	}
+	rLimit.Max = 10000
+	rLimit.Cur = 10000
+	err = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func Main() {
+	//setULimit()
 	engine := gin.Default()
 	service.Register(engine)
 	if err := engine.Run(fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port)); err != nil {

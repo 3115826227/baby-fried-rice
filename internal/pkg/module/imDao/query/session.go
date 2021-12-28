@@ -50,7 +50,7 @@ func GetSessionUserCount(sessionId int64) (count int64, err error) {
 }
 
 func GetSessionById(id int64) (session tables.Session, err error) {
-	err = db.GetDB().GetDB().Where("id = ?", id).Find(&session).Error
+	err = db.GetDB().GetDB().Where("id = ?", id).First(&session).Error
 	return
 }
 

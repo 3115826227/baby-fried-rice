@@ -45,7 +45,7 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 		return
 	}
 	var detail = tables.SpaceDetail{
-		SpaceID: s.ID,
+		ID:      s.ID,
 		Content: req.Content,
 		Images:  images,
 	}
@@ -108,7 +108,7 @@ func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSp
 	}
 	var detailMap = make(map[string]tables.SpaceDetail)
 	for _, d := range details {
-		detailMap[d.SpaceID] = d
+		detailMap[d.ID] = d
 	}
 	var likeMap = make(map[string]struct{})
 	if likeMap, err = query.SpaceLikedQuery(req.Origin, ids); err != nil {
@@ -229,8 +229,8 @@ func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.Req
 		return
 	}
 	var detail = tables.CommentDetail{
-		CommentID: s.ID,
-		Content:   req.Content,
+		ID:      s.ID,
+		Content: req.Content,
 	}
 	if err = db.GetDB().CreateObject(&detail); err != nil {
 		log.Logger.Error(err.Error())

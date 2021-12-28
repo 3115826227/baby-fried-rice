@@ -3,8 +3,9 @@ package tables
 import "baby-fried-rice/internal/pkg/kit/constant"
 
 type AccountUserSignInLog struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT" json:"id"`
 	// 签到用户
-	AccountId string `gorm:"column:account_id;pk" json:"account_id"`
+	AccountId string `gorm:"column:account_id;" json:"account_id"`
 	// 签到奖励积分
 	Coin constant.RewardCoinBySignedInType `gorm:"column:coin" json:"coin"`
 	// 签到类型

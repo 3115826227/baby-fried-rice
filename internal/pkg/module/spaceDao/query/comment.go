@@ -58,7 +58,7 @@ func CommentDetailQuery(ids []string) (detailMap map[string]tables.CommentDetail
 	}
 	detailMap = make(map[string]tables.CommentDetail)
 	for _, d := range details {
-		detailMap[d.CommentID] = d
+		detailMap[d.ID] = d
 	}
 	return
 }

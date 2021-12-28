@@ -1,0 +1,49 @@
+log:
+  loglevel: "DEBUG"
+  logpath:
+
+server:
+  httpserver:
+    name: "sync"
+    serial: 1
+    addr: "0.0.0.0"
+    port: 12800
+
+elasticsearch:
+  urls:
+    - 127.0.0.1:9200
+  username: user
+  password: secret
+
+database:
+  subdatabase:
+    accountdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-account
+    spacedatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-space
+    shopdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-shop
+    imdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-im
+    smsdatabase:
+      host: 127.0.0.1
+      port: 23306
+      username: root
+      password: 123456
+      dbname: baby-sms

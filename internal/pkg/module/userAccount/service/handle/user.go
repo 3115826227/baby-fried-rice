@@ -6,6 +6,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
+	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/sms"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/userAccount/cache"
 	"baby-fried-rice/internal/pkg/module/userAccount/config"
@@ -71,6 +72,7 @@ func UserLoginHandle(c *gin.Context) {
 			AccountId: resp.User.AccountId,
 			Username:  resp.User.Username,
 			Platform:  "pc",
+			Phone:     resp.User.Phone,
 		}
 		if err = cache.GetCache().Add(fmt.Sprintf("%v:%v", constant.TokenPrefix, token), userMeta.ToString()); err != nil {
 			log.Logger.Error(err.Error())
@@ -93,12 +95,11 @@ func UserRegisterHandle(c *gin.Context) {
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
-	req.Phone = strings.TrimSpace(req.Phone)
 
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var reqRegister = &user.ReqUserRegister{
@@ -108,12 +109,11 @@ func UserRegisterHandle(c *gin.Context) {
 			Ip:        c.GetHeader(handle.HeaderIP),
 		},
 		Username: req.Username,
-		Phone:    req.Phone,
 	}
 	_, err = userClient.UserDaoRegister(context.Background(), reqRegister)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -125,7 +125,7 @@ func UserLogoutHandle(c *gin.Context) {
 	token, err := cache.GetCache().Get(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	go func() {
@@ -146,7 +146,7 @@ func UserDetailHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var resp *user.RspDaoUserDetail
@@ -154,20 +154,25 @@ func UserDetailHandle(c *gin.Context) {
 		&user.ReqDaoUserDetail{AccountId: userMeta.AccountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
+	var phoneVerify = false
+	if resp.Detail.Phone != "" {
+		phoneVerify = true
+	}
 	var detailRsp = rsp.UserDetailResp{
-		AccountId:  resp.Detail.AccountId,
-		Describe:   resp.Detail.Describe,
-		HeadImgUrl: resp.Detail.HeadImgUrl,
-		Username:   resp.Detail.Username,
-		SchoolId:   resp.Detail.SchoolId,
-		Gender:     resp.Detail.Gender,
-		Age:        resp.Detail.Age,
-		Phone:      resp.Detail.Phone,
-		Coin:       resp.Detail.Coin,
-		IsOfficial: resp.Detail.IsOfficial,
+		AccountId:   resp.Detail.AccountId,
+		Describe:    resp.Detail.Describe,
+		HeadImgUrl:  resp.Detail.HeadImgUrl,
+		Username:    resp.Detail.Username,
+		SchoolId:    resp.Detail.SchoolId,
+		Gender:      resp.Detail.Gender,
+		Age:         resp.Detail.Age,
+		Phone:       resp.Detail.Phone,
+		Coin:        resp.Detail.Coin,
+		IsOfficial:  resp.Detail.IsOfficial,
+		PhoneVerify: phoneVerify,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }
@@ -236,6 +241,108 @@ func UserPwdUpdateHandle(c *gin.Context) {
 	handle.SuccessResp(c, "", nil)
 }
 
+// 手机验证码生成
+func UserPhoneCodeGenHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	phone := c.Query("phone")
+	if phone == "" {
+		err := fmt.Errorf(handle.InternalCodePhoneEmptyMsg)
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneEmpty)
+		return
+	}
+	if ok := handle.PhoneInvalid(phone); !ok {
+		err := fmt.Errorf("%v, phone is %v", handle.InternalCodePhoneInvalidMsg, phone)
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneInvalid)
+		return
+	}
+	_, exist, err := cache.GetUserPhoneCode(userMeta.AccountId)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		return
+	}
+	if exist {
+		err = fmt.Errorf("phone code gen too busy")
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneVerifyCodeTooBusy)
+		return
+	}
+	code := handle.GeneratePhoneCode()
+	var smsClient sms.DaoSmsClient
+	if smsClient, err = grpc.GetSmsClient(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	if err = cache.SetUserPhoneCode(userMeta.AccountId, code); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var req = sms.ReqSendMessageDao{
+		AccountId: userMeta.AccountId,
+		Phone:     phone,
+		PhoneCode: code,
+		SignName:  "",
+		Code:      int64(constant.SmsRegisterCode),
+	}
+	if _, err = smsClient.SendMessageDao(context.Background(), &req); err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneVerifyCodeError)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
+}
+
+// 用户手机验证
+func UserPhoneVerifyHandle(c *gin.Context) {
+	userMeta := handle.GetUserMeta(c)
+	var req requests.UserPhoneVerifyReq
+	if err := c.ShouldBind(&req); err != nil {
+		log.Logger.Error(err.Error())
+		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		return
+	}
+	code, exist, err := cache.GetUserPhoneCode(userMeta.AccountId)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	if !exist {
+		err = fmt.Errorf("phone code is expired")
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneVerifyCodeExpire)
+		return
+	}
+	if code != req.Code {
+		err = fmt.Errorf("phone code is invalid")
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, handle.CodePhoneVerifyCodeInvalid)
+		return
+	}
+	var userClient user.DaoUserClient
+	if userClient, err = grpc.GetUserClient(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var updateReq = &user.ReqDaoUserDetailUpdate{
+		Detail: &user.DaoUserDetail{
+			AccountId: userMeta.AccountId,
+			Phone:     req.Phone,
+		},
+	}
+	if _, err = userClient.UserDaoDetailUpdate(context.Background(), updateReq); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	handle.SuccessResp(c, "", nil)
+}
+
 // 查看他人用户信息
 func UserQueryHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
@@ -278,17 +385,19 @@ func UserQueryHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	var detailRsp = rsp.UserDetailResp{
-		AccountId:  resp.Detail.AccountId,
-		Describe:   resp.Detail.Describe,
-		HeadImgUrl: resp.Detail.HeadImgUrl,
-		Username:   resp.Detail.Username,
-		SchoolId:   resp.Detail.SchoolId,
-		Gender:     resp.Detail.Gender,
-		Age:        resp.Detail.Age,
-		IsFriend:   imResp.IsFriend,
-		Remark:     imResp.Remark,
-		IsOfficial: resp.Detail.IsOfficial,
+	var phoneVerify bool
+	if resp.Detail.Phone != "" {
+		phoneVerify = true
+	}
+	var detailRsp = rsp.OtherUserDetailResp{
+		AccountId:   resp.Detail.AccountId,
+		Describe:    resp.Detail.Describe,
+		HeadImgUrl:  resp.Detail.HeadImgUrl,
+		Username:    resp.Detail.Username,
+		PhoneVerify: phoneVerify,
+		IsFriend:    imResp.IsFriend,
+		Remark:      imResp.Remark,
+		IsOfficial:  resp.Detail.IsOfficial,
 	}
 	handle.SuccessResp(c, "", detailRsp)
 }

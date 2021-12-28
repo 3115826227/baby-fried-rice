@@ -7,12 +7,13 @@ import (
 )
 
 type User struct {
-	AccountID  string              `json:"account_id"`
-	Username   string              `json:"username"`
-	HeadImgUrl string              `json:"head_img_url"`
-	Remark     string              `json:"remark"`
-	IsOfficial bool                `json:"is_official"`
-	OnlineType im.OnlineStatusType `json:"online_type,omitempty"`
+	AccountID   string              `json:"account_id"`
+	Username    string              `json:"username"`
+	HeadImgUrl  string              `json:"head_img_url"`
+	Remark      string              `json:"remark"`
+	IsOfficial  bool                `json:"is_official"`
+	OnlineType  im.OnlineStatusType `json:"online_type,omitempty"`
+	PhoneVerify bool                `json:"phone_verify"`
 }
 
 type UserDataResp struct {
@@ -28,18 +29,31 @@ type LoginResult struct {
 
 // 用户信息
 type UserDetailResp struct {
-	AccountId  string `json:"account_id"`
-	Describe   string `json:"describe"`
-	HeadImgUrl string `json:"head_img_url"`
-	Username   string `json:"username"`
-	SchoolId   string `json:"school_id"`
-	Gender     int32  `json:"gender"`
-	Age        int64  `json:"age"`
-	Phone      string `json:"phone,"`
-	Coin       int64  `json:"coin"`
-	IsFriend   bool   `json:"is_friend"`
-	Remark     string `json:"remark"`
-	IsOfficial bool   `json:"is_official"`
+	AccountId   string `json:"account_id"`
+	Describe    string `json:"describe"`
+	HeadImgUrl  string `json:"head_img_url"`
+	Username    string `json:"username"`
+	SchoolId    string `json:"school_id"`
+	Gender      int32  `json:"gender"`
+	Age         int64  `json:"age"`
+	Phone       string `json:"phone"`
+	PhoneVerify bool   `json:"phone_verify"`
+	Coin        int64  `json:"coin"`
+	IsFriend    bool   `json:"is_friend"`
+	Remark      string `json:"remark"`
+	IsOfficial  bool   `json:"is_official"`
+}
+
+// 他人用户信息
+type OtherUserDetailResp struct {
+	AccountId   string `json:"account_id"`
+	Describe    string `json:"describe"`
+	HeadImgUrl  string `json:"head_img_url"`
+	Username    string `json:"username"`
+	PhoneVerify bool   `json:"phone_verify"`
+	IsFriend    bool   `json:"is_friend"`
+	Remark      string `json:"remark"`
+	IsOfficial  bool   `json:"is_official"`
 }
 
 // 后台管理用户信息

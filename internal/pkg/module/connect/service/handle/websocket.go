@@ -34,6 +34,7 @@ var (
 			return true
 		},
 	}
+	connectionLock        = &sync.RWMutex{}
 	ConnectionMap         = make(map[string]*websocket.Conn)
 	mq                    interfaces.MQ
 	writeChan             = make(chan models.WSMessageNotify, 2000)
@@ -85,7 +86,9 @@ func handleWrite() {
 	for {
 		select {
 		case msg := <-writeChan:
+			connectionLock.RLock()
 			conn, exist := ConnectionMap[msg.Receive]
+			connectionLock.RUnlock()
 			if exist {
 				if err := conn.WriteJSON(msg); err != nil {
 					log.Logger.Error(err.Error())
@@ -129,33 +132,44 @@ func WebSocketHandle(c *gin.Context) {
 		}
 		closeChan <- true
 		conn.Close()
+		connectionLock.Lock()
+		delete(ConnectionMap, userMeta.AccountId)
+		connectionLock.Unlock()
 	}()
 	log.Logger.Info(userMeta.AccountId + " connect success")
+	connectionLock.Lock()
 	ConnectionMap[userMeta.AccountId] = conn
+	connectionLock.Unlock()
 	if err = cache.UpdateUserOnlineStatus(userMeta.AccountId, im.OnlineStatusType_PCOnline); err != nil {
 		log.Logger.Error(err.Error())
 	}
 	for {
-		var msg models.WSMessageNotify
-		if err = conn.ReadJSON(&msg); err != nil {
-			log.Logger.Error(err.Error())
-			if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-				return
-			}
-			continue
-		}
-		switch msg.WSMessageNotifyType {
-		case constant.SessionMessageNotify:
-			switch msg.WSMessage.SessionMessage.SessionMessageType {
-			case constant.SessionMessage:
-				handleSession(msg, userMeta)
-			case constant.SessionMessageMessage:
-				handleSessionMessage(msg, userMeta.AccountId)
-			}
-		case constant.LiveMessageNotify:
-			handleLiveMessage(msg)
+		select {
+		case <-closeChan:
+			return
 		default:
-			continue
+			var msg models.WSMessageNotify
+			if err = conn.ReadJSON(&msg); err != nil {
+				log.Logger.Error(err.Error())
+				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+					return
+				}
+				continue
+			}
+			log.Logger.Info(fmt.Sprintf("user %v receive message %v", userMeta.Username, msg.ToString()))
+			switch msg.WSMessageNotifyType {
+			case constant.SessionMessageNotify:
+				switch msg.WSMessage.SessionMessage.SessionMessageType {
+				case constant.SessionMessage:
+					handleSession(msg, userMeta)
+				case constant.SessionMessageMessage:
+					handleSessionMessage(msg, userMeta.AccountId)
+				}
+			case constant.LiveMessageNotify:
+				handleLiveMessage(msg)
+			default:
+				continue
+			}
 		}
 	}
 }

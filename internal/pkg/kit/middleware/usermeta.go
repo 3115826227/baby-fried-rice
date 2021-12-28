@@ -16,6 +16,7 @@ func SetUserMeta() gin.HandlerFunc {
 		platform := header.Get(handle.HeaderPlatform)
 		reqId := header.Get(handle.HeaderReqId)
 		isOfficial, _ := strconv.ParseBool(header.Get(handle.HeaderIsOfficial))
+		phone := header.Get(handle.HeaderPhone)
 
 		if accountId == "" {
 			context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -31,6 +32,7 @@ func SetUserMeta() gin.HandlerFunc {
 			ReqId:      reqId,
 			Platform:   platform,
 			IsOfficial: isOfficial,
+			Phone:      phone,
 		}
 
 		context.Set(handle.GinContextKeyUserMeta, &userMeta)

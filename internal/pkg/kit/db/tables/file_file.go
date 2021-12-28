@@ -48,6 +48,7 @@ func (table *FileGroup) Get() interface{} {
 
 // 文件组关联信息
 type FileGroupUserRelation struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT"`
 	// 文件组id
 	GroupID string `gorm:"column:group_id;unique_index:idx_group_user_id"`
 	// 用户id

@@ -42,5 +42,6 @@ func CheckToken(c *gin.Context) {
 	header.Set(handle.HeaderReqId, userMeta.ReqId)
 	header.Set(handle.HeaderIsOfficial, fmt.Sprintf("%v", userMeta.IsOfficial))
 	header.Set(handle.HeaderPlatform, userMeta.Platform)
+	header.Set(handle.HeaderPhone, userMeta.Phone)
 	c.Next()
 }

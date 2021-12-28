@@ -46,7 +46,7 @@ func init() {
 	errChan = make(chan error, 1)
 	// 开启后台协程向注册中心发送心跳机制
 	go srv.HealthCheck(serverInfo, time.Duration(conf.Register.HealthyRollTime), errChan)
-	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster); err != nil {
+	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster, log.Logger); err != nil {
 		panic(err)
 	}
 }
@@ -55,7 +55,6 @@ func ServerRun() {
 	engine := gin.Default()
 
 	gin.SetMode(gin.ReleaseMode)
-	//engine.Use(middleware.Cors())
 	service.Register(engine)
 
 	engine.Run(fmt.Sprintf("%v:%v", conf.Server.HTTPServer.Addr, conf.Server.HTTPServer.Port))

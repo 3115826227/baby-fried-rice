@@ -31,7 +31,7 @@ func (table *Space) TableName() string {
 
 // 空间动态内容
 type SpaceDetail struct {
-	SpaceID string `gorm:"column:space_id"`
+	ID string `gorm:"column:id;pk"`
 	// 文字内容
 	Content string `gorm:"column:content"`
 	// 图片地址列表，用','分割
@@ -44,6 +44,7 @@ func (table *SpaceDetail) TableName() string {
 
 // 用户浏览记录表
 type VisitedRelation struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT;pk" json:"id"`
 	// 业务id
 	BizID string `gorm:"column:biz_id;unique_index:biz_type_account"`
 	// 业务类型
@@ -60,6 +61,7 @@ func (table *VisitedRelation) TableName() string {
 
 // 操作关系
 type OperatorRelation struct {
+	ID int64 `gorm:"column:id;AUTO_INCREMENT" json:"id"`
 	// 业务id
 	BizID string `gorm:"column:biz_id;unique_index:biz_type_host_origin_operator"`
 	// 业务类型
@@ -104,7 +106,7 @@ func (table *CommentRelation) TableName() string {
 
 // 空间动态评论内容
 type CommentDetail struct {
-	CommentID string `gorm:"column:comment_id;pk"`
+	ID string `gorm:"column:id;pk"`
 	// 评论内容，仅支持文字评论
 	Content string `gorm:"column:content"`
 }

@@ -128,11 +128,27 @@ type SessionWebRTCUserStatus struct {
 	SwapSdp       string               `json:"swap_sdp"`
 	RemoteSdp     string               `json:"remote_sdp"`
 	RemoteSwapSdp string               `json:"remote_swap_sdp"`
+	Video         bool                 `json:"video"`
 }
 
 func (status *SessionWebRTCUserStatus) ToString() string {
 	data, _ := json.Marshal(status)
 	return string(data)
+}
+
+// 音视频通话信息
+type SessionWebRTCInfo struct {
+	// 是否进行通话 true-正在通话 false-未通话
+	Status bool `json:"status"`
+	// 通话用户信息
+	Users []SessionWebRTCUserStatus `json:"users"`
+}
+
+// 音视频通话时长信息
+type SessionWebRTCTimeInfo struct {
+	SessionId int64 `json:"session_id"`
+	Video     bool  `json:"video"`
+	StartTime int64 `json:"start_time"`
 }
 
 type MessageReadUsers struct {
@@ -156,7 +172,7 @@ type FriendResp struct {
 
 type Friend struct {
 	// 用户id
-	AccountId string `json:"account_id"`
+	User User `json:"user"`
 	// 好友备注
 	Remark string `json:"remark"`
 	// 是否在黑名单中
@@ -165,21 +181,6 @@ type Friend struct {
 	Timestamp int64 `json:"timestamp"`
 	// 在线类型
 	OnlineType im.OnlineStatusType `json:"online_type"`
-}
-
-type Friends []Friend
-
-func (friends Friends) Len() int {
-	return len(friends)
-}
-
-func (friends Friends) Swap(i, j int) {
-	friends[i], friends[j] = friends[j], friends[i]
-}
-
-// 根据好友备注的字典序顺序排序
-func (friends Friends) Less(i, j int) bool {
-	return friends[i].Remark < friends[j].Remark
 }
 
 type OperatorResp struct {

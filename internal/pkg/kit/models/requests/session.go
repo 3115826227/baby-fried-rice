@@ -61,6 +61,13 @@ type ReqInviteJoinSession struct {
 	AccountId string `json:"account_id"`
 }
 
+// 修改会话中备注
+type ReqUpdateSessionRemark struct {
+	// 会话id
+	SessionId int64  `json:"session_id"`
+	Remark    string `json:"remark"`
+}
+
 // 从会话中移除请求参数
 type ReqRemoveFromSession struct {
 	// 会话id
@@ -123,15 +130,27 @@ type ReqUserManageUpdate struct {
 	AddFriendPermissionType int32 `json:"add_friend_permission_type"`
 }
 
+// 用户发送消息请求参数
+type ReqSendMessage struct {
+	// 会话id
+	SessionId int64 `json:"session_id"`
+	// 消息类型
+	MessageType im.SessionMessageType `json:"message_type"`
+	// 消息内容
+	Content string `json:"content"`
+}
+
 // 用户webrtc创建请求参数
 type ReqCreateWebRTC struct {
 	// 会话id
 	SessionId int64 `json:"session_id"`
 	// 用户sdp
 	Sdp string `json:"sdp"`
+	// 是否为视频，true-视频 false-音频
+	Video bool `json:"video"`
 }
 
-// 用户webrtc邀请加入参数
+// 用户webrtc邀请回复请求参数
 type ReqReturnWebRTC struct {
 	// 回复
 	Return bool `json:"return"`
@@ -139,4 +158,23 @@ type ReqReturnWebRTC struct {
 	SessionId int64 `json:"session_id"`
 	// 用户sdp
 	Sdp string `json:"sdp"`
+	// 是否为视频
+	Video bool `json:"video"`
+}
+
+// 用户webrtc加入请求参数
+type ReqJoinWebRTC struct {
+	SessionId int64  `json:"session_id"`
+	Sdp       string `json:"sdp"`
+	Video     bool   `json:"video"`
+}
+
+// 用户webrtc sdp交换请求参数
+type ReqSwapWebRTCSdp struct {
+	// webrtc开启用户
+	Origin    string `json:"origin"`
+	SessionId int64  `json:"session_id"`
+	RemoteSdp string `json:"remote_sdp"`
+	// 是否为视频
+	Video bool `json:"video"`
 }

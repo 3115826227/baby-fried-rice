@@ -23,6 +23,7 @@ func Register(engine *gin.Engine) {
 	user := api.Group("")
 	user.Use(kitMiddleware.GenerateUUID)
 	user.Use(middleware.CheckToken)
+	//user.Use(middleware.Auth)
 
 	user.Any("/manage/*any", HandleManageProxy)
 	user.Any("/account/user/*any", HandleAccountUserProxy)

@@ -6,7 +6,7 @@ baby-fried-rice（宝宝煎米果，以下简称baby）是一套由Go语言开�
 
 ## 体验入口
 
-[宝宝煎米果](http://118.25.142.228:8080/)
+[宝宝煎米果](https://babyfriedrice)
 
 ## 业务内容
 

@@ -7,13 +7,6 @@ import (
 	"encoding/json"
 )
 
-type UserBaseInfo struct {
-	AccountId  string `json:"account_id"`
-	HeadImgUrl string `json:"head_img_url"`
-	Username   string `json:"username"`
-	IsOfficial bool   `json:"is_official"`
-}
-
 type WSMessageNotify struct {
 	// 消息通知类型
 	WSMessageNotifyType constant.WSMessageNotifyType `json:"ws_message_notify_type"`

@@ -98,7 +98,7 @@ func (server *ServerETCD) HealthCheck(rs interfaces.RegisterServerInfo, rollTime
 				errChan <- err
 				return
 			}
-			server.lc.Info("server lease keep alive successful")
+			server.lc.Debug("server lease keep alive successful")
 		}
 	}
 }

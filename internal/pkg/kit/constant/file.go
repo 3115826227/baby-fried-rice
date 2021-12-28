@@ -7,3 +7,10 @@ const (
 	ProtectFile                    = 2
 	PrivateFile                    = 3
 )
+
+type FileMode string
+
+const (
+	LocalFileMode       FileMode = "local"
+	QiNiuYunOssFileMode          = "qiniuyun"
+)

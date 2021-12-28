@@ -6,8 +6,9 @@ import (
 )
 
 type UserOnlineStatus struct {
-	AccountId  string
-	OnlineType im.OnlineStatusType
+	AccountId   string              `json:"account_id"`
+	VideoStatus bool                `json:"video_status"`
+	OnlineType  im.OnlineStatusType `json:"online_type"`
 }
 
 func (status *UserOnlineStatus) ToString() string {

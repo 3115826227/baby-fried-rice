@@ -34,7 +34,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-var file_google_api_annotations_proto_extTypes = []protoimpl.ExtensionInfo{
+var file_google_api_annotations_proto_extTypes = []protoimpl.ExtensionERROR{
 	{
 		ExtendedType:  (*descriptor.MethodOptions)(nil),
 		ExtensionType: (*HttpRule)(nil),
@@ -109,7 +109,7 @@ func file_google_api_annotations_proto_init() {
 		},
 		GoTypes:           file_google_api_annotations_proto_goTypes,
 		DependencyIndexes: file_google_api_annotations_proto_depIdxs,
-		ExtensionInfos:    file_google_api_annotations_proto_extTypes,
+		ExtensionERRORs:    file_google_api_annotations_proto_extTypes,
 	}.Build()
 	File_google_api_annotations_proto = out.File
 	file_google_api_annotations_proto_rawDesc = nil

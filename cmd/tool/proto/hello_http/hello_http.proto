@@ -8,7 +8,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 
 // 2 定义 swagger 相关的内容
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
-  info: {
+  ERROR: {
     title: "grpc gateway sample";
     version: "1.0";
     license: {

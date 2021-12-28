@@ -6,13 +6,14 @@ import (
 	"baby-fried-rice/internal/pkg/module/file/config"
 	"baby-fried-rice/internal/pkg/module/file/db"
 	"context"
+	"fmt"
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
 	"math/rand"
 	"time"
 )
 
-type OssManager struct {
+type QiNiuYunOssManager struct {
 	ctx            context.Context
 	lc             log.Logging
 	bucketManagers map[int]*storage.BucketManager
@@ -38,7 +39,7 @@ func newOssBucketManager(metaId int) (*storage.BucketManager, string, error) {
 	return bucketManager, ossMeta.Bucket, nil
 }
 
-func NewOssManager(lc log.Logging) (*OssManager, error) {
+func NewOssManager(lc log.Logging) (FileManager, error) {
 	var bucketManagers = make(map[int]*storage.BucketManager)
 	var buckets = make(map[string]int)
 	for i := 1; i <= config.OssMetaNum; i++ {
@@ -49,7 +50,7 @@ func NewOssManager(lc log.Logging) (*OssManager, error) {
 		buckets[bucket] = i
 		bucketManagers[i] = bm
 	}
-	var manager = &OssManager{
+	var manager = &QiNiuYunOssManager{
 		ctx:            context.Background(),
 		lc:             lc,
 		buckets:        buckets,
@@ -59,20 +60,7 @@ func NewOssManager(lc log.Logging) (*OssManager, error) {
 	return manager, nil
 }
 
-var (
-	ossManager *OssManager
-)
-
-func InitOssManager() (err error) {
-	ossManager, err = NewOssManager(log.Logger)
-	return
-}
-
-func GetOssManager() *OssManager {
-	return ossManager
-}
-
-func (m *OssManager) UploadFile(key, localFilePath string) (ossMeta tables.OssMeta, err error) {
+func (m *QiNiuYunOssManager) UploadFile(key, localFilePath string) (ossMeta tables.OssMeta, downUrl string, err error) {
 	var metaId = m.r.Intn(config.OssMetaNum) + 1
 	err = db.GetDB().GetObject(map[string]interface{}{"id": metaId}, &ossMeta)
 	if err != nil {
@@ -94,23 +82,19 @@ func (m *OssManager) UploadFile(key, localFilePath string) (ossMeta tables.OssMe
 		m.lc.Error(err.Error())
 		return
 	}
+	downUrl = fmt.Sprintf("http://%v/%v", ossMeta.Domain, key)
 	return
 }
 
-func (m *OssManager) getMetaIdByBucket(bucket string) int {
+func (m *QiNiuYunOssManager) getMetaIdByBucket(bucket string) int {
 	return m.buckets[bucket]
 }
 
-func (m *OssManager) getManagerByBucket(bucket string) *storage.BucketManager {
+func (m *QiNiuYunOssManager) getManagerByBucket(bucket string) *storage.BucketManager {
 	return m.bucketManagers[m.getMetaIdByBucket(bucket)]
 }
 
-func (m *OssManager) GetFile(bucket, key string) (storage.FileInfo, error) {
-	bm := m.getManagerByBucket(bucket)
-	return bm.Stat(bucket, key)
-}
-
-func (m *OssManager) DeleteFile(bucket, key string) error {
+func (m *QiNiuYunOssManager) DeleteFile(bucket, key string) error {
 	bm := m.getManagerByBucket(bucket)
 	return bm.Delete(bucket, key)
 }

@@ -95,7 +95,7 @@ func (service *PrivateMessageService) PrivateMessageDetailDao(ctx context.Contex
 
 func privateMessageModelConvertPb(msg tables.UserPrivateMessage) *privatemessage.PrivateMessageQueryDao {
 	return &privatemessage.PrivateMessageQueryDao{
-		Id:              msg.MessageId,
+		Id:              msg.Id,
 		SendId:          msg.SendId,
 		ReceiveId:       msg.ReceiveId,
 		MessageType:     msg.MessageType,

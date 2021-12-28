@@ -1,7 +1,6 @@
 package handle
 
 import (
-	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -19,6 +18,7 @@ const (
 	HeaderPlatform   = "platform"
 	HeaderReqId      = "reqId"
 	HeaderIsOfficial = "isOfficial"
+	HeaderPhone      = "phone"
 
 	GinContextKeyUserMeta = "userMeta"
 
@@ -44,6 +44,8 @@ type UserMeta struct {
 	Platform string `json:"platform"`
 	//是否为超级管理员
 	IsOfficial bool `json:"isOfficial"`
+	//手机号 如果为空表示未认证用户
+	Phone string `json:"phone"`
 }
 
 func (meta *UserMeta) ToString() string {
@@ -55,18 +57,15 @@ func GetUserMeta(c *gin.Context) *UserMeta {
 	return c.MustGet(GinContextKeyUserMeta).(*UserMeta)
 }
 
-func (meta *UserMeta) GetUserBaseInfo() models.UserBaseInfo {
-	return models.UserBaseInfo{
-		AccountId:  meta.AccountId,
-		Username:   meta.Username,
-		IsOfficial: meta.IsOfficial,
-	}
-}
-
 func (meta *UserMeta) GetUser() rsp.User {
+	var phoneVerify = false
+	if meta.Phone != "" {
+		phoneVerify = true
+	}
 	return rsp.User{
-		AccountID:  meta.AccountId,
-		Username:   meta.Username,
-		IsOfficial: meta.IsOfficial,
+		AccountID:   meta.AccountId,
+		Username:    meta.Username,
+		IsOfficial:  meta.IsOfficial,
+		PhoneVerify: phoneVerify,
 	}
 }

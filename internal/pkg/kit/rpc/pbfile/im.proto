@@ -383,6 +383,16 @@ enum  SessionMessageType
   VideoRejectMessage = 101;
   // 视频通话对方无响应消息
   VideoNoReplyMessage = 102;
+  // 视频通话已取消消息
+  VideoCancelMessage = 103;
+  // 语音通话记录消息
+  AudioLogMessage = 110;
+  // 语音通话拒绝消息
+  AudioRejectMessage = 111;
+  // 语音通话对方无响应消息
+  AudioNoReplyMessage = 112;
+  // 语音通话已取消消息
+  AudioCancelMessage = 113;
 }
 
 // 会话消息

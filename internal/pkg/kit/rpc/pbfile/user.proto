@@ -56,6 +56,9 @@ service DaoUser {
 
   // 查询系统迭代版本列表
   rpc IteratorVersionQueryDao (google.protobuf.Empty) returns (RspIteratorVersionQueryDao);
+
+  // 举报用户
+  rpc UserTipAddDao (ReqUserTipAddDao) returns (google.protobuf.Empty);
 }
 
 message ReqUserDaoById {
@@ -71,13 +74,12 @@ message UserDao {
   string username = 2;
   string headImgUrl = 3;
   bool isOfficial = 4;
+  bool phoneVerify = 5;
 }
 
 message ReqUserRegister  {
   ReqPasswordLogin login = 1;
   string username = 2;
-  int32 gender = 3;
-  string phone = 4;
 }
 
 message ReqPasswordLogin {
@@ -332,4 +334,14 @@ message IteratorVersionDao {
 // 系统版本迭代查询返回
 message RspIteratorVersionQueryDao {
   repeated IteratorVersionDao list = 1;
+}
+
+// 举报用户
+message ReqUserTipAddDao {
+  // 举报用户
+  string reportAccountId = 1;
+  // 被举报用户
+  string reportedAccountId = 2;
+  // 描述
+  string describe = 3;
 }

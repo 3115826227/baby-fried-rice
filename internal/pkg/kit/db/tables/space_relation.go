@@ -37,6 +37,7 @@ func (table *Operator) TableName() string {
 }
 
 type Friend struct {
+	ID int64 `gorm:"column:id;pk;autoIncrement"`
 	// 用户id
 	Origin string `gorm:"column:origin" json:"origin"`
 	// 好友id
@@ -56,8 +57,9 @@ func (table *Friend) TableName() string {
 }
 
 type UserManage struct {
+	ID int64 `gorm:"column:id;pk;autoIncrement"`
 	// 用户id
-	AccountId string `gorm:"column:account_id;primaryKey" json:"account_id"`
+	AccountId string `gorm:"column:account_id;unique" json:"account_id"`
 	// 好友加入权限
 	AddFriendPermissionType im.AddFriendPermissionType `gorm:"column:add_permission_type" json:"add_friend_permission_type"`
 	// 更新时间

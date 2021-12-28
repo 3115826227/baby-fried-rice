@@ -24,7 +24,7 @@ func NewClientDB(mysqlUrl string, lc log.Logging) (client interfaces.DB, err err
 }
 
 func (client *ClientDB) GetDB() *gorm.DB {
-	return client.db.Debug()
+	return client.db
 }
 
 func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
@@ -32,22 +32,22 @@ func (client *ClientDB) InitTables(dos ...interfaces.DataObject) (err error) {
 	for _, do := range dos {
 		tables = append(tables, do)
 	}
-	return client.db.Debug().AutoMigrate(tables...)
+	return client.db.AutoMigrate(tables...)
 }
 
 // 添加
 func (client *ClientDB) CreateObject(object interfaces.DataObject) (err error) {
-	return client.db.Debug().Create(object).Error
+	return client.db.Create(object).Error
 }
 
 // 删除
 func (client *ClientDB) DeleteObject(object interfaces.DataObject) (err error) {
-	return client.db.Debug().Delete(object).Error
+	return client.db.Delete(object).Error
 }
 
 // 获取结果
 func (client *ClientDB) GetObject(query map[string]interface{}, object interfaces.DataObject) (err error) {
-	template := client.db.Debug().Table(object.TableName())
+	template := client.db.Table(object.TableName())
 	for key, value := range query {
 		template = template.Where(fmt.Sprintf("%v = ?", key), value)
 	}
@@ -56,13 +56,13 @@ func (client *ClientDB) GetObject(query map[string]interface{}, object interface
 
 // 更新数据
 func (client *ClientDB) UpdateObject(object interfaces.DataObject) (err error) {
-	return client.db.Debug().Table(object.TableName()).Save(object).Error
+	return client.db.Table(object.TableName()).Save(object).Error
 }
 
 // 判断是否存在
 func (client *ClientDB) ExistObject(query map[string]interface{}, do interfaces.DataObject) (exist bool, err error) {
 	var count int64
-	template := client.db.Debug().Table(do.TableName())
+	template := client.db.Table(do.TableName())
 	for key, value := range query {
 		template = template.Where(fmt.Sprintf("%v = ?", key), value)
 	}
@@ -79,7 +79,7 @@ func (client *ClientDB) ExistObject(query map[string]interface{}, do interfaces.
 
 func (client *ClientDB) CreateMulti(bean ...interface{}) error {
 	var err error
-	tx := client.db.Debug().Begin()
+	tx := client.db.Begin()
 	defer func() {
 		if err != nil {
 			client.lc.Error("insert beans failed")

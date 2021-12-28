@@ -10,6 +10,7 @@ import (
 	"baby-fried-rice/internal/pkg/module/gateway/service"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"syscall"
 )
 
 var (
@@ -27,12 +28,27 @@ func init() {
 	if err := cache.InitCache(conf.Cache.Redis.MainCache, log.Logger); err != nil {
 		panic(err)
 	}
-	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster); err != nil {
+	if err := server.InitRegisterClient(conf.Register.ETCD.Cluster, log.Logger); err != nil {
+		panic(err)
+	}
+}
+
+func setULimit() {
+	var rLimit syscall.Rlimit
+	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	if err != nil {
+		panic(err)
+	}
+	rLimit.Max = 10000
+	rLimit.Cur = 10000
+	err = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	if err != nil {
 		panic(err)
 	}
 }
 
 func Main() {
+	//setULimit()
 	engine := gin.Default()
 
 	engine.Use(middleware.Cors())

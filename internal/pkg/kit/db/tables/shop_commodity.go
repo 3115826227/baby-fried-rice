@@ -31,7 +31,7 @@ func (table *Commodity) TableName() string {
 
 // 商品图片关系表
 type CommodityImageRel struct {
-	CommodityID     string `gorm:"commodity_id"`
+	ID              string `gorm:"id;pk"`
 	Image           string `gorm:"image"`
 	CreateTimestamp int64  `gorm:"create_timestamp"`
 }

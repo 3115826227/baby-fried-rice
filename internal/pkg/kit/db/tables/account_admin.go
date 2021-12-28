@@ -20,8 +20,10 @@ func (table *AccountAdmin) TableName() string {
 	return "account_admin"
 }
 
-func (table *AccountAdmin) Get() interface{} {
-	return *table
+func (table *AccountAdmin) Parse(rows []interface{}) {
+	table.CommonField.ID = rows[0].(string)
+	table.LoginName = rows[3].(string)
+	table.Username = rows[4].(string)
 }
 
 type AccountAdminLoginLog struct {

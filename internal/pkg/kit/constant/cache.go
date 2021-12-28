@@ -20,4 +20,6 @@ const (
 	AccountUserSessionWebRTCTimeKey = "account:user:session:webrtc:time"
 
 	AccountDialogSessionUserIDPrefix = "account:dialog:session:user:id"
+
+	AccountPhoneVerifyCodePrefix = "account:phone:verify:code"
 )

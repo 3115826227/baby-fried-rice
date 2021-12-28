@@ -11,7 +11,6 @@ type PasswordLoginReq struct {
 type UserRegisterReq struct {
 	PasswordLoginReq
 	Username string `json:"username" binding:"required"` //昵称
-	Phone    string `json:"phone" binding:"required"`    //手机号
 }
 
 // 管理平台添加用户
@@ -33,6 +32,11 @@ type UserDetailUpdateReq struct {
 type UserPwdUpdateReq struct {
 	Password    string `json:"password"`
 	NewPassword string `json:"new_password"`
+}
+
+type UserPhoneVerifyReq struct {
+	Phone string `json:"phone" binding:"required"`
+	Code  string `json:"code" binding:"required,len=4"`
 }
 
 type UserCoinGiveawayReq struct {

@@ -14,7 +14,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"sort"
 	"strconv"
 	"time"
 )
@@ -509,10 +508,37 @@ func FriendQueryHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
+	var friendIds = make([]string, 0)
+	for _, f := range resp.List {
+		friendIds = append(friendIds, f.AccountId)
+	}
+	var userClient user.DaoUserClient
+	if userClient, err = grpc.GetUserClient(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var userResp *user.RspUserDaoById
+	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: friendIds})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var userMap = make(map[string]rsp.User)
+	for _, u := range userResp.Users {
+		userMap[u.Id] = rsp.User{
+			AccountID:   u.Id,
+			Username:    u.Username,
+			HeadImgUrl:  u.HeadImgUrl,
+			IsOfficial:  u.IsOfficial,
+			PhoneVerify: u.PhoneVerify,
+		}
+	}
 	var list = make([]rsp.Friend, 0)
 	for _, f := range resp.List {
 		var friend = rsp.Friend{
-			AccountId:  f.AccountId,
+			User:       userMap[f.AccountId],
 			Remark:     f.Remark,
 			BlackList:  f.BlackList,
 			Timestamp:  f.Timestamp,
@@ -520,7 +546,6 @@ func FriendQueryHandle(c *gin.Context) {
 		}
 		list = append(list, friend)
 	}
-	sort.Sort(rsp.Friends(list))
 	var res = rsp.FriendResp{Friends: list}
 	handle.SuccessResp(c, "", res)
 }

@@ -9,6 +9,27 @@ import (
 	"time"
 )
 
+// 发送消息通知
+func sendMessageNotify(msg rsp.Message, send rsp.User, accountId string) {
+	var notify = models.WSMessageNotify{
+		WSMessageNotifyType: constant.SessionMessageNotify,
+		Receive:             accountId,
+		WSMessage: models.WSMessage{
+			WSMessageType: im.SessionNotifyType_DefaultNotify,
+			Send:          send,
+			SessionMessage: &models.SessionMessage{
+				SessionMessageType: constant.SessionMessageMessage,
+				Message:            msg,
+			},
+		},
+		Timestamp: msg.SendTimestamp,
+	}
+	if err := mq.Send(topic, notify.ToString()); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+}
+
 // 邀请加入会话通知
 func sendInviteNotify(session rsp.Session, send rsp.User, accountId string) {
 	var notify = models.WSMessageNotify{
@@ -65,6 +86,14 @@ func sendWithDrawnMessageNotify(message rsp.Message, accountId string) {
 		},
 		Timestamp: time.Now().Unix(),
 	}
+	if err := mq.Send(topic, notify.ToString()); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+}
+
+func sendWebRTCNotify(notify models.WSMessageNotify) {
+	// 给邀请者发送通知
 	if err := mq.Send(topic, notify.ToString()); err != nil {
 		log.Logger.Error(err.Error())
 		return
