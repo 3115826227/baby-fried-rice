@@ -18,6 +18,7 @@ func CommodityModelToRsp(commodity tables.Commodity) Commodity {
 		MainImg:    commodity.MainImg,
 		CreateTime: commodity.CreatedAt.Unix(),
 		UpdateTime: commodity.UpdatedAt.Unix(),
+		Status:     commodity.Status,
 	}
 }
 
@@ -35,16 +36,17 @@ func CommodityRpcToRsp(commodity *shop.CommodityQueryDao) Commodity {
 }
 
 type Commodity struct {
-	Id         string            `json:"id"`
-	Name       string            `json:"name"`
-	Title      string            `json:"title"`
-	Describe   string            `json:"describe"`
-	SellType   constant.SellType `json:"sell_type"`
-	Price      int64             `json:"price"`
-	Coin       int64             `json:"coin"`
-	MainImg    string            `json:"main_img"`
-	CreateTime int64             `json:"create_time,omitempty"`
-	UpdateTime int64             `json:"update_time,omitempty"`
+	Id         string                   `json:"id"`
+	Name       string                   `json:"name"`
+	Title      string                   `json:"title"`
+	Describe   string                   `json:"describe"`
+	SellType   constant.SellType        `json:"sell_type"`
+	Price      int64                    `json:"price"`
+	Coin       int64                    `json:"coin"`
+	MainImg    string                   `json:"main_img"`
+	CreateTime int64                    `json:"create_time,omitempty"`
+	UpdateTime int64                    `json:"update_time,omitempty"`
+	Status     constant.CommodityStatus `json:"status"`
 }
 
 type CommodityDetailResp struct {
@@ -59,7 +61,7 @@ func CommodityOrderModelToRsp(order tables.CommodityOrder) CommodityOrderBase {
 		PaymentType:     order.PaymentType,
 		TotalPrice:      order.TotalPrice,
 		TotalCoin:       order.TotalCoin,
-		Status:          int64(order.Status),
+		Status:          order.Status,
 		CreateTimestamp: order.CreatedAt.Unix(),
 		UpdateTimestamp: order.UpdatedAt.Unix(),
 	}
@@ -71,14 +73,14 @@ type CommodityOrder struct {
 }
 
 type CommodityOrderBase struct {
-	Id              string `json:"id"`
-	AccountId       string `json:"account_id"`
-	PaymentType     int64  `json:"payment_type"`
-	TotalPrice      int64  `json:"total_price"`
-	TotalCoin       int64  `json:"total_coin"`
-	Status          int64  `json:"status"`
-	CreateTimestamp int64  `json:"create_timestamp"`
-	UpdateTimestamp int64  `json:"update_timestamp"`
+	Id              string               `json:"id"`
+	AccountId       string               `json:"account_id"`
+	PaymentType     int64                `json:"payment_type"`
+	TotalPrice      int64                `json:"total_price"`
+	TotalCoin       int64                `json:"total_coin"`
+	Status          constant.OrderStatus `json:"status"`
+	CreateTimestamp int64                `json:"create_timestamp"`
+	UpdateTimestamp int64                `json:"update_timestamp"`
 }
 
 type CommodityOrderDetailResp struct {

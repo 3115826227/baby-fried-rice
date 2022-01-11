@@ -593,18 +593,21 @@ func SessionMessageSendHandle(c *gin.Context) {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var rspMsg = rsp.Message{
-		SessionId:     messageAddResp.SessionId,
-		MessageId:     messageAddResp.MessageId,
-		MessageType:   req.MessageType,
-		Send:          userMeta.GetUser(),
-		Content:       req.Content,
-		SendTimestamp: imReq.SendTimestamp,
-	}
-	for _, u := range sessionDetailResp.Joins {
-		rspMsg.Receive = u.AccountId
-		sendMessageNotify(rspMsg, userMeta.GetUser(), u.AccountId)
-	}
+	go func() {
+		var rspMsg = rsp.Message{
+			SessionId:     messageAddResp.SessionId,
+			MessageId:     messageAddResp.MessageId,
+			MessageType:   req.MessageType,
+			Send:          userMeta.GetUser(),
+			Content:       req.Content,
+			SendTimestamp: imReq.SendTimestamp,
+		}
+		for _, u := range sessionDetailResp.Joins {
+			rspMsg.Receive = u.AccountId
+			sendMessageNotify(rspMsg, userMeta.GetUser(), u.AccountId)
+		}
+	}()
+	handle.SuccessResp(c, "", nil)
 }
 
 // 会话消息查询

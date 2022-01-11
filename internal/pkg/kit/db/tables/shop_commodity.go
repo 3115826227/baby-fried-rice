@@ -21,8 +21,8 @@ type Commodity struct {
 	Coin int64 `gorm:"column:coin"`
 	// 商品主图片
 	MainImg string `gorm:"column:main_img"`
-	// 商品状态 1-未上架 2-上架
-	Status int64 `gorm:"column:status"`
+	// 商品状态
+	Status constant.CommodityStatus `gorm:"column:status"`
 }
 
 func (table *Commodity) TableName() string {
@@ -31,7 +31,8 @@ func (table *Commodity) TableName() string {
 
 // 商品图片关系表
 type CommodityImageRel struct {
-	ID              string `gorm:"id;pk"`
+	ID              int64  `gorm:"column:id;pk;AUTO_INCREMENT" json:"id"`
+	CommodityId     string `gorm:"column:commodity_id;"`
 	Image           string `gorm:"image"`
 	CreateTimestamp int64  `gorm:"create_timestamp"`
 }

@@ -54,4 +54,8 @@ func Register(engine *gin.Engine) {
 	app.PATCH("/session/friend/black_list", handle.FriendBlackListUpdateHandle)
 	app.PATCH("/session/friend/remark", handle.FriendRemarkUpdateHandle)
 	app.DELETE("/session/friend", handle.FriendDeleteHandle)
+
+	app.POST("/session/img/collect", handle.ImgCollectAddHandle)
+	app.GET("/session/img/collect", handle.ImgCollectQueryHandle)
+	app.DELETE("/session/img/collect", handle.ImgCollectDeleteHandle)
 }

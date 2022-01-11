@@ -140,7 +140,7 @@ func DeleteCommodityHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return
 	}
-	if err = tx.Delete(&relations).Error; err != nil {
+	if err = tx.Delete(&tables.CommodityImageRel{}, "commodity_id = ?", id).Error; err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
 		return

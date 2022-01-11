@@ -11,6 +11,19 @@ const (
 	SellForCoinLottery = 3
 )
 
+type CommodityStatus int64
+
+const (
+	// 未上架
+	NotList CommodityStatus = 0
+	// 上架中
+	Listing = 1
+	// 已下架
+	Removed = 2
+	// 无货
+	SoldOut = 3
+)
+
 type OrderStatus int64
 
 const (

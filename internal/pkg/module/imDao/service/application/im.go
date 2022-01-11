@@ -199,7 +199,7 @@ func (service *IMService) SessionDialogQueryDao(ctx context.Context, req *im.Req
 		err = template.Order("send_timestamp desc").First(&latestRel).Error
 		if err == nil {
 			var message tables.Message
-			if message, err = query.GetMessage(latestRel.ID, latestRel.SessionID); err != nil {
+			if message, err = query.GetMessage(latestRel.MessageID, latestRel.SessionID); err != nil {
 				log.Logger.Error(err.Error())
 				return
 			}
@@ -232,7 +232,7 @@ func (service *IMService) SessionDialogQueryDao(ctx context.Context, req *im.Req
 		var msgTableName = (&tables.Message{}).TableName()
 		var relTableName = (&tables.MessageUserRelation{}).TableName()
 		var s = fmt.Sprintf(`select count(*) from %v as msg left join
-%v as rel on msg.id = rel.message_id where msg.send != '%v' and rel.session_id = %v and rel.receive = '%v' and rel.read = 0
+%v as rel on msg.id = rel.id where msg.send != '%v' and rel.session_id = %v and rel.receive = '%v' and rel.read = 0
 `, msgTableName, relTableName, req.AccountId, session.ID, req.AccountId)
 		if err = db.GetDB().GetDB().Raw(s).Scan(&sessionDao.Unread).Error; err != nil {
 			log.Logger.Error(err.Error())
@@ -613,7 +613,7 @@ func (service *IMService) SessionMessageAddDao(ctx context.Context, req *im.ReqS
 	var beans = make([]interface{}, 0)
 	for _, rel := range relations {
 		var msgRel = tables.MessageUserRelation{
-			ID:            message.ID,
+			MessageID:     message.ID,
 			SessionID:     message.SessionID,
 			Receive:       rel.UserID,
 			SendTimestamp: message.SendTimestamp,
@@ -652,8 +652,8 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	var messageIds []int64
 	var readMap = make(map[int64]bool)
 	for _, rel := range relations {
-		messageIds = append(messageIds, rel.ID)
-		readMap[rel.ID] = rel.Read
+		messageIds = append(messageIds, rel.MessageID)
+		readMap[rel.MessageID] = rel.Read
 	}
 	var messages []tables.Message
 	if messages, err = query.GetMessages(messageIds, req.SessionId); err != nil {
@@ -668,7 +668,7 @@ func (service *IMService) SessionMessageQueryDao(ctx context.Context, req *im.Re
 	var sendMap = make(map[string]tables.SessionUserRelation)
 	var readMessageIds = make([]int64, 0)
 	for _, rel := range relations {
-		var message = messageMap[rel.ID]
+		var message = messageMap[rel.MessageID]
 		sendMap[message.Send] = tables.SessionUserRelation{
 			SessionID: message.SessionID,
 			UserID:    message.Send,
@@ -784,7 +784,7 @@ func (service *IMService) SessionMessageReadStatusUpdateDao(ctx context.Context,
 	for _, msg := range messages {
 		ids = append(ids, msg.ID)
 	}
-	if err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("message_id in (?) and session_id = ? and receive = ?",
+	if err = db.GetDB().GetDB().Model(&tables.MessageUserRelation{}).Where("id in (?) and session_id = ? and receive = ?",
 		ids, req.SessionId, req.AccountId).Update("read", true).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -796,7 +796,7 @@ func (service *IMService) SessionMessageReadStatusUpdateDao(ctx context.Context,
 // 会话消息删除
 func (service *IMService) SessionMessageDeleteDao(ctx context.Context, req *im.ReqSessionMessageDeleteDao) (empty *emptypb.Empty, err error) {
 	if err = db.GetDB().GetDB().Model(tables.MessageUserRelation{}).
-		Where("session_id = ? and receive = ? and message_id in (?)",
+		Where("session_id = ? and receive = ? and id in (?)",
 			req.SessionId, req.AccountId, req.MessageIds).
 		Delete(&tables.MessageUserRelation{}).Error; err != nil {
 		log.Logger.Error(err.Error())
@@ -1107,7 +1107,10 @@ func (service *IMService) FriendQueryDao(ctx context.Context, req *im.ReqFriendQ
 	if req.RemarkLike != "" {
 		template = template.Where("remark like ?%", req.RemarkLike)
 	}
-	if err = template.Where("origin = ? and black_list = ?", req.Origin, req.BlackList).Find(&friends).Order("remark").Error; err != nil {
+	if req.BlackList {
+		template = template.Where("black_list = ?", req.BlackList)
+	}
+	if err = template.Where("origin = ?", req.Origin).Find(&friends).Order("remark").Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -1163,14 +1166,19 @@ func (service *IMService) FriendBlackListDao(ctx context.Context, req *im.ReqFri
 
 // 好友备注修改
 func (service *IMService) FriendRemarkDao(ctx context.Context, req *im.ReqFriendRemarkDao) (empty *emptypb.Empty, err error) {
-	var friend = tables.Friend{
-		Origin:    req.Origin,
-		Friend:    req.Friend,
+	var newFriend = tables.Friend{
 		Remark:    req.Remark,
 		Timestamp: time.Now().Unix(),
 	}
-	if err = db.GetDB().GetDB().Where("origin = ? and friend = ?",
-		req.Origin, req.Friend).Save(&friend).Error; err != nil {
+	var friend tables.Friend
+	if err = db.GetDB().GetDB().Where("origin = ? and friend = ?", req.Origin, req.Friend).First(&friend).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return nil, err
+	}
+	newFriend = friend
+	newFriend.Remark = req.Remark
+	newFriend.Timestamp = time.Now().Unix()
+	if err = db.GetDB().GetDB().Where("id = ?", newFriend.ID).Save(&newFriend).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
@@ -1227,5 +1235,60 @@ func (service *IMService) UserManageQueryDao(ctx context.Context, req *im.ReqUse
 		AddFriendPermissionType: um.AddFriendPermissionType,
 		UpdateTimestamp:         um.UpdateTimestamp,
 	}
+	return
+}
+
+// 添加收藏夹图片
+func (service *IMService) UserImgCollectAddDao(ctx context.Context, req *im.ReqUserImgCollectAddDao) (empty *emptypb.Empty, err error) {
+	var relation tables.MessageImgCollectRelation
+	relation, err = query.GetImgCollectRelation(req.AccountId, req.Img)
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			log.Logger.Error(err.Error())
+			return
+		}
+		relation = tables.MessageImgCollectRelation{
+			AccountId: req.AccountId,
+			Img:       req.Img,
+		}
+		if err = db.GetDB().CreateObject(&relation); err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	}
+	empty = new(emptypb.Empty)
+	return
+}
+
+// 查询收藏夹图片列表
+func (service *IMService) UserImgCollectQueryDao(ctx context.Context, req *im.ReqUserImgCollectQueryDao) (resp *im.RspUserImgCollectQueryDao, err error) {
+	var relations []tables.MessageImgCollectRelation
+	var total int64
+	relations, total, err = query.GetImgCollectRelations(req.AccountId, req.Page, req.PageSize)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var list = make([]string, 0)
+	for _, rel := range relations {
+		list = append(list, rel.Img)
+	}
+	resp = &im.RspUserImgCollectQueryDao{
+		List:     list,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+		Total:    total,
+	}
+	return
+}
+
+// 删除收藏夹图片
+func (service *IMService) UserImgCollectDeleteDao(ctx context.Context, req *im.ReqUserImgCollectDeleteDao) (empty *emptypb.Empty, err error) {
+	err = db.GetDB().GetDB().Delete(&tables.MessageImgCollectRelation{}, "account_id = ? and img = ?", req.AccountId, req.Img).Error
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	empty = new(emptypb.Empty)
 	return
 }
