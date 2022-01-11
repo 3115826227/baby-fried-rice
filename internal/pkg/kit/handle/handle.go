@@ -21,12 +21,23 @@ const (
 )
 
 var ErrCodeM = map[int]string{
-	ErrCodeLoginFailed:         "用户名或者密码错误",
-	CodeInvalidParams:          CodeInvalidParamsMsg,
-	CodeInternalError:          CodeInternalErrorMsg,
-	CodeRequiredForbidden:      CodeRequiredForbiddenMsg,
+	ErrCodeLoginFailed:    "用户名或者密码错误",
+	CodeInvalidParams:     CodeInvalidParamsMsg,
+	CodeInternalError:     CodeInternalErrorMsg,
+	CodeRequiredForbidden: CodeRequiredForbiddenMsg,
+
+	CodeLoginNameEmpty:    CodeLoginNameEmptyMsg,
+	CodeLoginNameExist:    CodeLoginNameExistMsg,
+	CodePasswordEmpty:     CodePasswordEmptyMsg,
+	CodeLoginNameNotExist: CodeLoginNameNotExistMsg,
+	CodePasswordInvalid:   CodePasswordInvalidMsg,
+	CodeUsernameEmpty:     CodeUsernameEmptyMsg,
+	CodeUserFreeze:        CodeUserFreezeMsg,
+	CodeUserCancel:        CodeUserCancelMsg,
+
 	CodePhoneInvalid:           CodePhoneInvalidMsg,
 	CodePhoneEmpty:             CodePhoneEmptyMsg,
+	CodePhoneVerifyExist:       CodePhoneVerifyExistMsg,
 	CodePhoneVerifyCodeTooBusy: CodePhoneVerifyCodeTooBusyMsg,
 	CodePhoneVerifyCodeError:   CodePhoneVerifyCodeErrorMsg,
 	CodePhoneVerifyCodeInvalid: CodePhoneVerifyCodeInvalidMsg,

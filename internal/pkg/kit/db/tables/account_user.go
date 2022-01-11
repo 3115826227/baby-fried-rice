@@ -49,13 +49,22 @@ type AccountUserDetail struct {
 	Gender     int32  `gorm:"column:gender"`
 	Age        int64  `gorm:"column:age"`
 	HeadImgUrl string `gorm:"column:head_img_url"`
-	Phone      string `gorm:"column:phone"`
+	Phone      string `gorm:"column:phone;unique_index:user_detail_phone_idx"`
 	// 是否为官方账号
 	IsOfficial bool `gorm:"column:is_official"`
 }
 
 func (table *AccountUserDetail) TableName() string {
 	return "baby_account_user_detail"
+}
+
+type AccountUserPhone struct {
+	CommonIntField
+	Phone string `gorm:"column:phone;unique"`
+}
+
+func (table *AccountUserPhone) TableName() string {
+	return "baby_account_user_phone"
 }
 
 // 用户积分

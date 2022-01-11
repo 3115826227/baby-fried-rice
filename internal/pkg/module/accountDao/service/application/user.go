@@ -6,6 +6,7 @@ import (
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
+	"baby-fried-rice/internal/pkg/kit/utils"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
 	"baby-fried-rice/internal/pkg/module/accountDao/db"
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
@@ -48,11 +49,20 @@ func (service *UserService) UserDaoById(ctx context.Context, req *user.ReqUserDa
 	return
 }
 
-func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUserRegister) (empty *emptypb.Empty, err error) {
-	if query.IsDuplicateLoginNameByUser(req.Login.LoginName) {
-		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.Login.LoginName))
+func (service *UserService) UserDaoLoginNameExist(ctx context.Context, req *user.ReqUserDaoLoginNameExist) (resp *user.RspUserDaoLoginNameExist, err error) {
+	var exist bool
+	exist, err = query.IsDuplicateLoginNameByUser(req.LoginName)
+	if err != nil {
+		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.LoginName))
 		return
 	}
+	resp = &user.RspUserDaoLoginNameExist{
+		Exist: exist,
+	}
+	return
+}
+
+func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUserRegister) (empty *emptypb.Empty, err error) {
 	accountID := handle.GenerateSerialNumber()
 	for {
 		if !query.IsDuplicateAccountID(accountID) {
@@ -124,16 +134,6 @@ func (service *UserService) UserDaoLogin(ctx context.Context, req *user.ReqPassw
 		log.Logger.Error(err.Error())
 		return
 	}
-	if loginUser.Cancel {
-		err = errors.New("user is cancel")
-		log.Logger.Error(err.Error())
-		return
-	}
-	if loginUser.Freeze {
-		err = errors.New("user is freeze")
-		log.Logger.Error(err.Error())
-		return
-	}
 	if loginUser.Password != handle.EncodePassword(loginUser.AccountId, req.Password) {
 		err = errors.New("password is invalid")
 		log.Logger.Error(err.Error())
@@ -150,14 +150,16 @@ func (service *UserService) UserDaoLogin(ctx context.Context, req *user.ReqPassw
 	}
 	// 写入日志
 	go func() {
-		var loginLog = tables.AccountUserLoginLog{
-			AccountId: detail.AccountID,
-			IP:        req.Ip,
-			LoginTime: time.Now(),
-		}
-		if err = db.GetDB().CreateObject(&loginLog); err != nil {
-			log.Logger.Error(err.Error())
-			return
+		if !loginUser.Cancel && !loginUser.Freeze {
+			var loginLog = tables.AccountUserLoginLog{
+				AccountId: detail.AccountID,
+				IP:        req.Ip,
+				LoginTime: time.Now(),
+			}
+			if err = db.GetDB().CreateObject(&loginLog); err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
 		}
 	}()
 	resp = &user.RspDaoUserLogin{
@@ -169,6 +171,8 @@ func (service *UserService) UserDaoLogin(ctx context.Context, req *user.ReqPassw
 			Gender:    detail.Gender,
 			Age:       detail.Age,
 			Phone:     detail.Phone,
+			Freeze:    loginUser.Freeze,
+			Cancel:    loginUser.Cancel,
 		},
 	}
 	return
@@ -193,6 +197,18 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 			AccountID: detail.AccountID,
 		}
 	}
+	var decodePhoneBytes []byte
+	decodePhoneBytes, err = utils.Base64Decode(detail.Phone)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var phoneBytes []byte
+	phoneBytes, err = utils.GcmDecrypt(decodePhoneBytes, utils.EncryptKey(detail.AccountID))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
 	resp = &user.RspDaoUserDetail{
 		Detail: &user.DaoUserDetail{
 			AccountId:  detail.AccountID,
@@ -201,7 +217,7 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 			SchoolId:   detail.SchoolId,
 			Gender:     detail.Gender,
 			Age:        detail.Age,
-			Phone:      detail.Phone,
+			Phone:      string(phoneBytes),
 			Describe:   detail.Describe,
 			Coin:       coin.Coin,
 			IsOfficial: detail.IsOfficial,
@@ -211,6 +227,18 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 }
 
 func (service *UserService) UserDaoDetailUpdate(ctx context.Context, req *user.ReqDaoUserDetailUpdate) (empty *emptypb.Empty, err error) {
+	var encodePhone string
+	if req.Detail.Phone != "" {
+		// 手机号验证
+		var encodePhoneBytes []byte
+		encodePhoneBytes, err = utils.GcmEncrypt([]byte(req.Detail.Phone), utils.EncryptKey(req.Detail.AccountId))
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		encodePhone = utils.Base64Encode(encodePhoneBytes)
+	}
+	var now = time.Now()
 	var detail = tables.AccountUserDetail{
 		AccountID:  req.Detail.AccountId,
 		Username:   req.Detail.Username,
@@ -218,9 +246,10 @@ func (service *UserService) UserDaoDetailUpdate(ctx context.Context, req *user.R
 		Gender:     req.Detail.Gender,
 		Age:        req.Detail.Age,
 		HeadImgUrl: req.Detail.HeadImgUrl,
-		Phone:      req.Detail.Phone,
 		Describe:   req.Detail.Describe,
+		Phone:      encodePhone,
 	}
+	detail.UpdatedAt = now
 	var tx = db.GetDB().GetDB().Begin()
 	defer func() {
 		if err != nil {
@@ -229,6 +258,16 @@ func (service *UserService) UserDaoDetailUpdate(ctx context.Context, req *user.R
 		}
 		tx.Commit()
 	}()
+	if encodePhone != "" {
+		var phone = tables.AccountUserPhone{
+			Phone: req.Detail.Phone,
+		}
+		phone.CreatedAt, phone.UpdatedAt = now, now
+		if err = tx.Create(&phone).Error; err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+	}
 	// 更新数据库的用户修改信息
 	if err = tx.Where("account_id = ?", req.Detail.AccountId).Updates(&detail).Error; err != nil {
 		log.Logger.Error(err.Error())
@@ -268,6 +307,19 @@ func (service *UserService) UserDaoAll(ctx context.Context, empty *emptypb.Empty
 		return
 	}
 	resp = &user.RspUserDaoAll{AccountIds: ids}
+	return
+}
+
+// 查询手机号是否被认证
+func (service *UserService) UserDaoPhoneVerify(ctx context.Context, req *user.ReqUserDaoPhoneVerify) (resp *user.RspUserDaoPhoneVerify, err error) {
+	var exist bool
+	if exist, err = query.GetUserPhone(req.Phone); err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = &user.RspUserDaoPhoneVerify{
+		Verify: exist,
+	}
 	return
 }
 
@@ -581,9 +633,9 @@ func (service *UserService) UserCommunicationAddDao(ctx context.Context, req *us
 		return
 	}
 	var detail = tables.CommunicationDetail{
-		Id: communication.ID,
-		Content:         req.Content,
-		Images:          req.Images,
+		Id:      communication.ID,
+		Content: req.Content,
+		Images:  req.Images,
 	}
 	if err = tx.Create(&detail).Error; err != nil {
 		log.Logger.Error(err.Error())

@@ -35,8 +35,7 @@ type UserPwdUpdateReq struct {
 }
 
 type UserPhoneVerifyReq struct {
-	Phone string `json:"phone" binding:"required"`
-	Code  string `json:"code" binding:"required,len=4"`
+	Code string `json:"code" binding:"required,len=4"`
 }
 
 type UserCoinGiveawayReq struct {

@@ -28,13 +28,13 @@ func IsDuplicateAccountID(accountID string) bool {
 }
 
 // 校验用户登录名是否重复
-func IsDuplicateLoginNameByUser(loginName string) bool {
+func IsDuplicateLoginNameByUser(loginName string) (bool, error) {
 	var count int64 = 0
 	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {
 		log.Logger.Error(err.Error())
-		return true
+		return false, err
 	}
-	return count != 0
+	return count != 0, nil
 }
 
 func GetUserByLogin(loginName string) (root tables.AccountUser, err error) {
@@ -94,10 +94,18 @@ func GetAll() (ids []string, err error) {
 	if err = db.GetDB().GetDB().Select("account_id").Find(&users).Error; err != nil {
 		return
 	}
-	for _, user := range users {
-		ids = append(ids, user.AccountID)
+	for _, u := range users {
+		ids = append(ids, u.AccountID)
 	}
 	return
+}
+
+func GetUserPhone(phone string) (exist bool, err error) {
+	var count int64
+	if err = db.GetDB().GetDB().Model(&tables.AccountUserPhone{}).Where("phone = ?", phone).Count(&count).Error; err != nil {
+		return
+	}
+	return count != 0, nil
 }
 
 func GetUserCoin(accountId string) (coin tables.AccountUserCoin, err error) {

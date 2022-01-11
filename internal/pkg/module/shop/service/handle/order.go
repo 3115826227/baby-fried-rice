@@ -24,7 +24,7 @@ func CommodityOrderBaseRpcToRsp(commodityOrderBase *shop.CommodityOrderBaseDao) 
 		PaymentType:     commodityOrderBase.PaymentType,
 		TotalPrice:      commodityOrderBase.TotalPrice,
 		TotalCoin:       commodityOrderBase.TotalCoin,
-		Status:          commodityOrderBase.Status,
+		Status:          constant.OrderStatus(commodityOrderBase.Status),
 		CreateTimestamp: commodityOrderBase.CreateTimestamp,
 		UpdateTimestamp: commodityOrderBase.UpdateTimestamp,
 	}

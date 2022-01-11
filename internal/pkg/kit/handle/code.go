@@ -16,8 +16,18 @@ const (
 
 	CodeSessionOriginPermission = 20031
 
-	CodePhoneInvalid = 20041
-	CodePhoneEmpty   = 20042
+	CodeLoginNameEmpty    = 30011
+	CodeLoginNameExist    = 30012
+	CodePasswordEmpty     = 30013
+	CodeLoginNameNotExist = 30014
+	CodePasswordInvalid   = 30015
+	CodeUsernameEmpty     = 30016
+	CodeUserFreeze        = 30017
+	CodeUserCancel        = 30018
+
+	CodePhoneInvalid     = 20041
+	CodePhoneEmpty       = 20042
+	CodePhoneVerifyExist = 20043
 
 	CodePhoneVerifyCodeTooBusy = 20011
 	CodePhoneVerifyCodeError   = 20012
@@ -46,15 +56,26 @@ const (
 
 	CodeSessionOriginPermissionMsg = "只有会话创建才有该权限"
 
+	// 用户相关
+	CodeLoginNameEmptyMsg    = "登录账号不能为空"
+	CodeLoginNameExistMsg    = "登录账号已存在"
+	CodePasswordEmptyMsg     = "登录密码不能为空"
+	CodeLoginNameNotExistMsg = "登录账号不存在"
+	CodePasswordInvalidMsg   = "无效的登录密码"
+	CodeUsernameEmptyMsg     = "用户名不能为空"
+	CodeUserFreezeMsg        = "用户账号被冻结"
+	CodeUserCancelMsg        = "用户账号已经注销"
+
 	// 手机号相关
-	CodePhoneInvalidMsg = "无效的手机号码"
-	CodePhoneEmptyMsg   = "手机号不能为空"
+	CodePhoneInvalidMsg     = "无效的手机号码"
+	CodePhoneEmptyMsg       = "手机号不能为空"
+	CodePhoneVerifyExistMsg = "手机号已经被验证"
 
 	// 验证码相关
 	CodePhoneVerifyCodeTooBusyMsg = "验证码发送太频繁，请稍后再试"
 	CodePhoneVerifyCodeErrorMsg   = "验证码申请失败，请重试"
 	CodePhoneVerifyCodeInvalidMsg = "验证码无效，请填写正确的验证码"
-	CodePhoneVerifyCodeExpireMsg  = "验证码已过期，请重新申请验证码"
+	CodePhoneVerifyCodeExpireMsg  = "找不到验证的手机号，请填写正确的手机号，重新获取短信验证码"
 	CodePhoneVerifyCodeEmptyMsg   = "验证码不能为空，请填写正确有效的验证码"
 
 	CodeSelfVideoConflictErrorMsg = "您有未结束的通话，请先结束当前会话"
