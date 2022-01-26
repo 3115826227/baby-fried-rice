@@ -67,6 +67,8 @@ message ReqCommentAddDao {
   string content = 6;
   // 评论者
   string origin = 7;
+  // 是否匿名
+  bool anonymity = 8;
 }
 
 // 评论添加返回信息
@@ -99,6 +101,8 @@ message CommentDao {
   repeated CommentReplyDao reply = 11;
   // 访问者是否已点赞
   bool originLiked = 12;
+  // 是否匿名
+  bool anonymity = 13;
 }
 
 // 评论回复列表查询请求
@@ -147,6 +151,8 @@ message CommentReplyDao {
   repeated CommentReplyDao reply = 7;
   // 访问者是否已点赞
   bool originLiked = 8;
+  // 是否匿名
+  bool anonymity = 9;
 }
 
 // 个人评论列表查询请求
@@ -177,6 +183,8 @@ message CommentPersonDao {
   int64 floor = 7;
   // 评论时间
   int64 createTimestamp = 8;
+  // 是否匿名
+  bool anonymity = 9;
 }
 
 // 个人评论列表查询返回

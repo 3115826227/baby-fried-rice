@@ -9,8 +9,12 @@ option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/space";  //
 service DaoSpace {
   // 空间动态添加
   rpc SpaceAddDao(ReqSpaceAddDao) returns (RspSpaceAddDao);
+  // 空间动态转发
+  rpc SpaceForwardDao (ReqSpaceForwardDao) returns (RspSpaceForwardDao);
   // 空间动态删除
   rpc SpaceDeleteDao(ReqSpaceDeleteDao) returns (google.protobuf.Empty);
+  // 空间动态基本查询
+  rpc SpaceBaseQueryDao (ReqSpaceBaseQueryDao) returns (RspSpaceBaseQueryDao);
   // 空间动态查询
   rpc SpaceQueryDao(ReqSpaceQueryDao) returns (RspSpaceQueryDao);
   // 空间动态信息更新，仅更新部分字段，比如浏览，评论，点赞
@@ -41,11 +45,56 @@ message ReqSpaceAddDao {
   repeated string images = 3;
   // 访问类型
   SpaceVisitorType visitorType = 4;
+  // 是否匿名
+  bool anonymity = 5;
 }
 
 // 空间动态添加返回
 message RspSpaceAddDao {
   string id = 1;
+}
+
+// 空间动态转发请求
+message ReqSpaceForwardDao {
+  // 操作人
+  string origin = 1;
+  // 转发空间动态id
+  string spaceId = 2;
+  // 动态内容
+  string content = 3;
+  // 访问类型
+  SpaceVisitorType visitorType = 4;
+}
+
+// 空间动态转发返回
+message RspSpaceForwardDao {
+  string id = 1;
+}
+
+// 空间动态基本信息查询请求
+message ReqSpaceBaseQueryDao {
+  repeated string ids = 1;
+}
+
+// 空间动态基本信息
+message SpaceBaseQueryDao {
+  // 空间动态id
+  string id = 1;
+  // 空间动态发布者
+  string origin = 2;
+  // 空间动态内容
+  string content = 3;
+  // 空间动态图片地址列表
+  repeated string images = 4;
+  // 访问类型
+  SpaceVisitorType visitorType = 5;
+  // 是否匿名
+  bool anonymity = 6;
+}
+
+// 空间动态基本信息返回
+message RspSpaceBaseQueryDao {
+  repeated SpaceBaseQueryDao list = 1;
 }
 
 // 空间动态查询请求
@@ -83,10 +132,18 @@ message SpaceQueryDao {
   int64 commentTotal = 8;
   // 楼层总数
   int64 floorTotal = 9;
+  // 转发数
+  int64 forwardTotal = 10;
+  // 是否转发
+  bool forward = 11;
+  // 转发原动态id
+  string originSpaceId = 12;
   // 创建时间
-  int64 createTime = 10;
+  int64 createTime = 13;
   // 访问者是否已点赞
-  bool originLiked = 11;
+  bool originLiked = 14;
+  // 是否匿名
+  bool anonymity = 15;
 }
 
 // 空间动态更新请求
@@ -101,6 +158,8 @@ message ReqSpaceIncrUpdateDao {
   int64 likeIncrement = 4;
   // 增量楼层数
   int64 floorIncrement = 5;
+  // 增加转发数
+  int64 ForwardIncrement = 6;
 }
 
 // 空间动态删除请求参数

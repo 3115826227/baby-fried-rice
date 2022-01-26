@@ -178,3 +178,8 @@ type ReqSwapWebRTCSdp struct {
 	// 是否为视频
 	Video bool `json:"video"`
 }
+
+// 用户图片收藏夹添加请求参数
+type ReqAddUserImgCollect struct {
+	Img string `json:"img" binding:"required"`
+}

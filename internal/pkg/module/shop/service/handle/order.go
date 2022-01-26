@@ -24,7 +24,7 @@ func CommodityOrderBaseRpcToRsp(commodityOrderBase *shop.CommodityOrderBaseDao) 
 		PaymentType:     commodityOrderBase.PaymentType,
 		TotalPrice:      commodityOrderBase.TotalPrice,
 		TotalCoin:       commodityOrderBase.TotalCoin,
-		Status:          commodityOrderBase.Status,
+		Status:          constant.OrderStatus(commodityOrderBase.Status),
 		CreateTimestamp: commodityOrderBase.CreateTimestamp,
 		UpdateTimestamp: commodityOrderBase.UpdateTimestamp,
 	}
@@ -36,13 +36,13 @@ func CommodityOrderAddHandle(c *gin.Context) {
 	var req requests.ReqAddCommodityOrder
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	shopClient, err := grpc.GetShopClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var orderCommodities = make([]*shop.OrderCommodityAddDao, 0)
@@ -63,7 +63,7 @@ func CommodityOrderAddHandle(c *gin.Context) {
 	_, err = shopClient.CommodityOrderAddDao(context.Background(), reqShop)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -75,13 +75,13 @@ func CommodityOrderPayHandle(c *gin.Context) {
 	var req requests.ReqPayCommodityOrder
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	shopClient, err := grpc.GetShopClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqShop = &shop.ReqCommodityOrderDetailQueryDao{
@@ -92,7 +92,7 @@ func CommodityOrderPayHandle(c *gin.Context) {
 	resp, err = shopClient.CommodityOrderDetailQueryDao(context.Background(), reqShop)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.PayOrderCommodityResp{
@@ -126,14 +126,14 @@ func CommodityOrderPayHandle(c *gin.Context) {
 	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var respCoin *user.RspUserCoinDao
 	respCoin, err = userClient.UserCoinDao(context.Background(), &user.ReqUserCoinDao{AccountId: userMeta.AccountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if respCoin.Coin < resp.CommodityOrder.TotalCoin {
@@ -149,7 +149,7 @@ func CommodityOrderPayHandle(c *gin.Context) {
 	_, err = shopClient.CommodityOrderStatusUpdateDao(context.Background(), reqShopStatus)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	// 如果是积分兑换，则发送积分变动消息给消息队列，交给下游处理
@@ -176,14 +176,14 @@ func CommodityOrderQueryHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var shopClient shop.DaoShopClient
 	shopClient, err = grpc.GetShopClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &shop.ReqCommodityOrderQueryDao{
@@ -195,7 +195,7 @@ func CommodityOrderQueryHandle(c *gin.Context) {
 	resp, err = shopClient.CommodityOrderQueryDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -220,7 +220,7 @@ func CommodityOrderDetailQueryHandle(c *gin.Context) {
 	shopClient, err := grpc.GetShopClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &shop.ReqCommodityOrderDetailQueryDao{
@@ -231,7 +231,7 @@ func CommodityOrderDetailQueryHandle(c *gin.Context) {
 	resp, err = shopClient.CommodityOrderDetailQueryDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var orderCommodityDetails = make([]rsp.OrderCommodityDetail, 0)
@@ -258,7 +258,7 @@ func CommodityOrderDeleteHandle(c *gin.Context) {
 	shopClient, err := grpc.GetShopClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &shop.ReqCommodityOrderDeleteDao{
@@ -268,7 +268,7 @@ func CommodityOrderDeleteHandle(c *gin.Context) {
 	_, err = shopClient.CommodityOrderDeleteDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)

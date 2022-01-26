@@ -42,6 +42,11 @@ func GetSpace(id string) (space tables.Space, err error) {
 	return
 }
 
+func SpaceQueryByIds(ids []string) (spaces []tables.Space, err error)  {
+	err = db.GetDB().GetDB().Where("id in (?)", ids).Find(&spaces).Error
+	return
+}
+
 func SpaceDetailQuery(ids []string) (details []tables.SpaceDetail, err error) {
 	err = db.GetDB().GetDB().Where("id in (?)", ids).Find(&details).Error
 	return

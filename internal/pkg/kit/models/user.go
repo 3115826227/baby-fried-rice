@@ -15,3 +15,9 @@ func (status *UserOnlineStatus) ToString() string {
 	data, _ := json.Marshal(status)
 	return string(data)
 }
+
+type UserPhoneCode struct {
+	AccountId string `json:"account_id"`
+	Phone     string `json:"phone"`
+	Code      string `json:"code"`
+}

@@ -9,6 +9,8 @@ option go_package = "baby-fried-rice/internal/pkg/kit/rpc/pbservices/user";  // 
 service DaoUser {
   // 用户注册函数
   rpc UserDaoRegister(ReqUserRegister) returns (google.protobuf.Empty);
+  // 用户登录名是否存在
+  rpc UserDaoLoginNameExist(ReqUserDaoLoginNameExist) returns (RspUserDaoLoginNameExist);
   // 用户登录函数
   rpc UserDaoLogin(ReqPasswordLogin) returns (RspDaoUserLogin);
   // 用户详细信息获取函数
@@ -26,6 +28,8 @@ service DaoUser {
   rpc UserDaoById(ReqUserDaoById) returns (RspUserDaoById);
   // 获取所有用户id
   rpc UserDaoAll(google.protobuf.Empty) returns (RspUserDaoAll);
+  // 查询手机号是否已经被认证
+  rpc UserDaoPhoneVerify(ReqUserDaoPhoneVerify) returns (RspUserDaoPhoneVerify);
 
   // 查询用户积分
   rpc UserCoinDao (ReqUserCoinDao) returns (RspUserCoinDao);
@@ -69,6 +73,14 @@ message RspUserDaoById {
   repeated  UserDao users = 1;
 }
 
+message ReqUserDaoLoginNameExist {
+  string loginName = 1;
+}
+
+message RspUserDaoLoginNameExist {
+  bool exist = 1;
+}
+
 message UserDao {
   string id = 1;
   string username = 2;
@@ -102,6 +114,8 @@ message RspDaoUser {
   int32 gender = 5;
   int64  age = 6;
   string phone = 7;
+  bool freeze = 8;
+  bool cancel = 9;
 }
 
 // 定义登录函数返回参数
@@ -147,6 +161,15 @@ message ReqDaoUserPwdUpdate {
 // 获取所有用户AccountId
 message RspUserDaoAll {
   repeated string accountIds = 1;
+}
+
+// 查询手机号码是否被认证
+message ReqUserDaoPhoneVerify {
+  string phone = 1;
+}
+
+message RspUserDaoPhoneVerify {
+  bool verify = 1;
 }
 
 // 查询用户积分

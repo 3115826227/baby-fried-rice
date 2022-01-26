@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	HeaderUUID  = "requestID"
-	HeaderToken = "token"
-	TokenPrefix = "token"
-	HeaderIP    = "IP"
+	HeaderUUID     = "requestID"
+	HeaderToken    = "token"
+	TokenPrefix    = "token"
+	HeaderIP       = "IP"
+	HeaderLanguage = "Accept-Language"
 
 	HeaderAccountId  = "accountId"
 	HeaderUsername   = "username"

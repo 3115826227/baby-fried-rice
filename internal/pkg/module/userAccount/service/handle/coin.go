@@ -22,14 +22,14 @@ func CoinLogHandle(c *gin.Context) {
 	pageReq, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var userClient user.DaoUserClient
 	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &user.ReqUserCoinLogQueryDao{
@@ -41,7 +41,7 @@ func CoinLogHandle(c *gin.Context) {
 	resp, err = userClient.UserCoinLogQueryDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -68,7 +68,7 @@ func DeleteCoinLogHandle(c *gin.Context) {
 			id, err := strconv.Atoi(idStr)
 			if err != nil {
 				log.Logger.Error(err.Error())
-				c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+				c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 				return
 			}
 			ids = append(ids, int64(id))
@@ -76,7 +76,7 @@ func DeleteCoinLogHandle(c *gin.Context) {
 		userClient, err := grpc.GetUserClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		var req = &user.ReqUserCoinLogDeleteDao{
@@ -86,7 +86,7 @@ func DeleteCoinLogHandle(c *gin.Context) {
 		_, err = userClient.UserCoinLogDeleteDao(context.Background(), req)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}
@@ -99,14 +99,14 @@ func CoinRankHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *user.RspUserCoinRankQueryDao
 	resp, err = userClient.UserCoinRankQueryDao(context.Background(), &user.ReqUserCoinRankQueryDao{AccountId: userMeta.AccountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.UserCoinRank{
@@ -126,14 +126,14 @@ func CoinRankBoardHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *user.RspUserCoinRankBoardQueryDao
 	resp, err = userClient.UserCoinRankBoardQueryDao(context.Background(), &emptypb.Empty{})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -144,7 +144,7 @@ func CoinRankBoardHandle(c *gin.Context) {
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var idsMap = make(map[string]rsp.User)

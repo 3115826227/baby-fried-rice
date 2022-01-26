@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
@@ -169,25 +170,25 @@ func InviteVideoHandle(c *gin.Context) {
 	sts, err := checkUserWebRTCStatus(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	if sts {
-		err = fmt.Errorf(handle.CodeSelfVideoConflictErrorMsg)
+		err = fmt.Errorf(constant.CodeSelfVideoConflictErrorMsg)
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeSelfVideoConflictError)
+		handle.FailedResp(c, constant.CodeSelfVideoConflictError)
 		return
 	}
 	var req requests.ReqCreateWebRTC
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var detailResp *im.RspSessionDetailQueryDao
@@ -196,7 +197,7 @@ func InviteVideoHandle(c *gin.Context) {
 		AccountId: userMeta.AccountId,
 	}); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	if detailResp.SessionType == im.SessionType_DoubleSession {
@@ -210,21 +211,21 @@ func InviteVideoHandle(c *gin.Context) {
 		var otherStatus models.UserOnlineStatus
 		if otherStatus, err = cache.GetUserOnlineStatus(other); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		// 用户已离线
 		if otherStatus.OnlineType == im.OnlineStatusType_Offline {
-			err = fmt.Errorf(handle.CodeUserOfflineErrorMsg)
+			err = fmt.Errorf(constant.CodeUserOfflineErrorMsg)
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeSelfVideoConflictError)
+			handle.FailedResp(c, constant.CodeSelfVideoConflictError)
 			return
 		}
 		// 用户正在与其他用户通话中
 		if otherStatus.VideoStatus {
-			err = fmt.Errorf(handle.CodeUserVideoConflictErrorMsg)
+			err = fmt.Errorf(constant.CodeUserVideoConflictErrorMsg)
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeSelfVideoConflictError)
+			handle.FailedResp(c, constant.CodeSelfVideoConflictError)
 			return
 		}
 	}
@@ -232,7 +233,7 @@ func InviteVideoHandle(c *gin.Context) {
 	swapSdp, err = CreateSession(req.Sdp, req.SessionId, userMeta.AccountId, req.Video)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 
@@ -245,7 +246,7 @@ func InviteVideoHandle(c *gin.Context) {
 	}
 	if err = cache.UpdateSessionWebRTCUserStatus(status); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 
@@ -268,13 +269,13 @@ func JoinVideoHandle(c *gin.Context) {
 	var req requests.ReqJoinWebRTC
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	swapSdp, err := CreateSession(req.Sdp, req.SessionId, userMeta.AccountId, req.Video)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var status = rsp.SessionWebRTCUserStatus{
@@ -286,7 +287,7 @@ func JoinVideoHandle(c *gin.Context) {
 	}
 	if err = cache.UpdateSessionWebRTCUserStatus(status); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	handle.SuccessResp(c, "", swapSdp)
@@ -299,7 +300,7 @@ func ReturnVideoHandle(c *gin.Context) {
 	var req requests.ReqReturnWebRTC
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	var status = rsp.SessionWebRTCUserStatus{
@@ -313,12 +314,12 @@ func ReturnVideoHandle(c *gin.Context) {
 	}
 	if err = cache.UpdateSessionWebRTCUserStatus(status); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	if err = cache.SetSessionWebRTCTimeInfo(req.SessionId, req.Video); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	sessionWebRTCChanLock.RLock()
@@ -327,7 +328,7 @@ func ReturnVideoHandle(c *gin.Context) {
 	if !exist {
 		err = fmt.Errorf("session id isn't exist")
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	info.notify <- status
@@ -352,7 +353,7 @@ func SwapWebRTCSdpHandle(c *gin.Context) {
 	var req requests.ReqSwapWebRTCSdp
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	var remoteSwapSdp string
@@ -360,7 +361,7 @@ func SwapWebRTCSdpHandle(c *gin.Context) {
 		req.Origin, req.Video)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	handle.SuccessResp(c, "", remoteSwapSdp)
@@ -372,18 +373,18 @@ func HangupVideoHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi("session_id")
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	if err = cache.RemoveSessionWebRTCUserStatus(int64(sessionId), userMeta.AccountId); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var imClient im.DaoImClient
 	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var detailResp *im.RspSessionDetailQueryDao
@@ -392,7 +393,7 @@ func HangupVideoHandle(c *gin.Context) {
 		AccountId: userMeta.AccountId,
 	}); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var notify models.WSMessageNotify
@@ -402,7 +403,7 @@ func HangupVideoHandle(c *gin.Context) {
 		timeInfo, err = cache.GetSessionWebRTCTimeInfo(int64(sessionId))
 		if err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		notify.WSMessage.WSMessageType = im.SessionNotifyType_HangupVideoMessage
@@ -416,7 +417,7 @@ func HangupVideoHandle(c *gin.Context) {
 		var messageId int64
 		if messageId, err = storageVideoMessage(notify, userMeta.AccountId, time.Now().Unix()-timeInfo.StartTime); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		for _, u := range detailResp.Joins {
@@ -431,12 +432,12 @@ func HangupVideoHandle(c *gin.Context) {
 		}
 		if err = cache.DeleteSessionWebRTC(int64(sessionId)); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		if err = cache.DeleteSessionWebRTCTimeInfo(int64(sessionId)); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		sessionWebRTCChanLock.Lock()
@@ -453,14 +454,14 @@ func VideoStatusHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi("session_id")
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	var mp map[string]rsp.SessionWebRTCUserStatus
 	mp, err = cache.GetSessionWebRTC(int64(sessionId))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var users = make([]rsp.SessionWebRTCUserStatus, 0)

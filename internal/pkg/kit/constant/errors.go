@@ -13,7 +13,3 @@ var (
 
 	UnOriginInviteRemoveSessionError = errors.New("you are not the session's origin, can't make user remove the session")
 )
-
-var (
-	CodeNeedOriginAuditSessionMsg = "waiting the session's origin audit"
-)

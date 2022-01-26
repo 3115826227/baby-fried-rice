@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -24,7 +25,7 @@ func FileUploadHandle(c *gin.Context) {
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 
@@ -32,14 +33,14 @@ func FileUploadHandle(c *gin.Context) {
 	data, err = ioutil.ReadAll(file)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	defer file.Close()
 
 	if err = ioutil.WriteFile(header.Filename, data, 0755); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	defer func() {
@@ -55,7 +56,7 @@ func FileUploadHandle(c *gin.Context) {
 	ossMeta, downUrl, err = application.GetFileManager().UploadFile(header.Filename, localPath)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 
@@ -73,7 +74,7 @@ func FileUploadHandle(c *gin.Context) {
 	f.CreatedAt = now
 	if err = db.GetDB().CreateObject(&f); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 
@@ -96,7 +97,7 @@ func FileQueryHandle(c *gin.Context) {
 	var files = make([]tables.File, 0)
 	if err := db.GetDB().GetDB().Where("origin = ?", userMeta.AccountId).Find(&files).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]rsp.File, 0)
@@ -123,19 +124,19 @@ func FileDeleteHandle(c *gin.Context) {
 	if err := db.GetDB().GetDB().Where("id = ? and origin = ?",
 		id, userMeta.AccountId).First(&file).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	tx := db.GetDB().GetDB().Begin()
 	if err := tx.Where("id = ? and origin = ?", id, userMeta.AccountId).Delete(&tables.File{}).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if err := application.GetFileManager().DeleteFile(file.Bucket, file.FileName); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	tx.Commit()

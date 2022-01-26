@@ -29,6 +29,7 @@ func InitDB(mysqlUrl string) (err error) {
 	return client.InitTables(
 		&tables.AccountUser{},
 		&tables.AccountUserDetail{},
+		&tables.AccountUserPhone{},
 		&tables.AccountUserLoginLog{},
 		&tables.UserPrivateMessage{},
 		&tables.UserPrivateMessageContent{},

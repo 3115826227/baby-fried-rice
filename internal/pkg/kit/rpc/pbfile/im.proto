@@ -78,6 +78,12 @@ service DaoIm {
   rpc UserManageUpdateDao(ReqUserManageUpdateDao) returns (google.protobuf.Empty);
   // 用户管理查询
   rpc UserManageQueryDao(ReqUserManageQueryDao) returns (RspUserManageQueryDao);
+  // 添加收藏夹图片
+  rpc UserImgCollectAddDao (ReqUserImgCollectAddDao) returns (google.protobuf.Empty);
+  // 查询收藏夹图片列表
+  rpc UserImgCollectQueryDao (ReqUserImgCollectQueryDao) returns (RspUserImgCollectQueryDao);
+  // 删除收藏夹图片
+  rpc UserImgCollectDeleteDao (ReqUserImgCollectDeleteDao) returns (google.protobuf.Empty);
 }
 
 // 会话类型
@@ -377,6 +383,8 @@ enum  SessionMessageType
   ImgMessage = 2;
   // 已撤回消息
   WithDrawnMessage = 3;
+  // 表情包消息
+  EmojiMessage = 4;
   // 视频通话记录消息
   VideoLogMessage = 100;
   // 视频通话拒绝消息
@@ -669,4 +677,30 @@ message RspUserManageQueryDao {
   string accountId = 1;
   AddFriendPermissionType addFriendPermissionType = 2;
   int64 updateTimestamp = 3;
+}
+
+// 添加到收藏夹
+message ReqUserImgCollectAddDao {
+  string accountId = 1;
+  string img = 2;
+}
+
+// 查询收藏夹列表
+message ReqUserImgCollectQueryDao {
+  string accountId = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+}
+
+message RspUserImgCollectQueryDao {
+  repeated string list = 1;
+  int64 page = 2;
+  int64 pageSize = 3;
+  int64 total = 4;
+}
+
+// 删除收藏夹图片
+message ReqUserImgCollectDeleteDao {
+  string accountId = 1;
+  string img = 2;
 }

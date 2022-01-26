@@ -26,13 +26,13 @@ func SendPrivateMessageHandle(c *gin.Context) {
 	pmReq.SendId = userMeta.AccountId
 	if err := c.ShouldBind(&pmReq); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	pmClient, err := grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var now = time.Now().Unix()
@@ -49,7 +49,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 	resp, err = pmClient.PrivateMessageAddDao(context.Background(), &reqAdd)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go func() {
@@ -61,7 +61,7 @@ func SendPrivateMessageHandle(c *gin.Context) {
 		respDetail, err = pmClient.PrivateMessageDetailDao(context.Background(), reqDetail)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		var pm = respDetail.PrivateMessage
@@ -96,14 +96,14 @@ func PrivateMessagesHandle(c *gin.Context) {
 	pageReq, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var pmClient privatemessage.DaoPrivateMessageClient
 	pmClient, err = grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	reqQuery := privatemessage.ReqPrivateMessageQueryDao{
@@ -116,7 +116,7 @@ func PrivateMessagesHandle(c *gin.Context) {
 	resp, err = pmClient.PrivateMessageQueryDao(context.Background(), &reqQuery)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -127,14 +127,14 @@ func PrivateMessagesHandle(c *gin.Context) {
 	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var idsMap = make(map[string]*user.UserDao)
@@ -159,14 +159,14 @@ func UpdatePrivateMessageStatusHandle(c *gin.Context) {
 	var upm requests.UpdatePrivateMessageStatusReq
 	if err := c.ShouldBind(&upm); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	if len(upm.MessageIds) != 0 {
 		pmClient, err := grpc.GetPrivateMessageClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		reqUpdate := privatemessage.ReqPrivateMessageStatusUpdateDao{
@@ -176,7 +176,7 @@ func UpdatePrivateMessageStatusHandle(c *gin.Context) {
 		_, err = pmClient.PrivateMessageStatusUpdateDao(context.Background(), &reqUpdate)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}
@@ -190,13 +190,13 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 	if messageId == "" {
 		err := fmt.Errorf("message is isn't null")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	pmClient, err := grpc.GetPrivateMessageClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	reqDetail := privatemessage.ReqPrivateMessageDetailDao{
@@ -207,7 +207,7 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 	resp, err = pmClient.PrivateMessageDetailDao(context.Background(), &reqDetail)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var pm = resp.PrivateMessage
@@ -216,19 +216,19 @@ func PrivateMessageDetailHandle(c *gin.Context) {
 	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{pm.SendId}})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if len(userResp.Users) != 1 {
 		err = fmt.Errorf("query user error")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var detail = userResp.Users[0]
@@ -247,7 +247,7 @@ func DeletePrivateMessageHandle(c *gin.Context) {
 		pmClient, err := grpc.GetPrivateMessageClient()
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		req := &privatemessage.ReqPrivateMessageDeleteDao{
@@ -257,7 +257,7 @@ func DeletePrivateMessageHandle(c *gin.Context) {
 		_, err = pmClient.PrivateMessageDeleteDao(context.Background(), req)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}

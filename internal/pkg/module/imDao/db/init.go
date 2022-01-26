@@ -34,5 +34,6 @@ func InitDB(mysqlUrl string) (err error) {
 		&tables.Operator{},
 		&tables.Friend{},
 		&tables.UserManage{},
+		&tables.MessageImgCollectRelation{},
 	)
 }

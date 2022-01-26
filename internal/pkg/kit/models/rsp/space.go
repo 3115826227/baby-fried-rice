@@ -10,15 +10,28 @@ type SpaceResp struct {
 	Content      string                 `json:"content"`
 	Images       []string               `json:"images"`
 	VisitorType  space.SpaceVisitorType `json:"visitor_type"`
-	Origin       User                   `json:"origin"`
+	Origin       *User                  `json:"origin,omitempty"`
 	CreateTime   int64                  `json:"create_time"`
 	VisitTotal   int64                  `json:"visit_total"`
 	LikeTotal    int64                  `json:"like_total"`
 	FloorTotal   int64                  `json:"floor_total"`
 	OriginLiked  bool                   `json:"origin_liked"`
 	CommentTotal int64                  `json:"comment_total"`
+	Forward      bool                   `json:"forward"`
+	ForwardSpace ForwardSpace           `json:"forward_space"`
+	ForwardTotal int64                  `json:"forward_total"`
 	OpenComment  bool                   `json:"open_comment"`
 	Comments     []*CommentResp         `json:"comments"`
+	Anonymity    bool                   `json:"anonymity"`
+	OriginSpace  bool                   `json:"origin_space"`
+}
+
+type ForwardSpace struct {
+	SpaceId     string                 `json:"space_id"`
+	Content     string                 `json:"content"`
+	Images      []string               `json:"images"`
+	Origin      *User                  `json:"origin"`
+	VisitorType space.SpaceVisitorType `json:"visitor_type"`
 }
 
 type SpacesResp struct {

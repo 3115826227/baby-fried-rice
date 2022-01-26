@@ -36,26 +36,26 @@ func SessionAddHandle(c *gin.Context) {
 	var req requests.ReqAddSession
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var resp *user.RspUserDaoById
 	resp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: req.Joins})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var joins = make([]*im.JoinRemarkDao, 0)
@@ -77,7 +77,7 @@ func SessionAddHandle(c *gin.Context) {
 	_, err = imClient.SessionAddDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -98,7 +98,7 @@ func SessionQueryHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var sessionId int
@@ -107,7 +107,7 @@ func SessionQueryHandle(c *gin.Context) {
 		sessionId, err = strconv.Atoi(sessionIdStr)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+			c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 			return
 		}
 	}
@@ -115,7 +115,7 @@ func SessionQueryHandle(c *gin.Context) {
 	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionQueryDao{
@@ -130,7 +130,7 @@ func SessionQueryHandle(c *gin.Context) {
 	resp, err = imClient.SessionQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -151,14 +151,14 @@ func SessionDialogQueryHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionDialogQueryDao{
@@ -170,7 +170,7 @@ func SessionDialogQueryHandle(c *gin.Context) {
 	resp, err = imClient.SessionDialogQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var sessions = make([]interface{}, 0)
@@ -209,7 +209,7 @@ func SessionByFriendQueryHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionByFriendQueryDao{
@@ -220,7 +220,7 @@ func SessionByFriendQueryHandle(c *gin.Context) {
 	resp, err = imClient.SessionByFriendQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", resp.SessionId)
@@ -232,13 +232,13 @@ func SessionDialogDeleteHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionDialogDao{
@@ -248,7 +248,7 @@ func SessionDialogDeleteHandle(c *gin.Context) {
 	_, err = imClient.SessionDialogDeleteDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -259,13 +259,13 @@ func SessionDetailHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -276,7 +276,7 @@ func SessionDetailHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var joins = make([]rsp.User, 0)
@@ -307,13 +307,13 @@ func SessionUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateSession
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionUpdateDao{
@@ -325,7 +325,7 @@ func SessionUpdateHandle(c *gin.Context) {
 	_, err = imClient.SessionUpdateDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -337,13 +337,13 @@ func SessionJoinHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -354,7 +354,7 @@ func SessionJoinHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	switch resp.JoinPermissionType {
@@ -365,13 +365,13 @@ func SessionJoinHandle(c *gin.Context) {
 		}
 		if _, err = imClient.SessionJoinDao(context.Background(), reqJoinSession); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 	case im.SessionJoinPermissionType_InviteJoin:
 		err = constant.NeedInviteJoinSessionError
 		log.Logger.Error(err.Error())
-		handle.ErrorResp(c, http.StatusOK, handle.CodeNeedInviteJoinSession, handle.CodeNeedInviteJoinSessionMsg)
+		handle.ErrorResp(c, http.StatusOK, constant.CodeNeedInviteJoinSession, constant.CodeNeedInviteJoinSessionMsg)
 		return
 	case im.SessionJoinPermissionType_OriginAudit:
 		var reqOperator = &im.ReqOperatorAddDao{
@@ -384,7 +384,7 @@ func SessionJoinHandle(c *gin.Context) {
 		var optResp *im.RspOperatorAddDao
 		if optResp, err = imClient.OperatorAddDao(context.Background(), reqOperator); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, handle.CodeInternalError)
+			handle.FailedResp(c, constant.CodeInternalError)
 			return
 		}
 		// 给需要确认的用户发送通知
@@ -392,7 +392,7 @@ func SessionJoinHandle(c *gin.Context) {
 			go sendOperatorNotify(imClient, optResp.OperatorId, userMeta.AccountId, false)
 		}
 		log.Logger.Info(constant.CodeNeedOriginAuditSessionMsg)
-		handle.ErrorResp(c, http.StatusOK, handle.CodeNeedOriginAuditSession, handle.CodeNeedOriginAuditSessionMsg)
+		handle.ErrorResp(c, http.StatusOK, constant.CodeNeedOriginAuditSession, constant.CodeNeedOriginAuditSessionMsg)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -404,13 +404,13 @@ func SessionInviteHandle(c *gin.Context) {
 	var req requests.ReqInviteJoinSession
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *im.RspSessionDetailQueryDao
@@ -420,7 +420,7 @@ func SessionInviteHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var session = rsp.Session{
@@ -437,7 +437,7 @@ func SessionInviteHandle(c *gin.Context) {
 	_, err = imClient.SessionInviteJoinDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go sendInviteNotify(session, userMeta.GetUser(), req.AccountId)
@@ -450,13 +450,13 @@ func SessionRemarkUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateSessionRemark
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionRemarkUpdateDao(context.Background(), &im.ReqSessionRemarkUpdateDao{
@@ -466,7 +466,7 @@ func SessionRemarkUpdateHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -478,13 +478,13 @@ func SessionRemoveHandle(c *gin.Context) {
 	var req requests.ReqRemoveFromSession
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionRemoveDao{
@@ -495,7 +495,7 @@ func SessionRemoveHandle(c *gin.Context) {
 	_, err = imClient.SessionRemoveDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -507,13 +507,13 @@ func SessionLeaveHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionLeaveDao{
@@ -523,7 +523,7 @@ func SessionLeaveHandle(c *gin.Context) {
 	_, err = imClient.SessionLeaveDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -535,13 +535,13 @@ func SessionDeleteHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionDeleteDao{
@@ -551,7 +551,7 @@ func SessionDeleteHandle(c *gin.Context) {
 	_, err = imClient.SessionDeleteDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -563,7 +563,7 @@ func SessionMessageSendHandle(c *gin.Context) {
 	var req requests.ReqSendMessage
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
 	// 将会话消息发给imDao服务存入数据库中
@@ -577,7 +577,7 @@ func SessionMessageSendHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodeInternalError)
+		handle.FailedResp(c, constant.CodeInternalError)
 		return
 	}
 	var messageAddResp *im.RspSessionMessageAddDao
@@ -593,18 +593,21 @@ func SessionMessageSendHandle(c *gin.Context) {
 		log.Logger.Error(err.Error())
 		return
 	}
-	var rspMsg = rsp.Message{
-		SessionId:     messageAddResp.SessionId,
-		MessageId:     messageAddResp.MessageId,
-		MessageType:   req.MessageType,
-		Send:          userMeta.GetUser(),
-		Content:       req.Content,
-		SendTimestamp: imReq.SendTimestamp,
-	}
-	for _, u := range sessionDetailResp.Joins {
-		rspMsg.Receive = u.AccountId
-		sendMessageNotify(rspMsg, userMeta.GetUser(), u.AccountId)
-	}
+	go func() {
+		var rspMsg = rsp.Message{
+			SessionId:     messageAddResp.SessionId,
+			MessageId:     messageAddResp.MessageId,
+			MessageType:   req.MessageType,
+			Send:          userMeta.GetUser(),
+			Content:       req.Content,
+			SendTimestamp: imReq.SendTimestamp,
+		}
+		for _, u := range sessionDetailResp.Joins {
+			rspMsg.Receive = u.AccountId
+			sendMessageNotify(rspMsg, userMeta.GetUser(), u.AccountId)
+		}
+	}()
+	handle.SuccessResp(c, "", nil)
 }
 
 // 会话消息查询
@@ -613,20 +616,20 @@ func SessionMessageQueryHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var req requests.PageCommonReq
 	req, err = handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqSession = &im.ReqSessionMessageQueryDao{
@@ -639,7 +642,7 @@ func SessionMessageQueryHandle(c *gin.Context) {
 	resp, err = imClient.SessionMessageQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var idMap = make(map[string]struct{})
@@ -653,14 +656,14 @@ func SessionMessageQueryHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]*user.UserDao)
@@ -713,19 +716,19 @@ func SessionMessageReadUsersQueryHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var messageId int
 	if messageId, err = strconv.Atoi(c.Query("message_id")); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *im.RspSessionMessageReadUsersQueryDao
@@ -736,21 +739,21 @@ func SessionMessageReadUsersQueryHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = append(resp.ReadUsers, resp.UnreadUsers...)
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var idsMap = make(map[string]rsp.User)
@@ -783,21 +786,21 @@ func SessionMessageWithDrawnHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var messageId int
 	messageId, err = strconv.Atoi(c.Query("message_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionMessageWithDrawnDao(context.Background(), &im.ReqSessionMessageWithDrawnDao{
@@ -807,7 +810,7 @@ func SessionMessageWithDrawnHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *im.RspSessionDetailQueryDao
@@ -817,7 +820,7 @@ func SessionMessageWithDrawnHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go func() {
@@ -841,13 +844,13 @@ func SessionMessageReadStatusUpdateHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionMessageReadStatusUpdateDao(context.Background(), &im.ReqSessionMessageReadStatusUpdateDao{
@@ -856,7 +859,7 @@ func SessionMessageReadStatusUpdateHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -868,21 +871,21 @@ func SessionSingleMessageReadStatusUpdateHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var messageId int
 	messageId, err = strconv.Atoi(c.Query("message_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	accountId := c.Query("account_id")
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionMessageReadStatusUpdateDao(context.Background(), &im.ReqSessionMessageReadStatusUpdateDao{
@@ -892,7 +895,7 @@ func SessionSingleMessageReadStatusUpdateHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go func() {
@@ -911,7 +914,7 @@ func SessionMessageDeleteHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	messageIdsStr := strings.Split(c.Query("message_ids"), ",")
@@ -920,7 +923,7 @@ func SessionMessageDeleteHandle(c *gin.Context) {
 		var messageId int
 		if messageId, err = strconv.Atoi(messageIdStr); err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+			c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 			return
 		}
 		messageIds = append(messageIds, int64(messageId))
@@ -928,7 +931,7 @@ func SessionMessageDeleteHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionMessageDeleteDao(context.Background(), &im.ReqSessionMessageDeleteDao{
@@ -938,7 +941,7 @@ func SessionMessageDeleteHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -950,13 +953,13 @@ func SessionMessageFlushHandle(c *gin.Context) {
 	sessionId, err := strconv.Atoi(c.Query("session_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = imClient.SessionMessageFlushDao(context.Background(), &im.ReqSessionMessageFlushDao{
@@ -965,7 +968,7 @@ func SessionMessageFlushHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)

@@ -3,6 +3,7 @@ package query
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
@@ -28,20 +29,22 @@ func IsDuplicateAccountID(accountID string) bool {
 }
 
 // 校验用户登录名是否重复
-func IsDuplicateLoginNameByUser(loginName string) bool {
+func IsDuplicateLoginNameByUser(loginName string) (bool, error) {
 	var count int64 = 0
 	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {
 		log.Logger.Error(err.Error())
-		return true
+		return false, errors.NewInternalErr(err)
 	}
-	return count != 0
+	return count != 0, nil
 }
 
 func GetUserByLogin(loginName string) (root tables.AccountUser, err error) {
 	var query = map[string]interface{}{
 		"login_name": loginName,
 	}
-	err = db.GetDB().GetObject(query, &root)
+	if err = db.GetDB().GetObject(query, &root); err != nil {
+		err = errors.NewInternalErr(err)
+	}
 	return
 }
 
@@ -49,6 +52,7 @@ func GetUserDetail(accountId string) (detail tables.AccountUserDetail, err error
 	if detail, err = cache.GetUserDetail(accountId); err != nil {
 		err = db.GetDB().GetObject(map[string]interface{}{"account_id": accountId}, &detail)
 		if err != nil {
+			err = errors.NewInternalErr(err)
 			return
 		}
 		go cache.SetUserDetail(detail)
@@ -94,10 +98,18 @@ func GetAll() (ids []string, err error) {
 	if err = db.GetDB().GetDB().Select("account_id").Find(&users).Error; err != nil {
 		return
 	}
-	for _, user := range users {
-		ids = append(ids, user.AccountID)
+	for _, u := range users {
+		ids = append(ids, u.AccountID)
 	}
 	return
+}
+
+func GetUserPhone(phone string) (exist bool, err error) {
+	var count int64
+	if err = db.GetDB().GetDB().Model(&tables.AccountUserPhone{}).Where("phone = ?", phone).Count(&count).Error; err != nil {
+		return
+	}
+	return count != 0, nil
 }
 
 func GetUserCoin(accountId string) (coin tables.AccountUserCoin, err error) {

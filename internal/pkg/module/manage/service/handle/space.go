@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
@@ -18,7 +19,7 @@ func SpaceHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -36,7 +37,7 @@ func SpaceHandle(c *gin.Context) {
 	spaces, total, err = query.GetSpaces(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -51,7 +52,7 @@ func SpaceHandle(c *gin.Context) {
 	var idsMap = make(map[string]tables.AccountUserDetail)
 	if idsMap, err = query.GetUsersByIds(ids); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	for _, s := range spaces {
@@ -79,13 +80,13 @@ func UpdateSpaceAuditHandle(c *gin.Context) {
 	var req requests.ReqUpdateSpaceAudit
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var space tables.Space
 	if err := db.GetSpaceDB().GetObject(map[string]interface{}{"id": req.SpaceId}, &space); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	if req.Audit != nil {
@@ -93,7 +94,7 @@ func UpdateSpaceAuditHandle(c *gin.Context) {
 		space.UpdatedAt = time.Now()
 		if err := db.GetSpaceDB().UpdateObject(&space); err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}

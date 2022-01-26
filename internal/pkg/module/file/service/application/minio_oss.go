@@ -5,11 +5,10 @@ import (
 	"baby-fried-rice/internal/pkg/kit/log"
 	"baby-fried-rice/internal/pkg/module/file/db"
 	"context"
+	"fmt"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/pkg/errors"
-	"net/url"
-	"time"
 )
 
 type MinIOManager struct {
@@ -29,8 +28,8 @@ func NewMinIOManager(lc log.Logging, metaId int) (FileManager, error) {
 		ctx: ctx,
 		lc:  lc,
 	}
-	manager.client, err = minio.New("127.0.0.1:9000", &minio.Options{
-		Creds:  credentials.NewStaticV4("admin", "admin123", ""),
+	manager.client, err = minio.New(ossMeta.Domain, &minio.Options{
+		Creds:  credentials.NewStaticV4(ossMeta.AccessKey, ossMeta.SecretKey, ""),
 		Secure: false,
 	})
 	if err != nil {
@@ -60,13 +59,7 @@ func (m *MinIOManager) UploadFile(key, localFilePath string) (ossMeta tables.Oss
 		m.lc.Error(err.Error())
 		return
 	}
-	var u *url.URL
-	u, err = m.client.PresignedGetObject(m.ctx, ossMeta.Bucket, key, 7*24*time.Hour, url.Values{})
-	if err != nil {
-		m.lc.Error(err.Error())
-		return
-	}
-	downUrl = u.String()
+	downUrl = fmt.Sprintf("http://%v/%v/%v", ossMeta.Domain, ossMeta.Bucket, key)
 	return
 }
 

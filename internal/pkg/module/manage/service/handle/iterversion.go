@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
@@ -19,7 +20,7 @@ func AddIterativeVersionHandle(c *gin.Context) {
 	var req requests.ReqAddIterativeVersion
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var now = time.Now().Unix()
@@ -31,7 +32,7 @@ func AddIterativeVersionHandle(c *gin.Context) {
 	}
 	if err := db.GetAccountDB().CreateObject(&iv); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -42,13 +43,13 @@ func UpdateIterativeVersionHandle(c *gin.Context) {
 	var req requests.ReqUpdateIterativeVersion
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	iv, err := query.GetIterativeVersionByVersion(req.Version)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if req.Content != nil {
@@ -60,7 +61,7 @@ func UpdateIterativeVersionHandle(c *gin.Context) {
 	iv.UpdateTimestamp = time.Now().Unix()
 	if err = db.GetAccountDB().UpdateObject(&iv); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -71,7 +72,7 @@ func QueryIterativeVersionHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -89,7 +90,7 @@ func QueryIterativeVersionHandle(c *gin.Context) {
 		status, err = strconv.ParseBool(statusStr)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+			c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 			return
 		}
 		param.Status = &status
@@ -97,7 +98,7 @@ func QueryIterativeVersionHandle(c *gin.Context) {
 	ivs, total, err = query.GetIterativeVersion(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)

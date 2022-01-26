@@ -128,13 +128,13 @@ func OperatorAddHandle(c *gin.Context) {
 	var req requests.ReqOperatorAdd
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqOperator = &im.ReqOperatorAddDao{
@@ -148,7 +148,7 @@ func OperatorAddHandle(c *gin.Context) {
 	resp, err = imClient.OperatorAddDao(context.Background(), reqOperator)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	// 给需要确认的用户发送通知
@@ -164,13 +164,13 @@ func OperatorConfirmHandle(c *gin.Context) {
 	var req requests.ReqOperatorConfirm
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqOperator = &im.ReqOperatorConfirmDao{
@@ -181,7 +181,7 @@ func OperatorConfirmHandle(c *gin.Context) {
 	_, err = imClient.OperatorConfirmDao(context.Background(), reqOperator)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	// 获取operator数据，发送给nsq，通知到前端
@@ -195,7 +195,7 @@ func OperatorConfirmHandle(c *gin.Context) {
 		})
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		switch od.OptType {
@@ -204,7 +204,7 @@ func OperatorConfirmHandle(c *gin.Context) {
 			var remark string
 			remark, err = GetUsername(od.Origin)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 				return
 			}
 			var reqFriend = im.ReqFriendAddDao{
@@ -217,12 +217,12 @@ func OperatorConfirmHandle(c *gin.Context) {
 			_, err = imClient.FriendAddDao(context.Background(), &reqFriend)
 			if err != nil {
 				log.Logger.Error(err.Error())
-				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 				return
 			}
 			if err = addFriendSession(od.Origin, remark, od.Receive, userMeta.Username, imClient); err != nil {
 				log.Logger.Error(err.Error())
-				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 				return
 			}
 		case im.OptType_JoinSession:
@@ -235,7 +235,7 @@ func OperatorConfirmHandle(c *gin.Context) {
 			_, err = imClient.SessionJoinDao(context.Background(), &reqSession)
 			if err != nil {
 				log.Logger.Error(err.Error())
-				c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+				c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 				return
 			}
 		}
@@ -249,13 +249,13 @@ func OperatorReadStatusUpdateHandle(c *gin.Context) {
 	var req requests.ReqOperatorReadStatusUpdate
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqOperator = &im.ReqOperatorReadStatusUpdateDao{
@@ -265,7 +265,7 @@ func OperatorReadStatusUpdateHandle(c *gin.Context) {
 	_, err = imClient.OperatorReadStatusUpdateDao(context.Background(), reqOperator)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -277,13 +277,13 @@ func OperatorQueryHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqOperator = &im.ReqOperatorsQueryDao{
@@ -295,7 +295,7 @@ func OperatorQueryHandle(c *gin.Context) {
 	resp, err = imClient.OperatorsQueryDao(context.Background(), reqOperator)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]rsp.Operator, 0)
@@ -310,14 +310,14 @@ func OperatorQueryHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	for _, u := range userResp.Users {
@@ -360,13 +360,13 @@ func OperatorDeleteHandle(c *gin.Context) {
 	operatorId, err := strconv.Atoi(c.Query("operator_id"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqOperator = &im.ReqOperatorDeleteDao{
@@ -376,7 +376,7 @@ func OperatorDeleteHandle(c *gin.Context) {
 	_, err = imClient.OperatorDeleteDao(context.Background(), reqOperator)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -409,7 +409,7 @@ func FriendAddHandle(c *gin.Context) {
 	var req requests.ReqAddFriend
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var remark string
@@ -420,14 +420,14 @@ func FriendAddHandle(c *gin.Context) {
 		var err error
 		remark, err = GetUsername(req.AccountId)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqFriend = &im.ReqFriendAddDao{
@@ -440,18 +440,18 @@ func FriendAddHandle(c *gin.Context) {
 	if err != nil {
 		if err.Error() == fmt.Sprintf("rpc error: code = Unknown desc = %v", constant.NeedApplyAddFriendError.Error()) {
 			// 需要发出好友申请
-			handle.ErrorResp(c, http.StatusOK, handle.CodeNeedApplyAddFriend, handle.CodeNeedApplyAddFriendMsg)
+			handle.ErrorResp(c, http.StatusOK, constant.CodeNeedApplyAddFriend, constant.CodeNeedApplyAddFriendMsg)
 			return
 		} else {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 	}
 	// 好友添加成功后，创建会话，给会话成员发送会话通知
 	if err = addFriendSession(userMeta.AccountId, userMeta.Username, req.AccountId, remark, imClient); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -493,7 +493,7 @@ func FriendQueryHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqFriend = &im.ReqFriendQueryDao{
@@ -505,7 +505,7 @@ func FriendQueryHandle(c *gin.Context) {
 	resp, err = imClient.FriendQueryDao(context.Background(), reqFriend)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var friendIds = make([]string, 0)
@@ -556,13 +556,13 @@ func FriendBlackListUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateFriendBlackList
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqFriend = &im.ReqFriendBlackListDao{
@@ -573,7 +573,7 @@ func FriendBlackListUpdateHandle(c *gin.Context) {
 	_, err = imClient.FriendBlackListDao(context.Background(), reqFriend)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -585,13 +585,13 @@ func FriendRemarkUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateFriendRemark
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqFriend = &im.ReqFriendRemarkDao{
@@ -602,7 +602,7 @@ func FriendRemarkUpdateHandle(c *gin.Context) {
 	_, err = imClient.FriendRemarkDao(context.Background(), reqFriend)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -615,7 +615,7 @@ func FriendDeleteHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqFriend = &im.ReqFriendDeleteDao{
@@ -625,7 +625,7 @@ func FriendDeleteHandle(c *gin.Context) {
 	_, err = imClient.FriendDeleteDao(context.Background(), reqFriend)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -636,7 +636,7 @@ func UserManageQueryHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqUserManage = &im.ReqUserManageQueryDao{
@@ -646,7 +646,7 @@ func UserManageQueryHandle(c *gin.Context) {
 	resp, err = imClient.UserManageQueryDao(context.Background(), reqUserManage)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var res = rsp.UserManageResp{
@@ -662,13 +662,13 @@ func UserManageUpdateHandle(c *gin.Context) {
 	var req requests.ReqUserManageUpdate
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var reqUserManage = &im.ReqUserManageUpdateDao{
@@ -678,7 +678,7 @@ func UserManageUpdateHandle(c *gin.Context) {
 	_, err = imClient.UserManageUpdateDao(context.Background(), reqUserManage)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)

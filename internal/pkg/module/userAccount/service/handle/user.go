@@ -2,7 +2,9 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
+	"baby-fried-rice/internal/pkg/kit/models"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
@@ -25,7 +27,12 @@ func UserLoginHandle(c *gin.Context) {
 	var req requests.PasswordLoginReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodeInvalidParams))
+		return
+	}
+	if err := req.Validate(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, err)
 		return
 	}
 	req.LoginName = strings.TrimSpace(req.LoginName)
@@ -39,14 +46,21 @@ func UserLoginHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var reqLoginNameExist = &user.ReqUserDaoLoginNameExist{LoginName: req.LoginName}
+	_, err = userClient.UserDaoLoginNameExist(c, reqLoginNameExist)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, err)
 		return
 	}
 	var resp *user.RspDaoUserLogin
 	resp, err = userClient.UserDaoLogin(context.Background(), reqLogin)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.LoginErrResponse)
+		handle.FailedResp(c, err)
 		return
 	}
 
@@ -54,7 +68,7 @@ func UserLoginHandle(c *gin.Context) {
 	token, err = handle.GenerateToken(resp.User.AccountId, time.Now(), config.GetConfig().TokenSecret)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 
@@ -90,18 +104,36 @@ func UserRegisterHandle(c *gin.Context) {
 	var req requests.UserRegisterReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodeInvalidParams))
 		return
 	}
+	if err := req.Validate(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, err)
+		return
+	}
+
 	req.LoginName = strings.TrimSpace(req.LoginName)
 	req.Password = strings.TrimSpace(req.Password)
 
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.SystemErrorResponse(c)
+		handle.FailedResp(c, err)
 		return
 	}
+	//var reqLoginNameExist = &user.ReqUserDaoLoginNameExist{LoginName: req.LoginName}
+	//var resp *user.RspUserDaoLoginNameExist
+	//resp, err = userClient.UserDaoLoginNameExist(c, reqLoginNameExist)
+	//if err != nil {
+	//	log.Logger.Error(err.Error())
+	//	handle.SystemErrorResponse(c)
+	//	return
+	//}
+	//if resp.Exist {
+	//	handle.FailedResp(c, handle.CodeLoginNameExist)
+	//	return
+	//}
 	var reqRegister = &user.ReqUserRegister{
 		Login: &user.ReqPasswordLogin{
 			LoginName: req.LoginName,
@@ -113,7 +145,7 @@ func UserRegisterHandle(c *gin.Context) {
 	_, err = userClient.UserDaoRegister(context.Background(), reqRegister)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.SystemErrorResponse(c)
+		handle.FailedResp(c, err)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -183,7 +215,7 @@ func UserDetailUpdateHandle(c *gin.Context) {
 	var req requests.UserDetailUpdateReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var updateReq = &user.ReqDaoUserDetailUpdate{
@@ -194,19 +226,18 @@ func UserDetailUpdateHandle(c *gin.Context) {
 			Username:   req.Username,
 			Gender:     req.Gender,
 			Age:        req.Age,
-			Phone:      req.Phone,
 		},
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	_, err = userClient.UserDaoDetailUpdate(context.Background(), updateReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -218,13 +249,13 @@ func UserPwdUpdateHandle(c *gin.Context) {
 	var req requests.UserPwdUpdateReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var updateReq = &user.ReqDaoUserPwdUpdate{
@@ -235,7 +266,7 @@ func UserPwdUpdateHandle(c *gin.Context) {
 	_, err = userClient.UserDaoPwdUpdate(context.Background(), updateReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -246,27 +277,45 @@ func UserPhoneCodeGenHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	phone := c.Query("phone")
 	if phone == "" {
-		err := fmt.Errorf(handle.InternalCodePhoneEmptyMsg)
+		err := fmt.Errorf(constant.InternalCodePhoneEmptyMsg)
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneEmpty)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneEmpty))
 		return
 	}
 	if ok := handle.PhoneInvalid(phone); !ok {
-		err := fmt.Errorf("%v, phone is %v", handle.InternalCodePhoneInvalidMsg, phone)
+		err := fmt.Errorf("%v, phone is %v", constant.InternalCodePhoneInvalidMsg, phone)
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneInvalid)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneInvalid))
 		return
 	}
 	_, exist, err := cache.GetUserPhoneCode(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	if exist {
 		err = fmt.Errorf("phone code gen too busy")
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneVerifyCodeTooBusy)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneVerifyCodeTooBusy))
+		return
+	}
+	var client user.DaoUserClient
+	if client, err = grpc.GetUserClient(); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var resp *user.RspUserDaoPhoneVerify
+	if resp, err = client.UserDaoPhoneVerify(c, &user.ReqUserDaoPhoneVerify{
+		Phone: phone,
+	}); err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	if resp.Verify {
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneVerifyExist))
 		return
 	}
 	code := handle.GeneratePhoneCode()
@@ -276,7 +325,12 @@ func UserPhoneCodeGenHandle(c *gin.Context) {
 		handle.SystemErrorResponse(c)
 		return
 	}
-	if err = cache.SetUserPhoneCode(userMeta.AccountId, code); err != nil {
+	var phoneCode = models.UserPhoneCode{
+		AccountId: userMeta.AccountId,
+		Phone:     phone,
+		Code:      code,
+	}
+	if err = cache.SetUserPhoneCode(phoneCode); err != nil {
 		log.Logger.Error(err.Error())
 		handle.SystemErrorResponse(c)
 		return
@@ -290,7 +344,7 @@ func UserPhoneCodeGenHandle(c *gin.Context) {
 	}
 	if _, err = smsClient.SendMessageDao(context.Background(), &req); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneVerifyCodeError)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneVerifyCodeError))
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -302,10 +356,10 @@ func UserPhoneVerifyHandle(c *gin.Context) {
 	var req requests.UserPhoneVerifyReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusOK, handle.ParamErrResponse)
+		c.JSON(http.StatusOK, constant.ParamErrResponse)
 		return
 	}
-	code, exist, err := cache.GetUserPhoneCode(userMeta.AccountId)
+	phoneCode, exist, err := cache.GetUserPhoneCode(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		handle.SystemErrorResponse(c)
@@ -314,13 +368,13 @@ func UserPhoneVerifyHandle(c *gin.Context) {
 	if !exist {
 		err = fmt.Errorf("phone code is expired")
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneVerifyCodeExpire)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneVerifyCodeExpire))
 		return
 	}
-	if code != req.Code {
+	if phoneCode.Code != req.Code {
 		err = fmt.Errorf("phone code is invalid")
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, handle.CodePhoneVerifyCodeInvalid)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodePhoneVerifyCodeInvalid))
 		return
 	}
 	var userClient user.DaoUserClient
@@ -332,13 +386,16 @@ func UserPhoneVerifyHandle(c *gin.Context) {
 	var updateReq = &user.ReqDaoUserDetailUpdate{
 		Detail: &user.DaoUserDetail{
 			AccountId: userMeta.AccountId,
-			Phone:     req.Phone,
+			Phone:     phoneCode.Phone,
 		},
 	}
 	if _, err = userClient.UserDaoDetailUpdate(context.Background(), updateReq); err != nil {
 		log.Logger.Error(err.Error())
 		handle.SystemErrorResponse(c)
 		return
+	}
+	if err = cache.DeleteUserPhoneCode(phoneCode.Phone); err != nil {
+		log.Logger.Error(err.Error())
 	}
 	handle.SuccessResp(c, "", nil)
 }
@@ -350,13 +407,13 @@ func UserQueryHandle(c *gin.Context) {
 	if accountId == "" {
 		err := fmt.Errorf("account_id can't null")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.JSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *user.RspDaoUserDetail
@@ -364,14 +421,14 @@ func UserQueryHandle(c *gin.Context) {
 		&user.ReqDaoUserDetail{AccountId: accountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var imClient im.DaoImClient
 	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var imReq = im.ReqIsFriendDao{
@@ -382,7 +439,7 @@ func UserQueryHandle(c *gin.Context) {
 	imResp, err = imClient.FriendIsDao(context.Background(), &imReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var phoneVerify bool

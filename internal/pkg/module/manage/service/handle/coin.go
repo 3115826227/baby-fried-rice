@@ -21,13 +21,13 @@ func SystemGiveawayUserCoinHandle(c *gin.Context) {
 	var req requests.UserCoinGiveawayReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userCoins, err := query.GetUserCoinsByIds(req.Ids)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userCoinMap = make(map[string]tables.AccountUserCoin)
@@ -81,7 +81,7 @@ func SystemGiveawayUserCoinHandle(c *gin.Context) {
 	}()
 	if err = tx.Exec(updateSql).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var coinLogs = make([]tables.AccountUserCoinLog, 0)
@@ -96,7 +96,7 @@ func SystemGiveawayUserCoinHandle(c *gin.Context) {
 	}
 	if err = tx.Create(&coinLogs).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -107,7 +107,7 @@ func UserCoinHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -129,7 +129,7 @@ func UserCoinHandle(c *gin.Context) {
 	userCoins, err = query.GetUserCoinsByIds(ids)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userCoinMap = make(map[string]tables.AccountUserCoin)

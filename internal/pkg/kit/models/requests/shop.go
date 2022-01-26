@@ -27,7 +27,7 @@ type ReqUpdateCommodity struct {
 	// 商品添加信息
 	ReqAddCommodity
 	// 商品信息
-	Status *int64 `json:"status"`
+	Status *constant.CommodityStatus `json:"status"`
 }
 
 // 下单请求

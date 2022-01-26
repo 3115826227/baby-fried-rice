@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
@@ -18,13 +19,13 @@ func OptAddHandle(c *gin.Context) {
 	var req requests.ReqAddOpt
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	commentClient, err := grpc.GetCommentClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
@@ -39,13 +40,13 @@ func OptAddHandle(c *gin.Context) {
 	resp, err = commentClient.OperatorAddDao(context.Background(), reqSpaceOpt)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if !resp.Result {
 		err = fmt.Errorf("operator add failed")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	} else {
 		// 空间动态的操作需要自己处理
@@ -53,7 +54,7 @@ func OptAddHandle(c *gin.Context) {
 			switch req.BizType {
 			case comment.BizType_Space:
 				if err = handleSpaceOpt(req); err != nil {
-					c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+					c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 					return
 				}
 			}

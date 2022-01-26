@@ -19,14 +19,14 @@ func SignInHandle(c *gin.Context) {
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *user.RspUserSignInDao
 	resp, err = userClient.UserSignInDao(context.Background(), &user.ReqUserSignInDao{AccountId: userMeta.AccountId})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.UserSignInResp{
@@ -55,7 +55,7 @@ func SignInLogHandle(c *gin.Context) {
 	userClient, err = grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &user.ReqUserSignInLogQueryDao{
@@ -68,7 +68,7 @@ func SignInLogHandle(c *gin.Context) {
 	resp, err = userClient.UserSignInLogQueryDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]rsp.UserSignInLogResp, 0)

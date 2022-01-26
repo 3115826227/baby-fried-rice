@@ -47,7 +47,7 @@ func ReplyQuery(params CommentQueryParams) (replies []tables.CommentRelation, to
 	if err = template.Count(&total).Error; err != nil {
 		return
 	}
-	err = template.Offset(offset).Limit(limit).Order("create_time").Find(&replies).Error
+	err = template.Offset(offset).Limit(limit).Order("create_time desc").Find(&replies).Error
 	return
 }
 

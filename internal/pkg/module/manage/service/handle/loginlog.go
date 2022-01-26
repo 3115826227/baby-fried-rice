@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -16,7 +17,7 @@ func AdminLoginLogHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -31,7 +32,7 @@ func AdminLoginLogHandle(c *gin.Context) {
 	logs, total, err = query.GetAdminLoginLogs(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -41,7 +42,7 @@ func AdminLoginLogHandle(c *gin.Context) {
 	var admins []tables.AccountAdmin
 	if err = db.GetAccountDB().GetDB().Where("id in (?)", ids).Find(&admins).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var idsMap = make(map[string]tables.AccountAdmin)
@@ -70,7 +71,7 @@ func UserLoginLogHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -85,7 +86,7 @@ func UserLoginLogHandle(c *gin.Context) {
 	logs, total, err = query.GetUserLoginLogs(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -95,7 +96,7 @@ func UserLoginLogHandle(c *gin.Context) {
 	var idsMap = make(map[string]tables.AccountUserDetail)
 	if idsMap, err = query.GetUsersByIds(ids); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)

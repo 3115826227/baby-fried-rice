@@ -24,7 +24,7 @@ func AdminLoginHandle(c *gin.Context) {
 	var req requests.PasswordLoginReq
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	// 根据登录账号查询用户
@@ -32,7 +32,7 @@ func AdminLoginHandle(c *gin.Context) {
 	admin, err := query.GetAdminByLogin(req.LoginName)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	// 根据用户id和原始密码进行加密
@@ -40,7 +40,7 @@ func AdminLoginHandle(c *gin.Context) {
 	if req.Password != admin.Password {
 		err = errors.New("password is invalid")
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	req.Ip = c.GetHeader("IP")
@@ -49,7 +49,7 @@ func AdminLoginHandle(c *gin.Context) {
 	token, err = handle.GenerateToken(admin.ID, time.Now(), config.GetConfig().TokenSecret)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 
@@ -91,7 +91,7 @@ func AdminLogoutHandle(c *gin.Context) {
 	token, err := cache.GetCache().Get(userMeta.AccountId)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go func() {
