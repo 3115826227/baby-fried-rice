@@ -3,6 +3,7 @@ package query
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
 	"baby-fried-rice/internal/pkg/module/accountDao/cache"
@@ -32,7 +33,7 @@ func IsDuplicateLoginNameByUser(loginName string) (bool, error) {
 	var count int64 = 0
 	if err := db.GetDB().GetDB().Model(&tables.AccountUser{}).Where("login_name = ?", loginName).Count(&count).Error; err != nil {
 		log.Logger.Error(err.Error())
-		return false, err
+		return false, errors.NewInternalErr(err)
 	}
 	return count != 0, nil
 }
@@ -41,7 +42,9 @@ func GetUserByLogin(loginName string) (root tables.AccountUser, err error) {
 	var query = map[string]interface{}{
 		"login_name": loginName,
 	}
-	err = db.GetDB().GetObject(query, &root)
+	if err = db.GetDB().GetObject(query, &root); err != nil {
+		err = errors.NewInternalErr(err)
+	}
 	return
 }
 
@@ -49,6 +52,7 @@ func GetUserDetail(accountId string) (detail tables.AccountUserDetail, err error
 	if detail, err = cache.GetUserDetail(accountId); err != nil {
 		err = db.GetDB().GetObject(map[string]interface{}{"account_id": accountId}, &detail)
 		if err != nil {
+			err = errors.NewInternalErr(err)
 			return
 		}
 		go cache.SetUserDetail(detail)

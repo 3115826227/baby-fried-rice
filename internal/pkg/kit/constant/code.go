@@ -1,13 +1,17 @@
-package handle
+package constant
+
+import "github.com/gin-gonic/gin"
+
+type Code uint32
 
 const (
-	CodeInvalidParams     = 400
-	CodeRequiredLogin     = 401
-	CodeRequiredForbidden = 403
-	CodeNotFound          = 404
-	CodeInternalError     = 500
-	CodeServiceNotFound   = 502
-	CodeUnVerifyForbidden = 600
+	CodeInvalidParams     Code = 400
+	CodeRequiredLogin          = 401
+	CodeRequiredForbidden      = 403
+	CodeNotFound               = 404
+	CodeInternalError     Code = 500
+	CodeServiceNotFound        = 502
+	CodeUnVerifyForbidden      = 600
 
 	CodeNeedApplyAddFriend = 20010
 
@@ -16,6 +20,7 @@ const (
 
 	CodeSessionOriginPermission = 20031
 
+	ErrCodeLoginFailed    = 99
 	CodeLoginNameEmpty    = 30011
 	CodeLoginNameExist    = 30012
 	CodePasswordEmpty     = 30013
@@ -38,6 +43,9 @@ const (
 	CodeSelfVideoConflictError = 20101
 	CodeUserVideoConflictError = 20102
 	CodeUserOfflineError       = 20103
+
+	CodeSpaceContentEmptyError       = 20501
+	CodeSpaceVisitorTypeInvalidError = 20511
 )
 
 const (
@@ -57,6 +65,7 @@ const (
 	CodeSessionOriginPermissionMsg = "只有会话创建才有该权限"
 
 	// 用户相关
+	ErrCodeLoginFailedMsg    = "用户名或密码错误"
 	CodeLoginNameEmptyMsg    = "登录账号不能为空"
 	CodeLoginNameExistMsg    = "登录账号已存在"
 	CodePasswordEmptyMsg     = "登录密码不能为空"
@@ -81,9 +90,53 @@ const (
 	CodeSelfVideoConflictErrorMsg = "您有未结束的通话，请先结束当前会话"
 	CodeUserVideoConflictErrorMsg = "对方正在通话，请稍后再试"
 	CodeUserOfflineErrorMsg       = "对方未上线，请稍后再试"
+
+	CodeSpaceContentEmptyErrorMsg       = "动态内容不能为空"
+	CodeSpaceVisitorTypeInvalidErrorMsg = "动态访问类型参数非法"
 )
 
 const (
 	InternalCodePhoneEmptyMsg   = "phone is empty"
 	InternalCodePhoneInvalidMsg = "phone is invalid"
 )
+
+var ErrCodeM = map[Code]string{
+	ErrCodeLoginFailed:    ErrCodeLoginFailedMsg,
+	CodeInvalidParams:     CodeInvalidParamsMsg,
+	CodeInternalError:     CodeInternalErrorMsg,
+	CodeRequiredForbidden: CodeRequiredForbiddenMsg,
+
+	CodeLoginNameEmpty:    CodeLoginNameEmptyMsg,
+	CodeLoginNameExist:    CodeLoginNameExistMsg,
+	CodePasswordEmpty:     CodePasswordEmptyMsg,
+	CodeLoginNameNotExist: CodeLoginNameNotExistMsg,
+	CodePasswordInvalid:   CodePasswordInvalidMsg,
+	CodeUsernameEmpty:     CodeUsernameEmptyMsg,
+	CodeUserFreeze:        CodeUserFreezeMsg,
+	CodeUserCancel:        CodeUserCancelMsg,
+
+	CodePhoneInvalid:           CodePhoneInvalidMsg,
+	CodePhoneEmpty:             CodePhoneEmptyMsg,
+	CodePhoneVerifyExist:       CodePhoneVerifyExistMsg,
+	CodePhoneVerifyCodeTooBusy: CodePhoneVerifyCodeTooBusyMsg,
+	CodePhoneVerifyCodeError:   CodePhoneVerifyCodeErrorMsg,
+	CodePhoneVerifyCodeInvalid: CodePhoneVerifyCodeInvalidMsg,
+	CodePhoneVerifyCodeExpire:  CodePhoneVerifyCodeExpireMsg,
+	CodePhoneVerifyCodeEmpty:   CodePhoneVerifyCodeEmptyMsg,
+	CodeSelfVideoConflictError: CodeSelfVideoConflictErrorMsg,
+	CodeUserVideoConflictError: CodeUserVideoConflictErrorMsg,
+	CodeUserOfflineError:       CodeUserOfflineErrorMsg,
+
+	CodeSpaceContentEmptyError:       CodeSpaceContentEmptyErrorMsg,
+	CodeSpaceVisitorTypeInvalidError: CodeSpaceVisitorTypeInvalidErrorMsg,
+}
+
+var ParamErrResponse = gin.H{
+	"code": CodeInvalidParams,
+	"data": make(map[string]interface{}),
+}
+
+var SysErrResponse = gin.H{
+	"code": CodeInternalError,
+	"data": make(map[string]interface{}),
+}

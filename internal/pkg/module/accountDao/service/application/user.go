@@ -3,6 +3,7 @@ package application
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
+	Errors "baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/user"
@@ -12,9 +13,9 @@ import (
 	"baby-fried-rice/internal/pkg/module/accountDao/log"
 	"baby-fried-rice/internal/pkg/module/accountDao/query"
 	"context"
-	"errors"
 	"fmt"
 	"github.com/go-redis/redis"
+	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 	"strings"
@@ -54,6 +55,7 @@ func (service *UserService) UserDaoLoginNameExist(ctx context.Context, req *user
 	exist, err = query.IsDuplicateLoginNameByUser(req.LoginName)
 	if err != nil {
 		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.LoginName))
+		err = Errors.NewCommonError(constant.CodeLoginNameExist)
 		return
 	}
 	resp = &user.RspUserDaoLoginNameExist{
@@ -63,6 +65,18 @@ func (service *UserService) UserDaoLoginNameExist(ctx context.Context, req *user
 }
 
 func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUserRegister) (empty *emptypb.Empty, err error) {
+	var exist bool
+	exist, err = query.IsDuplicateLoginNameByUser(req.Login.LoginName)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		err = Errors.NewCommonErr(constant.CodeInvalidParams, err)
+		return nil, Errors.ConvertEdgeXErrToRpc(err)
+	}
+	if exist {
+		log.Logger.Error(fmt.Sprintf("login name %v is duplication", req.Login.LoginName))
+		err = Errors.NewCommonErr(constant.CodeLoginNameExist, err)
+		return nil, Errors.ConvertEdgeXErrToRpc(err)
+	}
 	accountID := handle.GenerateSerialNumber()
 	for {
 		if !query.IsDuplicateAccountID(accountID) {
@@ -112,16 +126,16 @@ func (service *UserService) UserDaoRegister(ctx context.Context, req *user.ReqUs
 
 	if err = db.GetDB().CreateMulti(beans...); err != nil {
 		log.Logger.Error(err.Error())
-		return
+		return nil, Errors.ConvertEdgeXErrToRpc(err)
 	}
 	// 将用户信息和用户积分信息写入缓存
 	if err = cache.SetUserDetail(detail); err != nil {
 		log.Logger.Error(err.Error())
-		return
+		return nil, Errors.ConvertEdgeXErrToRpc(err)
 	}
 	if err = cache.SetUserCoin(coin); err != nil {
 		log.Logger.Error(err.Error())
-		return
+		return nil, Errors.ConvertEdgeXErrToRpc(err)
 	}
 	empty = new(emptypb.Empty)
 	return

@@ -2,6 +2,7 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
 	"crypto/md5"
@@ -15,53 +16,6 @@ import (
 	"strconv"
 	"time"
 )
-
-const (
-	ErrCodeLoginFailed = 99
-)
-
-var ErrCodeM = map[int]string{
-	ErrCodeLoginFailed:    "用户名或者密码错误",
-	CodeInvalidParams:     CodeInvalidParamsMsg,
-	CodeInternalError:     CodeInternalErrorMsg,
-	CodeRequiredForbidden: CodeRequiredForbiddenMsg,
-
-	CodeLoginNameEmpty:    CodeLoginNameEmptyMsg,
-	CodeLoginNameExist:    CodeLoginNameExistMsg,
-	CodePasswordEmpty:     CodePasswordEmptyMsg,
-	CodeLoginNameNotExist: CodeLoginNameNotExistMsg,
-	CodePasswordInvalid:   CodePasswordInvalidMsg,
-	CodeUsernameEmpty:     CodeUsernameEmptyMsg,
-	CodeUserFreeze:        CodeUserFreezeMsg,
-	CodeUserCancel:        CodeUserCancelMsg,
-
-	CodePhoneInvalid:           CodePhoneInvalidMsg,
-	CodePhoneEmpty:             CodePhoneEmptyMsg,
-	CodePhoneVerifyExist:       CodePhoneVerifyExistMsg,
-	CodePhoneVerifyCodeTooBusy: CodePhoneVerifyCodeTooBusyMsg,
-	CodePhoneVerifyCodeError:   CodePhoneVerifyCodeErrorMsg,
-	CodePhoneVerifyCodeInvalid: CodePhoneVerifyCodeInvalidMsg,
-	CodePhoneVerifyCodeExpire:  CodePhoneVerifyCodeExpireMsg,
-	CodePhoneVerifyCodeEmpty:   CodePhoneVerifyCodeEmptyMsg,
-	CodeSelfVideoConflictError: CodeSelfVideoConflictErrorMsg,
-	CodeUserVideoConflictError: CodeUserVideoConflictErrorMsg,
-	CodeUserOfflineError:       CodeUserOfflineErrorMsg,
-}
-
-var LoginErrResponse = gin.H{
-	"code":    ErrCodeLoginFailed,
-	"message": ErrCodeM[ErrCodeLoginFailed],
-}
-
-var ParamErrResponse = gin.H{
-	"code":    CodeInvalidParams,
-	"message": ErrCodeM[CodeInvalidParams],
-}
-
-var SysErrResponse = gin.H{
-	"code":    CodeInternalError,
-	"message": ErrCodeM[CodeInternalError],
-}
 
 var (
 	randSource = rand.NewSource(time.Now().UnixNano())
@@ -87,20 +41,16 @@ func SuccessListResp(c *gin.Context, message string, list []interface{}, total, 
 }
 
 func SystemErrorResponse(c *gin.Context) {
-	c.JSON(http.StatusInternalServerError, SysErrResponse)
+	c.JSON(http.StatusOK, constant.SysErrResponse)
 }
 
-func FailedResp(c *gin.Context, code int) {
-	msg, ok := ErrCodeM[code]
-	if !ok {
-		c.JSON(http.StatusOK, SysErrResponse)
-		return
-	}
-	c.JSON(http.StatusOK, rsp.CommonResp{Code: code, Message: msg, Data: make(map[string]interface{})})
+func FailedResp(c *gin.Context, err error) {
+	errw := errors.NewCommonErrorWrapper(err)
+	c.JSON(http.StatusOK, rsp.CommonResp{Code: errw.Code(), Data: make(map[string]interface{})})
 }
 
-func ErrorResp(c *gin.Context, statusCode, errCode int, message string) {
-	msg, ok := ErrCodeM[errCode]
+func ErrorResp(c *gin.Context, statusCode int, errCode constant.Code, message string) {
+	msg, ok := constant.ErrCodeM[errCode]
 	if ok && message == "" {
 		message = msg
 	}

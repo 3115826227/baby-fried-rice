@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/db/tables"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models"
@@ -20,7 +21,7 @@ func AddCommodityHandle(c *gin.Context) {
 	var req requests.ReqAddCommodity
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var now = time.Now()
@@ -37,7 +38,7 @@ func AddCommodityHandle(c *gin.Context) {
 	commodity.CreatedAt, commodity.UpdatedAt = now, now
 	if err := db.GetShopDB().CreateObject(&commodity); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -48,7 +49,7 @@ func UpdateCommodityHandle(c *gin.Context) {
 	var req requests.ReqUpdateCommodity
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var commodity = tables.Commodity{
@@ -67,7 +68,7 @@ func UpdateCommodityHandle(c *gin.Context) {
 	commodity.UpdatedAt = time.Now()
 	if err := db.GetShopDB().GetDB().Updates(&commodity).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -78,7 +79,7 @@ func CommodityHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var (
@@ -95,7 +96,7 @@ func CommodityHandle(c *gin.Context) {
 	commodities, total, err = query.GetCommodities(param)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -111,7 +112,7 @@ func DeleteCommodityHandle(c *gin.Context) {
 	var commodity tables.Commodity
 	if err := db.GetShopDB().GetDB().Where("id = ?", id).First(&commodity).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var relations []tables.CommodityImageRel
@@ -137,12 +138,12 @@ func DeleteCommodityHandle(c *gin.Context) {
 	}()
 	if err = tx.Delete(&commodity).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if err = tx.Delete(&tables.CommodityImageRel{}, "commodity_id = ?", id).Error; err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	go func() {

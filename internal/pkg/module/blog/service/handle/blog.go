@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -26,19 +27,19 @@ func TagAddHandle(c *gin.Context) {
 	var req requests.ReqAddTag
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.TagAddDao(context.Background(),
 		&blog.ReqTagAddDao{Origin: userMeta.AccountId, Tags: []string{req.Tag}}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -51,14 +52,14 @@ func TagHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *blog.RspTagQueryDao
 	if resp, err = client.TagQueryDao(context.Background(),
 		&blog.ReqTagQueryDao{Origin: userMeta.AccountId}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.TagResp{Tags: resp.Tags}
@@ -73,13 +74,13 @@ func TagDeleteHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.TagDeleteDao(context.Background(),
 		&blog.ReqTagDeleteDao{Origin: userMeta.AccountId, Tags: tags}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -92,19 +93,19 @@ func CategoryAddHandle(c *gin.Context) {
 	var req requests.ReqAddCategory
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.CategoryAddDao(context.Background(),
 		&blog.ReqCategoryAddDao{Origin: userMeta.AccountId, Category: req.Category}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -117,14 +118,14 @@ func CategoryHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *blog.RspCategoryQueryDao
 	if resp, err = client.CategoryQueryDao(context.Background(),
 		&blog.ReqCategoryQueryDao{Origin: userMeta.AccountId}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.CategoryResp{Categories: resp.Category}
@@ -139,13 +140,13 @@ func CategoryDeleteHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.CategoryDeleteDao(context.Background(),
 		&blog.ReqCategoryDeleteDao{Origin: userMeta.AccountId, Category: category}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -166,13 +167,13 @@ func BlogAddHandle(c *gin.Context) {
 	var req requests.ReqAddBlog
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var blogReq = blog.ReqBlogAddDao{
@@ -184,19 +185,19 @@ func BlogAddHandle(c *gin.Context) {
 	}
 	if _, err = client.BlogAddDao(context.Background(), &blogReq); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var fileName = fmt.Sprintf("file/blog_%v_%v.md", userMeta.AccountId, req.Title)
 	if err = writeFile([]byte(req.Content), fileName); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var data []byte
 	if data, err = handle.FileUpload(config.GetConfig().Rpc.SubServers.FileServer, fileName, *userMeta); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	log.Logger.Info(string(data))
@@ -215,13 +216,13 @@ func BlogUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateBlog
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var blogReq = blog.ReqBlogUpdateDao{
@@ -234,19 +235,19 @@ func BlogUpdateHandle(c *gin.Context) {
 	}
 	if _, err = client.BlogUpdateDao(context.Background(), &blogReq); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var fileName = fmt.Sprintf("file/blog_%v_%v.md", userMeta.AccountId, req.Title)
 	if err = writeFile([]byte(req.Content), fileName); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var data []byte
 	if data, err = handle.FileUpload(config.GetConfig().Rpc.SubServers.FileServer, fileName, *userMeta); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	log.Logger.Info(string(data))
@@ -263,19 +264,19 @@ func BlogHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var queryType int
 	if queryType, err = strconv.Atoi(c.Query("query_type")); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var blogReq = blog.ReqBlogQueryDao{
@@ -289,7 +290,7 @@ func BlogHandle(c *gin.Context) {
 	if resp, err = client.BlogQueryDao(context.Background(), &blogReq)
 		err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -299,14 +300,14 @@ func BlogHandle(c *gin.Context) {
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(),
 		&user.ReqUserDaoById{Ids: ids}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]rsp.User)
@@ -343,33 +344,33 @@ func BlogDetailHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *blog.RspBlogDetailQueryDao
 	if resp, err = client.BlogDetailQueryDao(context.Background(),
 		&blog.ReqBlogDetailQueryDao{BlogId: blogId, AccountId: userMeta.AccountId}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(),
 		&user.ReqUserDaoById{Ids: []string{resp.Blog.Blogger}}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if len(userResp.Users) != 1 {
 		err = fmt.Errorf("failed to get blogger by user dao")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var u = userResp.Users[0]
@@ -402,13 +403,13 @@ func BlogDeleteHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.BlogDeleteDao(context.Background(),
 		&blog.ReqBlogDeleteDao{Origin: userMeta.AccountId, BlogIds: ids}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -421,33 +422,33 @@ func BloggerHandle(c *gin.Context) {
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *blog.RspBloggerQueryDao
 	if resp, err = client.BloggerQueryDao(context.Background(),
 		&blog.ReqBloggerQueryDao{Blogger: blogger}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(),
 		&user.ReqUserDaoById{Ids: []string{resp.Blogger}}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if len(userResp.Users) != 1 {
 		err = fmt.Errorf("failed to get blogger by user dao")
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var u = userResp.Users[0]
@@ -473,13 +474,13 @@ func BloggerFansHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *blog.RspFansQueryDao
@@ -490,20 +491,20 @@ func BloggerFansHandle(c *gin.Context) {
 			PageSize: reqPage.PageSize,
 		}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(),
 		&user.ReqUserDaoById{Ids: resp.Users}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]rsp.User)
@@ -529,13 +530,13 @@ func BloggerFocusOnHandle(c *gin.Context) {
 	var req requests.ReqFocusOnBlogger
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.FocusAddDao(context.Background(),
@@ -545,7 +546,7 @@ func BloggerFocusOnHandle(c *gin.Context) {
 			Account: userMeta.AccountId,
 		}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -558,13 +559,13 @@ func BlogLikeHandle(c *gin.Context) {
 	var req requests.ReqBlogLikeBlogger
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client blog.DaoBlogClient
 	if client, err = grpc.GetBlogClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if _, err = client.BlogLikeAddDao(context.Background(),
@@ -574,7 +575,7 @@ func BlogLikeHandle(c *gin.Context) {
 			Account: userMeta.AccountId,
 		}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)

@@ -24,6 +24,7 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 	var s = tables.Space{
 		Origin:      req.Origin,
 		VisitorType: req.VisitorType,
+		Anonymity:   req.Anonymity,
 	}
 	now := time.Now()
 	s.CreatedAt, s.UpdatedAt = now, now
@@ -59,8 +60,21 @@ func (service *SpaceService) SpaceAddDao(ctx context.Context, req *space.ReqSpac
 	return
 }
 
-// 空间动态删除
-func (service *SpaceService) SpaceDeleteDao(ctx context.Context, req *space.ReqSpaceDeleteDao) (empty *emptypb.Empty, err error) {
+// 空间动态转发
+func (service *SpaceService) SpaceForwardDao(ctx context.Context, req *space.ReqSpaceForwardDao) (resp *space.RspSpaceForwardDao, err error) {
+	var originSpace tables.Space
+	originSpace, err = query.GetSpace(req.SpaceId)
+	if err != nil {
+		return
+	}
+	var s = tables.Space{
+		Origin:      req.Origin,
+		VisitorType: req.VisitorType,
+		Forward:     true,
+	}
+	now := time.Now()
+	s.CreatedAt, s.UpdatedAt = now, now
+	s.ID = handle.GenerateSerialNumberByLen(10)
 	var tx = db.GetDB().GetDB().Begin()
 	defer func() {
 		if err != nil {
@@ -69,16 +83,117 @@ func (service *SpaceService) SpaceDeleteDao(ctx context.Context, req *space.ReqS
 		}
 		tx.Commit()
 	}()
+	originSpace.ForwardTotal += 1
+	if err = tx.Save(&originSpace).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	if err = tx.Create(&s).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var detail = tables.SpaceDetail{
+		ID:      s.ID,
+		Content: req.Content,
+	}
+	if err = tx.Create(&detail).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var forward = tables.SpaceForwardRelation{
+		OriginSpaceId:  req.SpaceId,
+		ForwardSpaceId: s.ID,
+	}
+	if err = tx.Create(&forward).Error; err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	resp = &space.RspSpaceForwardDao{
+		Id: s.ID,
+	}
+	return
+}
+
+// 空间动态删除
+func (service *SpaceService) SpaceDeleteDao(ctx context.Context, req *space.ReqSpaceDeleteDao) (empty *emptypb.Empty, err error) {
+	var s tables.Space
+	s, err = query.GetSpace(req.Id)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var tx = db.GetDB().GetDB().Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	var originSpace tables.Space
+	if s.Forward {
+		if originSpace, err = query.GetSpace(s.OriginSpaceId); err == nil {
+			originSpace.ForwardTotal -= 1
+			if err = tx.Save(&originSpace).Error; err != nil {
+				log.Logger.Error(err.Error())
+				return
+			}
+		} else {
+			if err != gorm.ErrRecordNotFound {
+				log.Logger.Error(err.Error())
+				return
+			}
+			err = nil
+		}
+	}
 	if err = tx.Where("id = ? and origin = ?",
 		req.Id, req.Origin).Delete(&tables.Space{}).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if err = tx.Where("space_id = ?", req.Id).Delete(&tables.SpaceDetail{}).Error; err != nil {
+	if err = tx.Where("id = ?", req.Id).Delete(&tables.SpaceDetail{}).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
 	empty = new(emptypb.Empty)
+	return
+}
+
+// 空间动态列表基本查询
+func (service *SpaceService) SpaceBaseQueryDao(ctx context.Context, req *space.ReqSpaceBaseQueryDao) (resp *space.RspSpaceBaseQueryDao, err error) {
+	var spaces []tables.Space
+	spaces, err = query.SpaceQueryByIds(req.Ids)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var spaceMap = make(map[string]tables.Space)
+	for _, s := range spaces {
+		spaceMap[s.ID] = s
+	}
+	var details []tables.SpaceDetail
+	details, err = query.SpaceDetailQuery(req.Ids)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+	var list = make([]*space.SpaceBaseQueryDao, 0)
+	for _, detail := range details {
+		var s = &space.SpaceBaseQueryDao{
+			Id:          detail.ID,
+			Origin:      spaceMap[detail.ID].Origin,
+			Content:     detail.Content,
+			VisitorType: spaceMap[detail.ID].VisitorType,
+			Anonymity:   spaceMap[detail.ID].Anonymity,
+		}
+		if detail.Images != "" {
+			s.Images = strings.Split(detail.Images, ",")
+		} else {
+			s.Images = make([]string, 0)
+		}
+		list = append(list, s)
+	}
+	resp = &space.RspSpaceBaseQueryDao{List: list}
 	return
 }
 
@@ -116,17 +231,25 @@ func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSp
 		return
 	}
 	var querySpaces []*space.SpaceQueryDao
+	var originSpaceIdMap = make(map[string]struct{})
+	var originSpaceIds = make([]string, 0)
 	for _, s := range spaces {
 		var querySpace = &space.SpaceQueryDao{
-			Id:           s.ID,
-			Origin:       s.Origin,
-			Content:      detailMap[s.ID].Content,
-			VisitorType:  s.VisitorType,
-			VisitTotal:   s.VisitTotal,
-			LikeTotal:    s.LikeTotal,
-			CommentTotal: s.CommentTotal,
-			FloorTotal:   s.FloorTotal,
-			CreateTime:   s.CreatedAt.Unix(),
+			Id:            s.ID,
+			Origin:        s.Origin,
+			Content:       detailMap[s.ID].Content,
+			VisitorType:   s.VisitorType,
+			VisitTotal:    s.VisitTotal,
+			LikeTotal:     s.LikeTotal,
+			CommentTotal:  s.CommentTotal,
+			FloorTotal:    s.FloorTotal,
+			CreateTime:    s.CreatedAt.Unix(),
+			Forward:       s.Forward,
+			OriginSpaceId: s.OriginSpaceId,
+			Anonymity:     s.Anonymity,
+		}
+		if s.Forward {
+			originSpaceIds = append(originSpaceIds, s.OriginSpaceId)
 		}
 		if detailMap[s.ID].Images != "" {
 			querySpace.Images = strings.Split(detailMap[s.ID].Images, ",")
@@ -137,6 +260,20 @@ func (service *SpaceService) SpaceQueryDao(ctx context.Context, req *space.ReqSp
 			querySpace.OriginLiked = true
 		}
 		querySpaces = append(querySpaces, querySpace)
+	}
+	var originSpaces []tables.Space
+	originSpaces, err = query.SpaceQueryByIds(originSpaceIds)
+	for _, originSpace := range originSpaces {
+		originSpaceIdMap[originSpace.ID] = struct{}{}
+	}
+	for index, s := range querySpaces {
+		if s.Forward {
+			if _, exist := originSpaceIdMap[s.OriginSpaceId]; exist {
+				querySpaces[index].OriginSpaceId = s.OriginSpaceId
+			} else {
+				querySpaces[index].OriginSpaceId = ""
+			}
+		}
 	}
 	resp = &space.RspSpaceQueryDao{
 		Spaces: querySpaces,
@@ -159,6 +296,7 @@ func (service *SpaceService) SpaceIncrUpdateDao(ctx context.Context, req *space.
 	s.LikeTotal += req.LikeIncrement
 	s.CommentTotal += req.CommentIncrement
 	s.FloorTotal += req.FloorIncrement
+	s.ForwardTotal += req.ForwardIncrement
 	if err = db.GetDB().UpdateObject(&s); err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -195,11 +333,12 @@ func (service *SpaceService) VisitAddDao(ctx context.Context, req *comment.ReqVi
 // 评论添加
 func (service *SpaceService) CommentAddDao(ctx context.Context, req *comment.ReqCommentAddDao) (resp *comment.RspCommentAddDao, err error) {
 	var s = tables.CommentRelation{
-		BizID:    req.BizId,
-		BizType:  req.BizType,
-		ParentId: req.ParentId,
-		Origin:   req.Origin,
-		Floor:    req.Floor,
+		BizID:     req.BizId,
+		BizType:   req.BizType,
+		ParentId:  req.ParentId,
+		Origin:    req.Origin,
+		Floor:     req.Floor,
+		Anonymity: req.Anonymity,
 	}
 	if req.ParentId != "" {
 		var parentComment tables.CommentRelation
@@ -273,6 +412,7 @@ func CommentReplyQuery(params query.CommentQueryParams) (replies []*comment.Comm
 			Origin:          c.Origin,
 			CreateTimestamp: c.CreatedAt.Unix(),
 			LikeTotal:       c.LikeTotal,
+			Anonymity:       c.Anonymity,
 		}
 		if _, exist := optMap[c.ID]; exist {
 			reply.OriginLiked = true
@@ -329,6 +469,7 @@ func CommentReplyRecursionQuery(params query.CommentQueryParams) (replies []*com
 			CreateTimestamp: c.CreatedAt.Unix(),
 			LikeTotal:       c.LikeTotal,
 			Reply:           childReplies,
+			Anonymity:       c.Anonymity,
 		}
 		if _, exist := optMap[c.ID]; exist {
 			reply.OriginLiked = true
@@ -406,6 +547,7 @@ func (service *SpaceService) CommentQueryDao(ctx context.Context, req *comment.R
 			ReplyTotal:      replyTotalMap[c.ID],
 			LikeTotal:       c.LikeTotal,
 			Reply:           replyMap[c.ID],
+			Anonymity:       c.Anonymity,
 		}
 		if _, exist := optMap[c.ID]; exist {
 			cmmt.OriginLiked = true
@@ -518,6 +660,7 @@ func (service *SpaceService) CommentDeleteDao(ctx context.Context, req *comment.
 
 // 业务下的评论清空
 func (service *SpaceService) CommentClearDao(ctx context.Context, req *comment.ReqCommentClearDao) (empty *emptypb.Empty, err error) {
+	empty = new(emptypb.Empty)
 	return
 }
 

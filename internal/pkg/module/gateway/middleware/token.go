@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/module/gateway/cache"
 	"encoding/json"
@@ -16,7 +17,7 @@ func CheckToken(c *gin.Context) {
 		token = c.Query(handle.HeaderToken)
 	}
 	if token == "" {
-		handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
+		handle.ErrorResp(c, http.StatusUnauthorized, constant.CodeRequiredLogin, constant.CodeRequiredLoginMsg)
 		c.Abort()
 		return
 	}
@@ -24,14 +25,14 @@ func CheckToken(c *gin.Context) {
 	var tokenKey = fmt.Sprintf("%v:%v", handle.TokenPrefix, token)
 	var str, err = cache.GetCache().Get(tokenKey)
 	if err != nil {
-		handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
+		handle.ErrorResp(c, http.StatusUnauthorized, constant.CodeRequiredLogin, constant.CodeRequiredLoginMsg)
 		c.Abort()
 		return
 	}
 	var userMeta handle.UserMeta
 	err = json.Unmarshal([]byte(str), &userMeta)
 	if err != nil {
-		handle.ErrorResp(c, http.StatusUnauthorized, handle.CodeRequiredLogin, handle.CodeRequiredLoginMsg)
+		handle.ErrorResp(c, http.StatusUnauthorized, constant.CodeRequiredLogin, constant.CodeRequiredLoginMsg)
 		c.Abort()
 		return
 	}

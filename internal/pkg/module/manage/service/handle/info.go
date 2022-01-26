@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/module/manage/cache"
 	"baby-fried-rice/internal/pkg/module/manage/log"
@@ -15,7 +16,7 @@ func CacheInfoHandle(c *gin.Context) {
 	result, err := cache.GetCache().Info()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	results := strings.Split(result, "\n")

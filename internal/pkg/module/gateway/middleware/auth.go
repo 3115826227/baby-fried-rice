@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/module/gateway/log"
 	"baby-fried-rice/internal/pkg/module/gateway/server"
@@ -22,7 +24,7 @@ func Auth(c *gin.Context) {
 			return
 		}
 		if exist {
-			handle.FailedResp(c, handle.CodeUnVerifyForbidden)
+			handle.FailedResp(c, errors.NewCommonError(constant.CodeUnVerifyForbidden))
 			c.Abort()
 			return
 		}

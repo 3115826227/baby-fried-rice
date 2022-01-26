@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -21,13 +22,13 @@ func CommentAddHandle(c *gin.Context) {
 	var req requests.ReqAddComment
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	commentClient, err := grpc.GetCommentClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
@@ -39,14 +40,14 @@ func CommentAddHandle(c *gin.Context) {
 		Origin:   userMeta.AccountId,
 	}
 	if reqComment.Floor, err = handleBizCommentAdd(req, userMeta.AccountId); err != nil {
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *comment.RspCommentAddDao
 	resp, err = commentClient.CommentAddDao(context.Background(), reqComment)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", resp.Id)
@@ -58,13 +59,13 @@ func CommentQueryHandle(c *gin.Context) {
 	bizType, err := strconv.Atoi(c.Query("biz_type"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var pageReq requests.PageCommonReq
 	if pageReq, err = handle.PageHandle(c); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
@@ -79,7 +80,7 @@ func CommentQueryHandle(c *gin.Context) {
 	comments, total, err := commentQueryHandle(req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	for _, cmmt := range comments {
@@ -93,20 +94,20 @@ func CommentReplyQueryHandle(c *gin.Context) {
 	floor, err := strconv.Atoi(c.Query("floor"))
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	bizId := c.Query("biz_id")
 	var bizType int
 	if bizType, err = strconv.Atoi(c.Query("biz_type")); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var pageReq requests.PageCommonReq
 	if pageReq, err = handle.PageHandle(c); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
@@ -122,7 +123,7 @@ func CommentReplyQueryHandle(c *gin.Context) {
 	replies, total, err := commentReplyQueryHandle(req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	for _, reply := range replies {
@@ -139,14 +140,14 @@ func CommentDeleteHandle(c *gin.Context) {
 	bizType, err := strconv.Atoi(bizTypeStr)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
 	var commentClient comment.DaoCommentClient
 	if commentClient, err = grpc.GetCommentClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = &comment.ReqCommentDeleteDao{
@@ -159,11 +160,11 @@ func CommentDeleteHandle(c *gin.Context) {
 	resp, err = commentClient.CommentDeleteDao(context.Background(), req)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if err = handleBizCommentTotal(bizId, comment.BizType(bizType), -resp.Total); err != nil {
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -182,6 +183,7 @@ func commentQueryHandle(req comment.ReqCommentQueryDao) (comments []*rsp.Comment
 		return
 	}
 	total = commentResp.Total
+	comments = make([]*rsp.CommentResp, 0)
 	for _, cmmt := range commentResp.List {
 		comments = append(comments, rsp.CommentRpcConvertResponse(cmmt))
 	}

@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/comment"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/space"
 )
@@ -9,6 +11,27 @@ type ReqAddSpace struct {
 	Content     string                 `json:"content"`
 	Images      []string               `json:"images"`
 	VisitorType space.SpaceVisitorType `json:"visitor_type"`
+	Anonymity   bool                   `json:"anonymity"`
+}
+
+func (req ReqAddSpace) Validate() errors.Error {
+	var code constant.Code
+	if req.Content == "" {
+		code = constant.CodeSpaceContentEmptyError
+	}
+	if req.VisitorType > space.SpaceVisitorType_Private || req.VisitorType < space.SpaceVisitorType_Public {
+		code = constant.CodeSpaceVisitorTypeInvalidError
+	}
+	if code != 0 {
+		return errors.NewCommonError(code)
+	}
+	return nil
+}
+
+type ReqForwardSpace struct {
+	OriginSpaceId string                 `json:"origin_space_id"`
+	Content       string                 `json:"content"`
+	VisitorType   space.SpaceVisitorType `json:"visitor_type"`
 }
 
 type ReqQuerySpaces struct {

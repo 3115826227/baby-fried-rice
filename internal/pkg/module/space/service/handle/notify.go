@@ -37,7 +37,7 @@ func sendAddSpaceNotify(space rsp.SpaceResp, accountId string) {
 					Content:     space.Content,
 					Images:      space.Images,
 					VisitorType: space.VisitorType,
-					Origin: rsp.User{
+					Origin: &rsp.User{
 						AccountID:  detailResp.Detail.AccountId,
 						Username:   detailResp.Detail.Username,
 						HeadImgUrl: detailResp.Detail.HeadImgUrl,

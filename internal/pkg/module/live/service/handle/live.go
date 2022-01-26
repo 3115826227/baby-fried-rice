@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"baby-fried-rice/internal/pkg/kit/constant"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -19,13 +20,13 @@ func LiveRoomHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client live.DaoLiveClient
 	if client, err = grpc.GetLiveClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = live.ReqLiveRoomQueryDao{
@@ -35,7 +36,7 @@ func LiveRoomHandle(c *gin.Context) {
 	var resp *live.RspLiveRoomQueryDao
 	if resp, err = client.LiveRoomQueryDao(context.Background(), &req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -45,13 +46,13 @@ func LiveRoomHandle(c *gin.Context) {
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]rsp.User)
@@ -81,7 +82,7 @@ func LiveRoomDetailHandle(c *gin.Context) {
 	client, err := grpc.GetLiveClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = live.ReqLiveRoomDetailQueryDao{
@@ -91,25 +92,25 @@ func LiveRoomDetailHandle(c *gin.Context) {
 	var resp *live.RspLiveRoomDetailQueryDao
 	if resp, err = client.LiveRoomDetailQueryDao(context.Background(), &req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: []string{resp.Origin}}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	if len(userResp.Users) != 1 {
 		err = fmt.Errorf("get user dao by id %v failed", resp.Origin)
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var u = userResp.Users[0]
@@ -137,13 +138,13 @@ func LiveRoomUserHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client live.DaoLiveClient
 	if client, err = grpc.GetLiveClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = live.ReqLiveRoomUserQueryDao{
@@ -155,7 +156,7 @@ func LiveRoomUserHandle(c *gin.Context) {
 	var resp *live.RspLiveRoomUserQueryDao
 	if resp, err = client.LiveRoomUserQueryDao(context.Background(), &req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -165,13 +166,13 @@ func LiveRoomUserHandle(c *gin.Context) {
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]rsp.User)
@@ -202,13 +203,13 @@ func LiveRoomOriginUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateOriginLiveRoom
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client live.DaoLiveClient
 	if client, err = grpc.GetLiveClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var resp *live.RspLiveRoomDetailQueryDao
@@ -217,7 +218,7 @@ func LiveRoomOriginUpdateHandle(c *gin.Context) {
 		Status: req.Status,
 	}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response = rsp.UpdateOriginLiveRoomResp{
@@ -233,7 +234,7 @@ func LiveRoomOriginUpdateHandle(c *gin.Context) {
 		swapSdp, err = CreateSession(req.Sdp, resp.LiveRoomId, userMeta.AccountId, true)
 		if err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		response.SwapSdp = swapSdp
@@ -248,13 +249,13 @@ func LiveRoomUserOptUpdateHandle(c *gin.Context) {
 	var req requests.ReqUpdateUserLiveRoomOpt
 	if err = c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client live.DaoLiveClient
 	if client, err = grpc.GetLiveClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var liveReq = live.ReqLiveRoomUserOptAddDao{
@@ -265,7 +266,7 @@ func LiveRoomUserOptUpdateHandle(c *gin.Context) {
 	var resp *live.RspLiveRoomUserOptAddDao
 	if resp, err = client.LiveRoomUserOptAddDao(context.Background(), &liveReq); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var response rsp.UpdateUserLiveRoomOptResp
@@ -274,7 +275,7 @@ func LiveRoomUserOptUpdateHandle(c *gin.Context) {
 		var remoteSwapSdp string
 		if remoteSwapSdp, err = JoinSession(req.RemoteSdp, req.LiveRoomId, resp.Origin, true); err != nil {
 			log.Logger.Error(err.Error())
-			c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+			c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 			return
 		}
 		response.RemoteSwapSdp = remoteSwapSdp
@@ -288,13 +289,13 @@ func LiveRoomUserMessageHandle(c *gin.Context) {
 	reqPage, err := handle.PageHandle(c)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusBadRequest, handle.ParamErrResponse)
+		c.AbortWithStatusJSON(http.StatusBadRequest, constant.ParamErrResponse)
 		return
 	}
 	var client live.DaoLiveClient
 	if client, err = grpc.GetLiveClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var req = live.ReqLiveRoomMessageQueryDao{
@@ -306,7 +307,7 @@ func LiveRoomUserMessageHandle(c *gin.Context) {
 	var resp *live.RspLiveRoomMessageQueryDao
 	if resp, err = client.LiveRoomMessageQueryDao(context.Background(), &req); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var ids = make([]string, 0)
@@ -316,13 +317,13 @@ func LiveRoomUserMessageHandle(c *gin.Context) {
 	var userClient user.DaoUserClient
 	if userClient, err = grpc.GetUserClient(); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userResp *user.RspUserDaoById
 	if userResp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: ids}); err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, handle.SysErrResponse)
+		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
 	var userMap = make(map[string]rsp.User)
