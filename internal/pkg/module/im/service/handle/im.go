@@ -2,6 +2,7 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -42,20 +43,20 @@ func SessionAddHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	userClient, err := grpc.GetUserClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var resp *user.RspUserDaoById
 	resp, err = userClient.UserDaoById(context.Background(), &user.ReqUserDaoById{Ids: req.Joins})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodeInternalError))
 		return
 	}
 	var joins = make([]*im.JoinRemarkDao, 0)
@@ -265,7 +266,7 @@ func SessionDetailHandle(c *gin.Context) {
 	var imClient im.DaoImClient
 	if imClient, err = grpc.GetImClient(); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -276,7 +277,7 @@ func SessionDetailHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var joins = make([]rsp.User, 0)
@@ -343,7 +344,7 @@ func SessionJoinHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var reqSession = &im.ReqSessionDetailQueryDao{
@@ -354,7 +355,7 @@ func SessionJoinHandle(c *gin.Context) {
 	resp, err = imClient.SessionDetailQueryDao(context.Background(), reqSession)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	switch resp.JoinPermissionType {
@@ -365,7 +366,7 @@ func SessionJoinHandle(c *gin.Context) {
 		}
 		if _, err = imClient.SessionJoinDao(context.Background(), reqJoinSession); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, constant.CodeInternalError)
+			handle.SystemErrorResponse(c)
 			return
 		}
 	case im.SessionJoinPermissionType_InviteJoin:
@@ -384,7 +385,7 @@ func SessionJoinHandle(c *gin.Context) {
 		var optResp *im.RspOperatorAddDao
 		if optResp, err = imClient.OperatorAddDao(context.Background(), reqOperator); err != nil {
 			log.Logger.Error(err.Error())
-			handle.FailedResp(c, constant.CodeInternalError)
+			handle.SystemErrorResponse(c)
 			return
 		}
 		// 给需要确认的用户发送通知
@@ -577,7 +578,7 @@ func SessionMessageSendHandle(c *gin.Context) {
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var messageAddResp *im.RspSessionMessageAddDao

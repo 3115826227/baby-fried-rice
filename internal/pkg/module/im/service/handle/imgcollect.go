@@ -2,6 +2,7 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/rpc/pbservices/im"
@@ -16,13 +17,13 @@ func ImgCollectAddHandle(c *gin.Context) {
 	var req requests.ReqAddUserImgCollect
 	if err := c.ShouldBind(&req); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInvalidParams)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodeInvalidParams))
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	_, err = imClient.UserImgCollectAddDao(c, &im.ReqUserImgCollectAddDao{
@@ -31,7 +32,7 @@ func ImgCollectAddHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
@@ -49,7 +50,7 @@ func ImgCollectQueryHandle(c *gin.Context) {
 	imClient, err = grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var resp *im.RspUserImgCollectQueryDao
@@ -60,7 +61,7 @@ func ImgCollectQueryHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	var list = make([]interface{}, 0)
@@ -74,13 +75,13 @@ func ImgCollectDeleteHandle(c *gin.Context) {
 	userMeta := handle.GetUserMeta(c)
 	img := c.Query("img")
 	if img == "" {
-		handle.FailedResp(c, constant.CodeInvalidParams)
+		handle.FailedResp(c, errors.NewCommonError(constant.CodeInvalidParams))
 		return
 	}
 	imClient, err := grpc.GetImClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	_, err = imClient.UserImgCollectDeleteDao(c, &im.ReqUserImgCollectDeleteDao{
@@ -89,7 +90,7 @@ func ImgCollectDeleteHandle(c *gin.Context) {
 	})
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	handle.SuccessResp(c, "", nil)
