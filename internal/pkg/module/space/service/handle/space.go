@@ -29,13 +29,13 @@ func SpaceAddHandle(c *gin.Context) {
 	// 请求参数校验
 	if err := req.Validate(); err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, err.Code())
+		handle.FailedResp(c, err)
 		return
 	}
 	client, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)
@@ -52,7 +52,7 @@ func SpaceAddHandle(c *gin.Context) {
 	resp, err = client.SpaceAddDao(context.Background(), reqSpace)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		handle.FailedResp(c, constant.CodeInternalError)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	go func() {
@@ -79,7 +79,7 @@ func SpaceForwardHandle(c *gin.Context) {
 	client, err := grpc.GetSpaceClient()
 	if err != nil {
 		log.Logger.Error(err.Error())
-		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
+		handle.SystemErrorResponse(c)
 		return
 	}
 	userMeta := handle.GetUserMeta(c)

@@ -48,7 +48,7 @@ func SignInLogHandle(c *gin.Context) {
 		month = 0
 	}
 	if day, err = strconv.Atoi(c.Query("day")); err != nil {
-		month = 0
+		day = 0
 	}
 	userMeta := handle.GetUserMeta(c)
 	var userClient user.DaoUserClient
