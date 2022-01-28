@@ -211,18 +211,6 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 			AccountID: detail.AccountID,
 		}
 	}
-	var decodePhoneBytes []byte
-	decodePhoneBytes, err = utils.Base64Decode(detail.Phone)
-	if err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
-	var phoneBytes []byte
-	phoneBytes, err = utils.GcmDecrypt(decodePhoneBytes, utils.EncryptKey(detail.AccountID))
-	if err != nil {
-		log.Logger.Error(err.Error())
-		return
-	}
 	resp = &user.RspDaoUserDetail{
 		Detail: &user.DaoUserDetail{
 			AccountId:  detail.AccountID,
@@ -231,11 +219,25 @@ func (service *UserService) UserDaoDetail(ctx context.Context, req *user.ReqDaoU
 			SchoolId:   detail.SchoolId,
 			Gender:     detail.Gender,
 			Age:        detail.Age,
-			Phone:      string(phoneBytes),
 			Describe:   detail.Describe,
 			Coin:       coin.Coin,
 			IsOfficial: detail.IsOfficial,
 		},
+	}
+	if detail.Phone != "" {
+		var decodePhoneBytes []byte
+		decodePhoneBytes, err = utils.Base64Decode(detail.Phone)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		var phoneBytes []byte
+		phoneBytes, err = utils.GcmDecrypt(decodePhoneBytes, utils.EncryptKey(detail.AccountID))
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return
+		}
+		resp.Detail.Phone = string(phoneBytes)
 	}
 	return
 }
