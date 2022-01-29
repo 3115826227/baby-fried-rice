@@ -280,13 +280,42 @@ func SessionDetailHandle(c *gin.Context) {
 		handle.SystemErrorResponse(c)
 		return
 	}
+	var idMap = make(map[string]rsp.User, 0)
+	for _, u := range resp.Joins {
+		idMap[u.AccountId] = rsp.User{}
+	}
+	var ids = make([]string, 0)
+	for id := range idMap {
+		ids = append(ids, id)
+	}
+	var userClient user.DaoUserClient
+	userClient, err = grpc.GetUserClient()
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var userResp *user.RspUserDaoById
+	userResp, err = userClient.UserDaoById(c, &user.ReqUserDaoById{Ids: ids})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, err)
+		return
+	}
+	for _, u := range userResp.Users {
+		idMap[u.Id] = rsp.User{
+			AccountID:   u.Id,
+			Username:    u.Username,
+			HeadImgUrl:  u.HeadImgUrl,
+			IsOfficial:  u.IsOfficial,
+			PhoneVerify: u.PhoneVerify,
+		}
+	}
 	var joins = make([]rsp.User, 0)
 	for _, u := range resp.Joins {
-		var join = rsp.User{
-			AccountID:  u.AccountId,
-			Remark:     u.Remark,
-			OnlineType: u.OnlineType,
-		}
+		var join = idMap[u.AccountId]
+		join.Remark = u.Remark
+		join.OnlineType = u.OnlineType
 		joins = append(joins, join)
 	}
 	var res = rsp.SessionDetail{

@@ -713,15 +713,18 @@ func (service *UserService) UserCommunicationDetailQueryDao(ctx context.Context,
 			Reply:             communication.Reply,
 		},
 		Content:        detail.Content,
-		Images:         strings.Split(detail.Images, ","),
 		ReplyContent:   detail.ReplyContent,
 		ReplyTimestamp: detail.ReplyTimestamp,
+	}
+	if detail.Images != "" {
+		resp.Images = strings.Split(detail.Images, ",")
 	}
 	return
 }
 
 func (service *UserService) UserCommunicationDeleteDao(ctx context.Context, req *user.ReqUserCommunicationDeleteDao) (empty *emptypb.Empty, err error) {
-	if err = db.GetDB().GetDB().Model(&tables.Communication{}).Where("id = ? and origin = ?", req.Id, req.Origin).Update("delete", true).Error; err != nil {
+	if err = db.GetDB().GetDB().Delete(&tables.Communication{}, "id = ? and origin = ?",
+		req.Id, req.Origin).Error; err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}

@@ -12,8 +12,6 @@ type Communication struct {
 	Reply bool `gorm:"column:reply"`
 	// 沟通类型
 	CommunicationType user.CommunicationType `gorm:"column:communication_type"`
-	// 是否删除
-	Delete bool `gorm:"column:delete"`
 }
 
 func (table *Communication) TableName() string {

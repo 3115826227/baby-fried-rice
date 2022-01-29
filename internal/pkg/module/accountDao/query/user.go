@@ -211,7 +211,7 @@ func GetCommunication(params CommunicationQueryParams) (communications []tables.
 		offset = int((params.Page - 1) * params.PageSize)
 		limit  = int(params.PageSize)
 	)
-	var template = db.GetDB().GetDB().Model(&tables.Communication{}).Where("'delete' = 0")
+	var template = db.GetDB().GetDB().Model(&tables.Communication{})
 	if params.CommunicationType != user.CommunicationType_DefaultCommunication {
 		template = template.Where("communication_type = ?", params.CommunicationType)
 	}
@@ -223,12 +223,12 @@ func GetCommunication(params CommunicationQueryParams) (communications []tables.
 }
 
 func GetCommunicationDetail(id int64, origin string) (communication tables.Communication, detail tables.CommunicationDetail, err error) {
-	if err = db.GetDB().GetDB().Where("id = ? and origin = ? and 'delete' = 0",
+	if err = db.GetDB().GetDB().Where("id = ? and origin = ?",
 		id, origin).First(&communication).Error; err != nil {
 		return
 	}
 	if err = db.GetDB().GetObject(map[string]interface{}{
-		"communication_id": id,
+		"id": id,
 	}, &detail); err != nil {
 		return
 	}

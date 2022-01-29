@@ -519,6 +519,7 @@ func (service *IMService) SessionRemoveDao(ctx context.Context, req *im.ReqSessi
 		log.Logger.Error(err.Error())
 		return
 	}
+	empty = new(emptypb.Empty)
 	return
 }
 
