@@ -2,6 +2,7 @@ package handle
 
 import (
 	"baby-fried-rice/internal/pkg/kit/constant"
+	"baby-fried-rice/internal/pkg/kit/errors"
 	"baby-fried-rice/internal/pkg/kit/handle"
 	"baby-fried-rice/internal/pkg/kit/models/requests"
 	"baby-fried-rice/internal/pkg/kit/models/rsp"
@@ -30,13 +31,16 @@ func AddCommunicationHandle(c *gin.Context) {
 		return
 	}
 	var resp *user.RspUserCommunicationAddDao
-	resp, err = userClient.UserCommunicationAddDao(context.Background(), &user.ReqUserCommunicationAddDao{
+	var communicationReq = &user.ReqUserCommunicationAddDao{
 		AccountId:         userMeta.AccountId,
 		Title:             req.Title,
 		CommunicationType: req.CommunicationType,
 		Content:           req.Content,
-		Images:            strings.Join(req.Images, ","),
-	})
+	}
+	if len(req.Images) != 0 {
+		communicationReq.Images = strings.Join(req.Images, ",")
+	}
+	resp, err = userClient.UserCommunicationAddDao(context.Background(), communicationReq)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
@@ -120,6 +124,20 @@ func CommunicationDetailHandle(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, constant.SysErrResponse)
 		return
 	}
+	var userResp *user.RspUserDaoById
+	userResp, err = userClient.UserDaoById(c, &user.ReqUserDaoById{Ids: []string{resp.Communication.Origin}})
+	if err != nil {
+		log.Logger.Error(err.Error())
+		handle.FailedResp(c, err)
+		return
+	}
+	if len(userResp.Users) != 1 {
+		err = errors.NewCommonError(constant.CodeInternalError)
+		log.Logger.Error(err.Error())
+		handle.SystemErrorResponse(c)
+		return
+	}
+	var origin = userResp.Users[0]
 	var response = rsp.UserCommunicationDetailResp{
 		UserCommunicationResp: rsp.UserCommunicationResp{
 			Id:                resp.Communication.Id,
@@ -127,6 +145,13 @@ func CommunicationDetailHandle(c *gin.Context) {
 			CommunicationType: resp.Communication.CommunicationType,
 			CreateTimestamp:   resp.Communication.CreateTimestamp,
 			UpdateTimestamp:   resp.Communication.UpdateTimestamp,
+		},
+		Origin: rsp.User{
+			AccountID:   origin.Id,
+			Username:    origin.Username,
+			HeadImgUrl:  origin.HeadImgUrl,
+			IsOfficial:  origin.IsOfficial,
+			PhoneVerify: origin.PhoneVerify,
 		},
 		Content:        resp.Content,
 		Images:         resp.Images,

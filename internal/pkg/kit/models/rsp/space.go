@@ -6,24 +6,26 @@ import (
 )
 
 type SpaceResp struct {
-	Id           string                 `json:"id"`
-	Content      string                 `json:"content"`
-	Images       []string               `json:"images"`
-	VisitorType  space.SpaceVisitorType `json:"visitor_type"`
-	Origin       *User                  `json:"origin,omitempty"`
-	CreateTime   int64                  `json:"create_time"`
-	VisitTotal   int64                  `json:"visit_total"`
-	LikeTotal    int64                  `json:"like_total"`
-	FloorTotal   int64                  `json:"floor_total"`
-	OriginLiked  bool                   `json:"origin_liked"`
-	CommentTotal int64                  `json:"comment_total"`
-	Forward      bool                   `json:"forward"`
-	ForwardSpace ForwardSpace           `json:"forward_space"`
-	ForwardTotal int64                  `json:"forward_total"`
-	OpenComment  bool                   `json:"open_comment"`
-	Comments     []*CommentResp         `json:"comments"`
-	Anonymity    bool                   `json:"anonymity"`
-	OriginSpace  bool                   `json:"origin_space"`
+	Id                     string                 `json:"id"`
+	Content                string                 `json:"content"`
+	Images                 []string               `json:"images"`
+	VisitorType            space.SpaceVisitorType `json:"visitor_type"`
+	Origin                 *User                  `json:"origin,omitempty"`
+	CreateTime             int64                  `json:"create_time"`
+	VisitTotal             int64                  `json:"visit_total"`
+	LikeTotal              int64                  `json:"like_total"`
+	FloorTotal             int64                  `json:"floor_total"`
+	OriginLiked            bool                   `json:"origin_liked"`
+	CommentTotal           int64                  `json:"comment_total"`
+	Forward                bool                   `json:"forward"`
+	ForwardSpace           ForwardSpace           `json:"forward_space"`
+	ForwardTotal           int64                  `json:"forward_total"`
+	OpenComment            bool                   `json:"open_comment"`
+	Comments               []*CommentResp         `json:"comments"`
+	CurrentCommentPage     int64                  `json:"current_comment_page"`
+	CurrentCommentPageSize int64                  `json:"current_comment_page_size"`
+	Anonymity              bool                   `json:"anonymity"`
+	OriginSpace            bool                   `json:"origin_space"`
 }
 
 type ForwardSpace struct {
@@ -42,16 +44,18 @@ type SpacesResp struct {
 
 // 评论
 type CommentResp struct {
-	ID          string       `json:"id"`
-	User        User         `json:"origin"`
-	Content     string       `json:"content"`
-	CreateTime  int64        `json:"create_time"`
-	Floor       int64        `json:"floor"`
-	LikeTotal   int64        `json:"like_total"`
-	OriginLiked bool         `json:"origin_liked"`
-	OpenReply   bool         `json:"open_reply"`
-	ReplyTotal  int64        `json:"reply_total"`
-	Reply       []*ReplyResp `json:"reply"`
+	ID                   string       `json:"id"`
+	User                 User         `json:"origin"`
+	Content              string       `json:"content"`
+	CreateTime           int64        `json:"create_time"`
+	Floor                int64        `json:"floor"`
+	LikeTotal            int64        `json:"like_total"`
+	OriginLiked          bool         `json:"origin_liked"`
+	OpenReply            bool         `json:"open_reply"`
+	ReplyTotal           int64        `json:"reply_total"`
+	Reply                []*ReplyResp `json:"reply"`
+	CurrentReplyPage     int64        `json:"current_reply_page"`
+	CurrentReplyPageSize int64        `json:"current_reply_page_size"`
 }
 
 func (response *CommentResp) SetUser(idMap map[string]User) {

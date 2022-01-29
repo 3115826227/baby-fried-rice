@@ -164,6 +164,7 @@ type UserCommunicationResp struct {
 
 type UserCommunicationDetailResp struct {
 	UserCommunicationResp
+	Origin         User     `json:"origin"`
 	Content        string   `json:"content"`
 	Images         []string `json:"images"`
 	ReplyContent   string   `json:"reply_content"`

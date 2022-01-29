@@ -423,19 +423,14 @@ func CommentReplyQuery(params query.CommentQueryParams) (replies []*comment.Comm
 }
 
 func CommentReplyRecursionQuery(params query.CommentQueryParams) (replies []*comment.CommentReplyDao, total int64, err error) {
-	var comments []tables.CommentRelation
-	var commentTotal int64
-	if comments, commentTotal, err = query.CommentQuery(params); err != nil {
+	var replyList []tables.CommentRelation
+	if replyList, total, err = query.ReplyQuery(params); err != nil {
 		log.Logger.Error(err.Error())
 		return
 	}
-	if commentTotal == 0 {
-		return
-	}
-	total += commentTotal
 	var ids = make([]string, 0)
-	for _, c := range comments {
-		ids = append(ids, c.ID)
+	for _, r := range replyList {
+		ids = append(ids, r.ID)
 	}
 	var detailMap map[string]tables.CommentDetail
 	if detailMap, err = query.CommentDetailQuery(ids); err != nil {
@@ -452,31 +447,76 @@ func CommentReplyRecursionQuery(params query.CommentQueryParams) (replies []*com
 		log.Logger.Error(err.Error())
 		return
 	}
-	for _, c := range comments {
-		params.HostId = ""
-		params.ParentId = c.ID
-		var childReplies []*comment.CommentReplyDao
-		var replyTotal int64
-		if childReplies, replyTotal, err = CommentReplyRecursionQuery(params); err != nil {
-			log.Logger.Error(err.Error())
-			return
-		}
+	for _, r := range replyList {
 		var reply = &comment.CommentReplyDao{
-			Id:              c.ID,
-			ParentId:        c.ParentId,
-			Content:         detailMap[c.ID].Content,
-			Origin:          c.Origin,
-			CreateTimestamp: c.CreatedAt.Unix(),
-			LikeTotal:       c.LikeTotal,
-			Reply:           childReplies,
-			Anonymity:       c.Anonymity,
+			Id:              r.ID,
+			ParentId:        r.ParentId,
+			Content:         detailMap[r.ID].Content,
+			Origin:          r.Origin,
+			CreateTimestamp: r.CreatedAt.Unix(),
+			LikeTotal:       r.LikeTotal,
+			Anonymity:       r.Anonymity,
 		}
-		if _, exist := optMap[c.ID]; exist {
+		if _, exist := optMap[r.ID]; exist {
 			reply.OriginLiked = true
 		}
-		total += replyTotal
 		replies = append(replies, reply)
 	}
+
+	//var comments []tables.CommentRelation
+	//var commentTotal int64
+	//if comments, commentTotal, err = query.CommentQuery(params); err != nil {
+	//	log.Logger.Error(err.Error())
+	//	return
+	//}
+	//if commentTotal == 0 {
+	//	return
+	//}
+	//total += commentTotal
+	//var ids = make([]string, 0)
+	//for _, c := range comments {
+	//	ids = append(ids, c.ID)
+	//}
+	//var detailMap map[string]tables.CommentDetail
+	//if detailMap, err = query.CommentDetailQuery(ids); err != nil {
+	//	log.Logger.Error(err.Error())
+	//	return
+	//}
+	//var optMap map[string]tables.OperatorRelation
+	//var optParams = query.OperatorLikedQueryParams{
+	//	BizId:   params.BizId,
+	//	HostIds: ids,
+	//	Origin:  params.Origin,
+	//}
+	//if optMap, err = query.OperatorLikedQuery(optParams); err != nil {
+	//	log.Logger.Error(err.Error())
+	//	return
+	//}
+	//for _, c := range comments {
+	//	params.HostId = ""
+	//	params.ParentId = c.ID
+	//	var childReplies []*comment.CommentReplyDao
+	//	var replyTotal int64
+	//	if childReplies, replyTotal, err = CommentReplyRecursionQuery(params); err != nil {
+	//		log.Logger.Error(err.Error())
+	//		return
+	//	}
+	//	var reply = &comment.CommentReplyDao{
+	//		Id:              c.ID,
+	//		ParentId:        c.ParentId,
+	//		Content:         detailMap[c.ID].Content,
+	//		Origin:          c.Origin,
+	//		CreateTimestamp: c.CreatedAt.Unix(),
+	//		LikeTotal:       c.LikeTotal,
+	//		Reply:           childReplies,
+	//		Anonymity:       c.Anonymity,
+	//	}
+	//	if _, exist := optMap[c.ID]; exist {
+	//		reply.OriginLiked = true
+	//	}
+	//	total += replyTotal
+	//	replies = append(replies, reply)
+	//}
 	return
 }
 
